@@ -95,6 +95,8 @@ gem 'cancan', '~> 1.6.10'
 
 gem 'icalendar', '~> 2.2.2'
 
+gem 'newrelic_rpm', '~> 3.12.0.288'
+
 ##################################
 # Front-end Gems for Rails Admin #
 ##################################
