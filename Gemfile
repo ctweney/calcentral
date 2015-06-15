@@ -143,7 +143,6 @@ group :development, :test , :testext do
   gem 'guard-spork'
   gem 'spork-rails'
 
-  gem 'webmock', '~> 1.20.4'
 end
 
 group :development do
@@ -158,6 +157,8 @@ group :test do
 end
 
 group :test, :testext do
+  # TODO NewRelic won't work if webmock is present. 
+  gem 'webmock', '~> 1.20.4'
   # RSpec results that Hudson + Bamboo + xml happy CI servers can read. See https://rubygems.org/gems/rspec_junit_formatter
   # TODO: Use gem 'rspec_junit_formatter', '~> 0.2.x' when deprecated concern of CLC-3565 is resolved.
   gem 'rspec_junit_formatter', :git => 'https://github.com/sj26/rspec_junit_formatter.git'
