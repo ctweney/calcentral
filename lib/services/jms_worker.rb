@@ -72,6 +72,7 @@ class JmsWorker
   def write_stats
     self.class.increment(RECEIVED_MESSAGES, 1)
     self.class.write(LAST_MESSAGE_RECEIVED_TIME, Time.zone.now)
+    NewRelicWrapper.record_custom_event('jms message received', '')
   end
 
   def self.ping

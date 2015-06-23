@@ -59,6 +59,7 @@ class LiveUpdatesWarmer < TorqueBox::Messaging::MessageProcessor
     time = end_time - start_time
     self.class.increment(self.class.total_warmup_time, time)
     self.class.increment(self.class.total_warmups_requested, 1)
+    NewRelicWrapper.record_custom_event('live updates warmup', duration: time)
   end
 
 end

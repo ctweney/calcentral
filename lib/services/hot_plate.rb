@@ -108,6 +108,7 @@ class HotPlate < TorqueBox::Messaging::MessageProcessor
     end_time = Time.now.to_i
     time = end_time - start_time
     self.class.increment(self.class.total_warmup_time, time)
+    NewRelicWrapper.record_custom_event('hot plate warmup', duration: time)
   end
 
   def self.request_warmup(uid)

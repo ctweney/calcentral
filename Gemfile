@@ -95,8 +95,6 @@ gem 'cancan', '~> 1.6.10'
 
 gem 'icalendar', '~> 2.2.2'
 
-gem 'newrelic_rpm', '~> 3.12.0.288'
-
 ##################################
 # Front-end Gems for Rails Admin #
 ##################################
@@ -157,7 +155,7 @@ group :test do
 end
 
 group :test, :testext do
-  # TODO NewRelic won't work if webmock is present. 
+
   gem 'webmock', '~> 1.20.4'
   # RSpec results that Hudson + Bamboo + xml happy CI servers can read. See https://rubygems.org/gems/rspec_junit_formatter
   # TODO: Use gem 'rspec_junit_formatter', '~> 0.2.x' when deprecated concern of CLC-3565 is resolved.
@@ -166,4 +164,10 @@ end
 
 group :shell_debug do
   gem 'ruby-debug', '>= 0.10.5.rc9'
+end
+
+group :production do
+  # NewRelic won't work if webmock is present, so
+  # Settings.application.fake_proxies_enabled must be false and RAILS_ENV must be production
+  gem 'newrelic_rpm', '~> 3.12.0.288'
 end

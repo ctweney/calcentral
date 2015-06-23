@@ -90,6 +90,9 @@ class BackgroundJobsCheck < TorqueBox::Messaging::MessageProcessor
     else
       status = 'MISSING'
     end
+    if status != 'OK'
+      NewRelicWrapper.record_custom_event('background jobs problem', status: status, last_ping: last_ping.to_s)
+    end
     feed.merge(
       'status' => status,
       'last_ping' => last_ping
