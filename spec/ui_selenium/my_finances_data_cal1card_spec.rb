@@ -1,17 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require 'csv'
-require 'json'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/splash_page'
-require_relative 'pages/api_my_status_page'
-require_relative 'pages/api_my_cal1_card_page'
-require_relative 'pages/my_finances_pages'
-require_relative 'pages/my_finances_landing_page'
-
 describe 'My Finances Cal1Card', :testui => true do
 
   if ENV["UI_TEST"]
@@ -45,8 +31,8 @@ describe 'My Finances Cal1Card', :testui => true do
 
           begin
             splash_page = CalCentralPages::SplashPage.new(driver)
-            splash_page.load_page(driver)
-            splash_page.basic_auth(driver, uid)
+            splash_page.load_page
+            splash_page.basic_auth uid
             status_api_page = ApiMyStatusPage.new(driver)
             status_api_page.get_json(driver)
             has_finances_tab = status_api_page.has_finances_tab?
@@ -54,8 +40,8 @@ describe 'My Finances Cal1Card', :testui => true do
             cal1card_api.get_json(driver)
             if has_finances_tab
               my_finances_page = CalCentralPages::MyFinancesPages::MyFinancesLandingPage.new(driver)
-              my_finances_page.load_page(driver)
-              my_finances_page.wait_for_cal_1_card
+              my_finances_page.load_page
+              my_finances_page.cal_1_card_content_element.when_visible(WebDriverUtils.page_load_timeout)
 
               # Debit account:
               if cal1card_api.has_debit_account?

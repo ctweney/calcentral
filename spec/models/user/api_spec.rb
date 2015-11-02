@@ -1,11 +1,11 @@
-require "spec_helper"
-
 describe User::Api do
   before(:each) do
+    Settings.features.cs_profile = false
     @random_id = Time.now.to_f.to_s.gsub(".", "")
     @default_name = "Joe Default"
     CampusOracle::UserAttributes.stub(:new).and_return(double(get_feed: {
       'person_name' => @default_name,
+      'student_id' => 12345678,
       :roles => {
         :student => true,
         :exStudent => false,
@@ -13,6 +13,10 @@ describe User::Api do
         :staff => false
       }
     }))
+  end
+
+  after do
+    Settings.features.cs_profile = true
   end
 
   it "should find user with default name" do
@@ -41,6 +45,8 @@ describe User::Api do
     user_data[:preferred_name].should == @default_name
     user_data[:hasCanvasAccount].should_not be_nil
     user_data[:isCalendarOptedIn].should_not be_nil
+    user_data[:isCampusSolutionsStudent].should be_falsey
+    user_data[:showSisProfileUI].should be_falsey
   end
   it "should return whether the user is registered with Canvas" do
     Canvas::Proxy.stub(:has_account?).and_return(true, false)

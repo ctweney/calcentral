@@ -1,7 +1,3 @@
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'api_my_academics_page'
-
 class ApiMyAcademicsPageSemesters < ApiMyAcademicsPage
 
   include PageObject
@@ -443,7 +439,7 @@ class ApiMyAcademicsPageSemesters < ApiMyAcademicsPage
   end
 
   def course_site_name(course_site)
-    course_site['name']
+    course_site['name'].nil? ? nil : course_site['name'].strip.gsub('  ', ' ')
   end
 
   def course_site_names(course)
@@ -461,7 +457,7 @@ class ApiMyAcademicsPageSemesters < ApiMyAcademicsPage
   end
 
   def course_site_descrip(course_site)
-    course_site['shortDescription']
+    course_site['shortDescription'].nil? ? nil : course_site['shortDescription'].strip.gsub('  ', ' ')
   end
 
   def course_site_descrips(course)

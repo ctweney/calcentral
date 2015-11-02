@@ -1,20 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require 'csv'
-require 'json'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/splash_page'
-require_relative 'pages/my_academics_page'
-require_relative 'pages/my_academics_classes_card'
-require_relative 'pages/my_academics_teaching_card'
-require_relative 'pages/my_academics_class_page'
-require_relative 'pages/api_my_status_page'
-require_relative 'pages/api_my_classes_page'
-require_relative 'pages/api_my_academics_page_semesters'
-
 describe 'My Academics teaching', :testui => true do
 
   if ENV["UI_TEST"]
@@ -40,8 +23,8 @@ describe 'My Academics teaching', :testui => true do
 
           begin
             splash_page = CalCentralPages::SplashPage.new(driver)
-            splash_page.load_page(driver)
-            splash_page.basic_auth(driver, uid)
+            splash_page.load_page
+            splash_page.basic_auth uid
             status_api_page = ApiMyStatusPage.new(driver)
             status_api_page.get_json(driver)
 
@@ -50,7 +33,7 @@ describe 'My Academics teaching', :testui => true do
               academics_api_page.get_json(driver)
               all_semesters = academics_api_page.all_teaching_semesters
               teaching_card = CalCentralPages::MyAcademicsTeachingCard.new(driver)
-              teaching_card.load_page(driver)
+              teaching_card.load_page
               teaching_card.page_heading_element.when_visible(timeout=WebDriverUtils.academics_timeout)
 
               if all_semesters.present?
@@ -131,7 +114,7 @@ describe 'My Academics teaching', :testui => true do
 
                     # SEMESTER PAGES
 
-                    teaching_card.click_teaching_semester_link(driver, semester_name)
+                    teaching_card.click_teaching_semester_link semester_name
                     semester_page = CalCentralPages::MyAcademicsClassesCard.new(driver)
 
                     api_semester_courses = academics_api_page.semester_courses(semester)
@@ -155,7 +138,7 @@ describe 'My Academics teaching', :testui => true do
                       listing_codes = academics_api_page.course_listing_course_codes(course)
                       listing_codes.each do |course_code|
 
-                        semester_page.click_class_link_by_text(driver, course_code)
+                        semester_page.click_class_link_by_text course_code
                         class_page = CalCentralPages::MyAcademicsClassPage.new(driver)
                         class_page.class_info_heading_element.when_visible(WebDriverUtils.page_load_timeout)
 

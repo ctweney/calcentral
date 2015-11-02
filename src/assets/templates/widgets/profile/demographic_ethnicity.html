@@ -1,19 +1,11 @@
 <div class="cc-page-widget-profile-section" data-ng-controller="DemographicEthnicityController" data-cc-spinner-directive>
   <div class="cc-page-widget-profile-section-label">Ethnicity</div>
   <div class="cc-page-widget-profile-section-content">
-    <div data-ng-repeat="ethnicity in ethnicities.content" class="cc-page-widget-profile-section-content-item">
-      <div>
-        <span data-ng-bind="ethnicity.group"></span>
-      </div>
-      <div data-ng-bind="email.emailAddress"></div>
-      <div>
-        <button class="cc-button-link" data-ng-click="">Edit</button>
-      </div>
+    <div class="cc-page-widget-profile-section-content-item" data-ng-if="ethnicities.content.length">
+      <ul>
+        <li data-ng-repeat="ethnicity in ethnicities.content" data-ng-bind="ethnicity.detail.description"></li>
+      </ul>
     </div>
-  </div>
-  <div class="cc-page-widget-profile-section-add">
-    <button class="cc-button-link" data-ng-click="">
-      <i class="fa fa-plus"></i> Add
-    </button>
+    <div data-ng-if="!ethnicities.content.length" class="cc-page-widget-profile-section-not-available">Not available</div>
   </div>
 </div>

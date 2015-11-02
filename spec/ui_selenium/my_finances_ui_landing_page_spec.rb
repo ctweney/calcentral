@@ -1,17 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/my_finances_pages'
-require_relative 'pages/my_finances_landing_page'
-require_relative 'pages/cal_net_auth_page'
-require_relative 'pages/splash_page'
-require_relative 'pages/settings_page'
-
-# TEST DOES NOT INCLUDE CAL 1 CARD OR FIN AID, TO BE TESTED SEPARATELY.
-
 describe 'My Finances landing page', :testui => true do
 
   if ENV["UI_TEST"] && Settings.ui_selenium.layer != 'production'
@@ -30,14 +16,14 @@ describe 'My Finances landing page', :testui => true do
       @cal_net_prod_page = CalNetAuthPage.new(@driver)
       @cal_net_prod_page.login(UserUtils.oski_username, UserUtils.oski_password)
       splash_page = CalCentralPages::SplashPage.new(@driver)
-      splash_page.load_page(@driver)
+      splash_page.load_page
       splash_page.click_sign_in_button
       @cal_net_page = CalNetAuthPage.new(@driver)
       @cal_net_page.login(UserUtils.oski_username, UserUtils.oski_password)
       @my_finances_page = CalCentralPages::MyFinancesPages::MyFinancesLandingPage.new(@driver)
-      @my_finances_page.load_page(@driver)
-      @my_finances_page.wait_for_billing_summary(@driver)
-      @my_finances_page.wait_for_fin_resources_links
+      @my_finances_page.load_page
+      @my_finances_page.billing_summary_spinner_element.when_not_visible(timeout=WebDriverUtils.page_load_timeout)
+      @my_finances_page.fin_resources_list_element.when_visible(timeout)
     end
 
     context 'Billing Summary card' do

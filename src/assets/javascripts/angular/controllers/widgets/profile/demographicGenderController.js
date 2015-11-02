@@ -7,7 +7,7 @@ var angular = require('angular');
  */
 angular.module('calcentral.controllers').controller('DemographicGenderController', function(profileFactory, $scope, $q) {
   var parsePerson = function(data) {
-    var person = data.data.feed.person;
+    var person = data.data.feed.student;
     angular.extend($scope, {
       gender: {
         content: person.gender

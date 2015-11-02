@@ -1,9 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require 'json'
-require_relative '../util/web_driver_utils'
-
 class ApiMyFinAidPage
 
   include PageObject
@@ -11,9 +5,9 @@ class ApiMyFinAidPage
 
   def get_json(driver)
     logger.info('Parsing JSON from /api/my/finaid')
-    driver.get(WebDriverUtils.base_url + '/api/my/finaid')
+    navigate_to "#{WebDriverUtils.base_url}/api/my/finaid"
     wait = Selenium::WebDriver::Wait.new(:timeout => WebDriverUtils.page_load_timeout)
-    wait.until { driver.find_element(:xpath => '//pre[contains(.,"Finaid::MyFinAid")]') }
+    wait.until { driver.find_element(:xpath => '//pre[contains(.,"Finaid::Merged")]') }
     body = driver.find_element(:xpath, '//pre').text
     @parsed = JSON.parse(body)
   end
@@ -108,9 +102,7 @@ class ApiMyFinAidPage
     dates = []
     all_messages_sorted.each do |message|
       date = date_str(message)
-      unless date == nil
-        dates.push(date)
-      end
+      dates.push(Date.parse(date).strftime('%b %-d')) unless date.nil?
     end
     dates
   end

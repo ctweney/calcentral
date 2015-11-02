@@ -1,10 +1,7 @@
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'cal_central_pages'
-require_relative '../util/web_driver_utils'
-
 module CalCentralPages
+
   module MyFinancesPages
+
     class MyFinancesLandingPage
 
       include PageObject
@@ -58,16 +55,16 @@ module CalCentralPages
       unordered_list(:fin_messages_list, :xpath => '//ul[@class="cc-widget-activities-list"]')
       elements(:finaid_message, :list_item, :xpath => '//ul[@class="cc-widget-activities-list"]/li')
       elements(:finaid_message_sub_activity, :list_item, :xpath => '//ul[@class="cc-widget-activities-list"]/li//li[@data-ng-repeat="subActivity in activity.elements"]')
-      elements(:finaid_message_title, :div, :xpath => '//ul[@class="cc-widget-activities-list"]/li//strong[@class="ng-binding"][1]')
+      elements(:finaid_message_title, :div, :xpath => '//ul[@class="cc-widget-activities-list"]/li//strong[@class="ng-binding"]')
       elements(:finaid_message_source, :span, :xpath => '//ul[@class="cc-widget-activities-list"]/li//span[@data-ng-bind="activity.source"]')
       elements(:finaid_message_toggle, :link, :xpath => '//ul[@class="cc-widget-activities-list"]/li//div[@data-ng-click="api.widget.toggleShow($event, filteredList, activity, \'Recent Activity\')"]')
       elements(:finaid_message_year, :div, :xpath => '//ul[@class="cc-widget-activities-list"]/li//div[@data-ng-if="activity.termYear"]')
       elements(:finaid_message_icon, :image, :xpath => '//ul[@class="cc-widget-activities-list"]/li//i')
-      elements(:finaid_message_link, :link, :xpath => '//ul[@class="cc-widget-activities-list"]/li//a[@data-ng-if="activity.sourceUrl"]')
+      elements(:finaid_message_link, :link, :xpath => '//ul[@class="cc-widget-activities-list"]/li//a[@data-ng-if="activityItem.sourceUrl"]')
 
-      def load_page(driver)
+      def load_page
         logger.info('Loading My Finances landing page')
-        driver.get(WebDriverUtils.base_url + '/finances')
+        navigate_to "#{WebDriverUtils.base_url}/finances"
       end
 
       def click_details_link
@@ -75,22 +72,10 @@ module CalCentralPages
         activity_heading_element.when_visible(timeout=WebDriverUtils.page_load_timeout)
       end
 
-      def wait_for_cal_1_card
-        cal_1_card_content_element.when_visible(timeout=WebDriverUtils.page_load_timeout)
-      end
-
-      def wait_for_fin_resources_links
-        fin_resources_list_element.when_visible(timeout=WebDriverUtils.fin_resources_links_timeout)
-      end
-
-      def wait_for_fin_aid
-        fin_messages_list_element.when_visible(timeout=WebDriverUtils.fin_aid_timeout)
-      end
-
       def all_fin_aid_message_titles
         titles = []
         finaid_message_title_elements.each do |msg|
-          title = msg.text.gsub(/\s+/, "")
+          title = msg.text.gsub(/\s+/, '')
           titles.push(title)
         end
         titles
@@ -139,14 +124,11 @@ module CalCentralPages
         dates = []
         messages.each do |msg|
           begin
-            date_on_page = driver.find_element(:xpath => "//ul[@class='cc-widget-activities-list']/li[#{messages.index(msg) + 1}]//span[@data-ng-if='activity.date']").text
-            date = Time.parse(date_on_page).strftime("%-m/%d")
-          rescue
+            date = driver.find_element(:xpath => "//ul[@class='cc-widget-activities-list']/li[#{(messages.index(msg) + 1).to_s}]//span[@data-ng-if='activity.date']").text
+          rescue Selenium::WebDriver::Error::NoSuchElementError
             date = nil
           end
-          unless date == nil
-            dates.push(date)
-          end
+          dates.push(date) unless date.nil?
         end
         dates
       end
@@ -154,7 +136,7 @@ module CalCentralPages
       def all_fin_aid_message_links
         links = []
         finaid_message_link_elements.each do |msg|
-          link_url = msg.attribute('href').gsub(/\/\s*\z/, "")
+          link_url = msg.attribute('href').gsub(/\/\s*\z/, '')
           links.push(link_url)
         end
         links
@@ -164,8 +146,8 @@ module CalCentralPages
         statuses = []
         messages.each do |msg|
           begin
-            status = driver.find_element(:xpath => "//ul[@class='cc-widget-activities-list']/li[#{messages.index(msg) + 1}]//span[@data-ng-bind='activity.status']").text
-          rescue
+            status = driver.find_element(:xpath => "//ul[@class='cc-widget-activities-list']/li[#{(messages.index(msg) + 1).to_s}]//span[@data-ng-bind='activity.status']").text
+          rescue Selenium::WebDriver::Error::NoSuchElementError
             status = nil
           end
           statuses.push(status)
@@ -173,14 +155,13 @@ module CalCentralPages
         statuses
       end
 
-      def all_fin_aid_message_summaries(driver, messages)
+      def all_fin_aid_message_summaries(messages)
         summaries = []
         messages.each do |msg|
           begin
-            summary_on_page = driver.find_element(:xpath => "//ul[@class='cc-widget-activities-list']/li[#{messages.index(msg) + 1}]//p[@data-ng-bind-html='activity.summary | linky']").text
-            summary = summary_on_page.gsub(/\s+/, "")
-          rescue => e
-            logger.error e.message + "\n" + e.backtrace.join("\n")
+            summary_element = span_element(:xpath => "//ul[@class='cc-widget-activities-list']/li[#{(messages.index(msg) + 1).to_s}]//div[@class='cc-break-word cc-widget-activities-summary cc-clearfix ng-scope']")
+            summary = summary_element.text.gsub(/\s+/, '')
+          rescue Selenium::WebDriver::Error::NoSuchElementError
             summary = nil
           end
           summaries.push(summary)

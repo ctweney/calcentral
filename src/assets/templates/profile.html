@@ -1,4 +1,4 @@
-<div class="cc-page-profile">
+<div class="cc-page-profile" data-ng-if="api.user.profile.showSisProfileUI">
 
   <div class="medium-9 medium-push-3 columns cc-sidebar-content">
     <h1 class="cc-heading-page-title" data-ng-bind="header"></h1>
@@ -6,7 +6,7 @@
       <div class="cc-widget-title">
         <h2 data-ng-bind="currentCategory.name"></h2>
       </div>
-      <div data-ng-include="'widgets/profile/' + currentCategory.id + '.html'" class="cc-page-profile-widget"></div>
+      <div data-ng-include="('widgets/profile/' + currentCategory.id + '.html').replace('-', '_')" class="cc-page-profile-widget"></div>
     </div>
   </div>
 

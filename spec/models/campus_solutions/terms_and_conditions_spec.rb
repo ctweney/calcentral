@@ -1,10 +1,10 @@
-require 'spec_helper'
-
 describe CampusSolutions::TermsAndConditions do
+
+  let(:user_id) { '12345' }
 
   context 'post' do
     let(:params) { {} }
-    let(:proxy) { CampusSolutions::TermsAndConditions.new(fake: true, user_id: random_id, params: params) }
+    let(:proxy) { CampusSolutions::TermsAndConditions.new(fake: true, user_id: user_id, params: params) }
 
     context 'filtering out fields not on the whitelist' do
       let(:params) { {
@@ -45,9 +45,7 @@ describe CampusSolutions::TermsAndConditions do
       }
       it_should_behave_like 'a simple proxy that returns errors'
       it_behaves_like 'a proxy that properly observes the finaid feature flag'
-      it 'should make a successful post' do
-        expect(subject[:statusCode]).to eq 200
-      end
+      it_behaves_like 'a proxy that got data successfully'
     end
   end
 
@@ -56,16 +54,14 @@ describe CampusSolutions::TermsAndConditions do
       response: 'Y',
       aidYear: '2016'
     } }
-    let(:proxy) { CampusSolutions::TermsAndConditions.new(fake: false, user_id: random_id, params: params) }
+    let(:proxy) { CampusSolutions::TermsAndConditions.new(fake: false, user_id: user_id, params: params) }
 
     context 'performing a real post' do
       subject {
         proxy.get
       }
       it_should_behave_like 'a simple proxy that returns errors'
-      it 'should make a successful REAL post' do
-        expect(subject[:statusCode]).to eq 200
-      end
+      it_behaves_like 'a proxy that got data successfully'
     end
   end
 end

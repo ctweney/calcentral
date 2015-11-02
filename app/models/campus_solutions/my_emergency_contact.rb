@@ -1,9 +1,14 @@
 module CampusSolutions
   class MyEmergencyContact < UserSpecificModel
 
+    include PersonDataUpdatingModel
+
     def update(params = {})
-      proxy = CampusSolutions::EmergencyContact.new({user_id: @uid, params: params})
-      proxy.get
+      passthrough(CampusSolutions::EmergencyContact, params)
+    end
+
+    def delete(params = {})
+      passthrough(CampusSolutions::EmergencyContactDelete, params)
     end
 
   end

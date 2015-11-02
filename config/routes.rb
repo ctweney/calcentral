@@ -91,6 +91,11 @@ Calcentral::Application.routes.draw do
   post '/api/academics/canvas/mailing_lists/:canvas_course_id/populate' => 'canvas_mailing_lists#populate', :defaults => { :format => 'json' }
   post '/api/academics/canvas/mailing_lists/:canvas_course_id/delete' => 'canvas_mailing_lists#destroy', :defaults => { :format => 'json' }
 
+  # OEC endpoints
+  get '/api/oec_tasks' => 'oec_tasks#index', :defaults => { :format => 'json' }
+  post '/api/oec_tasks/:task_name' => 'oec_tasks#run', :defaults => { :format => 'json' }
+  get '/api/oec_tasks/status/:task_id' => 'oec_tasks#task_status',  :defaults => { :format => 'json' }
+
   # System utility endpoints
   get '/api/cache/clear' => 'cache#clear', :defaults => { :format => 'json' }
   get '/api/cache/delete' => 'cache#delete', :defaults => { :format => 'json' }
@@ -98,7 +103,7 @@ Calcentral::Application.routes.draw do
   get '/api/cache/warm/:uid' => 'cache#warm', :defaults => { :format => 'json' }
   get '/api/config' => 'config#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/ping' => 'ping#do', :defaults => {:format => 'json'}
-  get '/api/refresh_logging' => 'refresh_logging#refresh_logging', :defaults => { :format => 'json' }
+  get '/api/reload_yaml_settings' => 'yaml_settings#reload', :defaults => { :format => 'json' }
   get '/api/tools/styles' => 'tools#get_styles', :via => :get
   get '/api/server_info' => 'server_runtime#get_info', :via => :get
   get '/api/stats' => 'stats#get_stats', :via => :get, :defaults => { :format => 'json' }
@@ -107,6 +112,7 @@ Calcentral::Application.routes.draw do
   # Oauth endpoints: Google
   get '/api/google/request_authorization'=> 'google_auth#request_authorization'
   get '/api/google/handle_callback' => 'google_auth#handle_callback'
+  get '/api/google/current_scope' => 'google_auth#current_scope'
   post '/api/google/remove_authorization' => 'google_auth#remove_authorization', :via => :post
   post '/api/google/dismiss_reminder' => 'google_auth#dismiss_reminder', :defaults => { :format => 'json'}, :via => :post
 
@@ -133,9 +139,13 @@ Calcentral::Application.routes.draw do
   post '/delete_users/saved' => 'stored_users#delete_all_saved', via: :post, defaults: { format: 'json' }
 
   # Campus Solutions general purpose endpoints
+  get '/api/campus_solutions/checklist' => 'campus_solutions/checklist#get', :via => :get, :defaults => { :format => 'json' }
+  get '/api/campus_solutions/sir_config' => 'campus_solutions/sir_config#get', :via => :get, :defaults => { :format => 'json' }
+  get '/api/campus_solutions/deposit' => 'campus_solutions/deposit#get', :via => :get, :defaults => { :format => 'json' }
+  get '/api/campus_solutions/higher_one_url' => 'campus_solutions/higher_one_url#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/country' => 'campus_solutions/country#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/state' => 'campus_solutions/state#get', :via => :get, :defaults => { :format => 'json' }
-  get '/api/campus_solutions/ethnicity' => 'campus_solutions/ethnicity#get', :via => :get, :defaults => { :format => 'json' }
+  get '/api/campus_solutions/ethnicity_setup' => 'campus_solutions/ethnicity_setup#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/address_label' => 'campus_solutions/address_label#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/address_type' => 'campus_solutions/address_type#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/name_type' => 'campus_solutions/name_type#get', :via => :get, :defaults => { :format => 'json' }
@@ -152,11 +162,22 @@ Calcentral::Application.routes.draw do
   post '/api/campus_solutions/emergency_contact' => 'campus_solutions/emergency_contact#post', :via => :post, :defaults => { :format => 'json' }
   post '/api/campus_solutions/language' => 'campus_solutions/language#post', :via => :post, :defaults => { :format => 'json' }
   post '/api/campus_solutions/work_experience' => 'campus_solutions/work_experience#post', :via => :post, :defaults => { :format => 'json' }
+  post '/api/campus_solutions/ethnicity' => 'campus_solutions/ethnicity#post', :via => :post, :defaults => { :format => 'json' }
   post '/api/campus_solutions/terms_and_conditions' => 'campus_solutions/terms_and_conditions#post', :via => :post, :defaults => { :format => 'json' }
   post '/api/campus_solutions/title4' => 'campus_solutions/title4#post', :via => :post, :defaults => { :format => 'json' }
+  post '/api/campus_solutions/sir_response' => 'campus_solutions/sir_response#post', :via => :post, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/address/:type' => 'campus_solutions/address#delete', :via => :delete, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/email/:type' => 'campus_solutions/email#delete', :via => :delete, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/emergency_contact/:contactName' => 'campus_solutions/emergency_contact#delete', :via => :post, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/language/:jpmCatItemId' => 'campus_solutions/language#delete', :via => :delete, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/person_name/:type' => 'campus_solutions/person_name#delete', :via => :delete, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/phone/:type' => 'campus_solutions/phone#delete', :via => :delete, :defaults => { :format => 'json' }
+  delete '/api/campus_solutions/ethnicity/:ethnicGroupCode/:regRegion' => 'campus_solutions/ethnicity#delete', :via => :delete, :defaults => { :format => 'json' }
 
   # EDOs from integration hub
   get '/api/edos/person' => 'hub_edo#person', :via => :get, :defaults => { :format => 'json' }
+  get '/api/edos/student' => 'hub_edo#student', :via => :get, :defaults => { :format => 'json' }
+  get '/api/edos/work_experience' => 'hub_edo#work_experience', :via => :get, :defaults => { :format => 'json' }
 
   # All the other paths should use the bootstrap page
   # We need this because we use html5mode=true

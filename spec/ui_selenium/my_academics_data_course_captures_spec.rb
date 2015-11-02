@@ -1,14 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require 'csv'
-require 'json'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/splash_page'
-require_relative 'pages/my_academics_class_page'
-
 describe 'My Academics course captures card', :testui => true do
 
   if ENV["UI_TEST"]
@@ -36,10 +25,10 @@ describe 'My Academics course captures card', :testui => true do
 
           begin
             splash_page = CalCentralPages::SplashPage.new(driver)
-            splash_page.load_page(driver)
-            splash_page.basic_auth(driver, uid)
+            splash_page.load_page
+            splash_page.basic_auth uid
             my_academics = CalCentralPages::MyAcademicsClassPage.new(driver)
-            my_academics.load_class_page(driver, class_page)
+            my_academics.load_class_page class_page
             my_academics.course_capture_heading_element.when_visible(WebDriverUtils.academics_timeout)
             testable_users.push(uid)
 
@@ -96,7 +85,7 @@ describe 'My Academics course captures card', :testui => true do
                 logger.info 'No HTML5 player present'
               end
               unless video_itunes.nil?
-                itunes_video_link_present = WebDriverUtils.verify_external_link(driver, my_academics.itunes_video_link_element, "#{course} - Download free content from UC Berkeley on iTunes")
+                itunes_video_link_present = WebDriverUtils.verify_external_link(driver, my_academics.itunes_video_link_element, "#{course} - Free Podcast by UC Berkeley on iTunes")
                 it "shows an iTunes video URL for UID #{uid}" do
                   expect(itunes_video_link_present).to be true
                 end
@@ -124,7 +113,7 @@ describe 'My Academics course captures card', :testui => true do
                 end
               end
               unless audio_itunes.nil?
-                itunes_audio_link_present = WebDriverUtils.verify_external_link(driver, my_academics.itunes_audio_link_element, "#{course} - Download free content from UC Berkeley on iTunes")
+                itunes_audio_link_present = WebDriverUtils.verify_external_link(driver, my_academics.itunes_audio_link_element, "#{course} - Free Podcast by UC Berkeley on iTunes")
                 it "shows an iTunes audio URL for UID #{uid}" do
                   expect(itunes_audio_link_present).to be true
                 end

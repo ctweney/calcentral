@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe MyAcademics::Merged do
 
   # TODO: this test needs more bite, not that familiar about the underlying implementation but
@@ -15,8 +13,7 @@ describe MyAcademics::Merged do
       MyAcademics::Teaching,
       MyAcademics::Exams,
       MyAcademics::Telebears,
-      MyAcademics::CanvasSites,
-      MyAcademics::SakaiSites
+      MyAcademics::CanvasSites
     ]
     model_classes.each do |klass|
       model = klass.new "61889"

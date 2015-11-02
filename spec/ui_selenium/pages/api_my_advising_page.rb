@@ -1,7 +1,3 @@
-require 'selenium-webdriver'
-require 'page-object'
-require_relative '../util/web_driver_utils'
-
 class ApiMyAdvisingPage
 
   include PageObject
@@ -9,7 +5,7 @@ class ApiMyAdvisingPage
 
   def get_json(driver)
     logger.info('Parsing JSON from /api/my/advising')
-    driver.get(WebDriverUtils.base_url + '/api/my/advising')
+    navigate_to "#{WebDriverUtils.base_url}/api/my/advising"
     wait = Selenium::WebDriver::Wait.new(:timeout => WebDriverUtils.academics_timeout)
     wait.until { driver.find_element(:xpath => '//pre[contains(.,"Advising::MyAdvising")]') }
     body = driver.find_element(:xpath, '//pre').text
@@ -36,7 +32,7 @@ class ApiMyAdvisingPage
 
   def all_future_appt_dates
     dates = []
-    all_future_appt_epochs.each { |epoch| dates.push(WebDriverUtils.ui_date_display_format(Time.strptime(epoch, '%s'))) }
+    all_future_appt_epochs.each { |epoch| dates.push(WebDriverUtils.ui_numeric_date_format(Time.strptime(epoch, '%s'))) }
     dates
   end
 

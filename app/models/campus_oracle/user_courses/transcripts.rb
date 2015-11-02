@@ -9,7 +9,7 @@ module CampusOracle
           semesters = {}
           additional_credits = []
           transcript_rows = CampusOracle::Queries.get_transcript_grades(@uid)
-          transcript_rows.each_with_index do |row|
+          transcript_rows.each do |row|
             if row['term_yr'] == '0'
               add_additional_credit(additional_credits, row)
             else
@@ -27,15 +27,33 @@ module CampusOracle
 
       def add_additional_credit(additional_credits, row)
         title = case row['line_type']
-                when 'A' then row['memo_or_title'].sub('ADV PLACEMEN', 'AP ')
-                when 'I' then row['memo_or_title'].sub(/IB\s*/, 'IB ').sub('DIPL ELEC CR', 'DIPLOMA ELECTIVE')
-                when '1' then row['memo_or_title'].sub(/A\/L EXA\s*/, 'A LEVEL ')
-                else return
-                end
+          when 'A'
+            row['memo_or_title'].sub('ADV PLACEMEN', 'AP ')
+          when 'I'
+            row['memo_or_title'].sub(/IB\s*/, 'IB ').sub('DIPL ELEC CR', 'DIPLOMA ELECTIVE')
+          when '1'
+            row['memo_or_title'].sub(/A\/L EXA\s*/, 'A LEVEL ')
+          when 'J'
+            build_transfer_credit(additional_credits, row)
+            return
+          else
+            return
+        end
         additional_credits << {
           title: title,
           units: row['transcript_unit']
         }
+      end
+
+      def build_transfer_credit(additional_credits, row)
+        if row['memo_or_title'].present?
+          additional_credits << {
+            title: row['memo_or_title'],
+            units: row['transfer_unit']
+          }
+        else
+          additional_credits.last[:units] += row['transfer_unit']
+        end
       end
 
       def add_notation(semester, notation)
@@ -49,7 +67,7 @@ module CampusOracle
           semester[:courses] << {
             dept: row['dept_name'],
             courseCatalog: row['catalog_id'],
-            title: row['memo_or_title'],
+            title: handle_memo_or_title(row['memo_or_title']),
             units: row['transcript_unit'],
             grade: row['grade']
           }
@@ -70,12 +88,19 @@ module CampusOracle
       def credit_row?(row)
         row['transcript_unit'] > 0 &&
           !row['memo_or_title'].nil? &&
-          !row['memo_or_title'].include?('LAPSED') &&
-          !row['memo_or_title'].include?('REMOVED')
+          !row['memo_or_title'].include?('LAPSED')
       end
 
       def heading_row?(row)
         row['line_type'] == 'V' && row['memo_or_title'].present?
+      end
+
+      def handle_memo_or_title(memo_or_title)
+        if memo_or_title.include? 'REMOVED'
+          'Incomplete Removed'
+        else
+          memo_or_title
+        end
       end
 
     end

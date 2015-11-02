@@ -1,9 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'cal_central_pages'
-require_relative 'my_academics_page'
-
 module CalCentralPages
 
   class MyAcademicsProfileCard < MyAcademicsPage
@@ -12,6 +6,8 @@ module CalCentralPages
     div(:term_transition_msg, :xpath => '//div[@data-ng-if="transitionRegStatus"]')
     h3(:term_transition_heading, :xpath => '//h3[@data-ng-if="transitionRegStatus && collegeAndLevel.termName"]')
     div(:name, :xpath => '//div/strong[@data-ng-bind="api.user.profile.fullName"]')
+    button(:show_gpa, :xpath => '//button[text()="Show GPA"]')
+    button(:hide_gpa, :xpath => '//button[text()="Hide"]')
     span(:gpa, :xpath => '//span[@data-ng-bind="gpaUnits.cumulativeGpaFloat"]')
     elements(:college, :div, :xpath => '//div[@data-ng-bind="college.college"]')
     elements(:major, :div, :xpath => '//div[@data-ng-bind="college.major"]')

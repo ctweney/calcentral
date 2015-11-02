@@ -1,15 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/my_academics_profile_card'
-require_relative 'pages/my_academics_university_reqts_card'
-require_relative 'pages/splash_page'
-require_relative 'pages/api_my_status_page'
-require_relative 'pages/api_my_academics_page_semesters'
-
 describe 'My Academics profile and university requirements cards', :testui => true do
 
   if ENV["UI_TEST"]
@@ -40,15 +28,15 @@ describe 'My Academics profile and university requirements cards', :testui => tr
 
           begin
             splash_page = CalCentralPages::SplashPage.new(driver)
-            splash_page.load_page(driver)
-            splash_page.basic_auth(driver, uid)
+            splash_page.load_page
+            splash_page.basic_auth uid
             status_api_page = ApiMyStatusPage.new(driver)
             status_api_page.get_json(driver)
             academics_api_page= ApiMyAcademicsPageSemesters.new(driver)
             academics_api_page.get_json(driver)
             profile_card = CalCentralPages::MyAcademicsProfileCard.new(driver)
             reqts_card = CalCentralPages::MyAcademicsUniversityReqtsCard.new(driver)
-            profile_card.load_page(driver)
+            profile_card.load_page
 
             if (status_api_page.has_academics_tab? && status_api_page.is_student?) || status_api_page.has_student_history?
               profile_card.profile_card_element.when_visible(timeout=WebDriverUtils.academics_timeout)
@@ -77,9 +65,23 @@ describe 'My Academics profile and university requirements cards', :testui => tr
                 end
               else
                 api_gpa = academics_api_page.gpa
+                shows_gpa = profile_card.gpa_element.visible?
+                it "hide the GPA by default for UID #{uid}" do
+                  expect(shows_gpa).to be false
+                end
+
+                profile_card.show_gpa
+                gpa_revealed = profile_card.gpa_element.when_visible(timeout=WebDriverUtils.page_event_timeout)
                 my_academics_gpa = profile_card.gpa
-                it "show the GPA for UID #{uid}" do
+                it "show the GPA for UID #{uid} when a user clicks 'Show'" do
+                  expect(gpa_revealed).to be_truthy
                   expect(my_academics_gpa).to eql(api_gpa)
+                end
+
+                profile_card.hide_gpa
+                gpa_hidden = profile_card.gpa_element.when_not_visible(timeout)
+                it "hide the GPA for UID #{uid} when a user clicks 'Hide'" do
+                  expect(gpa_hidden).to be_truthy
                 end
               end
 

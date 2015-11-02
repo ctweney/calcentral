@@ -1,9 +1,5 @@
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'cal_central_pages'
-require_relative '../util/web_driver_utils'
-
 module CalCentralPages
+
   module MyFinancesPages
 
     include PageObject
@@ -31,28 +27,6 @@ module CalCentralPages
     div(:last_statement_bal_element, :xpath => '//div[@data-cc-amount-directive="myfinances.summary.lastStatementBalance"]')
     link(:view_statements_link, :xpath => '//a[contains(text(),"View Statements")]')
     link(:make_payment_link, :xpath => '//a[@href="http://studentbilling.berkeley.edu/carsPaymentOptions.htm"]')
-
-    def wait_for_billing_summary_card(driver)
-      logger.debug('Waiting for billing summary card to load')
-      wait = Selenium::WebDriver::Wait.new(:timeout => WebDriverUtils.page_load_timeout)
-      wait.until { driver.find_element(:xpath => '//ul[@data-ng-show="myfinances.summary"]') }
-    end
-
-    def wait_for_billing_summary(driver)
-      logger.debug('Waiting for billing summary to load, spinner is still going')
-      !10.times{ break unless (driver.find_element(:xpath, '//h2[contains(.,"Billing Summary")]/../following-sibling::div[@class="cc-spinner"]').displayed? rescue false); sleep 1 }
-    end
-
-    def wait_for_fin_resources_links
-      fin_resources_list_element.when_visible(timeout=WebDriverUtils.fin_resources_links_timeout)
-    end
-
-    def has_no_cars_data_msg?
-      if no_cars_data_msg?
-        return true
-      end
-      false
-    end
 
     def show_last_statement_bal
       unless last_statement_bal_element_element.visible?

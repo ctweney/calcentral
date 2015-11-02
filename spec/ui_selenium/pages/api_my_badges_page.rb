@@ -1,9 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require 'json'
-require_relative '../util/web_driver_utils'
-
 class ApiMyBadgesPage
 
   include PageObject
@@ -11,7 +5,7 @@ class ApiMyBadgesPage
 
   def get_json(driver)
     logger.info('Parsing JSON from /api/my/badges')
-    driver.get(WebDriverUtils.base_url + '/api/my/badges')
+    navigate_to "#{WebDriverUtils.base_url}/api/my/badges"
     body = driver.find_element(:xpath, '//pre').text
     @parsed = JSON.parse(body)
   end

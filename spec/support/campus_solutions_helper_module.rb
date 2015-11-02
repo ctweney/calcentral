@@ -18,9 +18,16 @@ module CampusSolutionsHelperModule
     end
   end
 
+  shared_examples 'a proxy that got data successfully' do
+    it 'has a 200 statusCode and a non-null feed' do
+      expect(subject[:statusCode]).to eq(200), "expected 200, got #{subject.inspect}"
+      expect(subject[:feed]).to be, "expected a feed, got #{subject.inspect}"
+    end
+  end
+
   shared_examples 'a successful feed' do
     it 'has some data' do
-      session['user_id'] = user
+      session['user_id'] = user_id
       get feed
       json = JSON.parse(response.body)
       expect(json['statusCode']).to eq 200

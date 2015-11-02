@@ -20,7 +20,7 @@ module MyTasks
 
     def collect_results(response)
       collected_results = []
-      if (response && response[:feed] && results = response[:feed][:personChklstItem])
+      if (response && response[:feed] && results = response[:feed][:checkListItems])
         logger.info "Sorting SIS Checklist feed into buckets with starting_date #{@starting_date}; #{results}"
         results.each do |result|
           if (formatted_entry = yield result)
@@ -33,25 +33,41 @@ module MyTasks
     end
 
     def entry_from_result(result)
-      {
-        emitter: CampusSolutions::Proxy::APP_ID,
-        linkDescription: "View in #{CampusSolutions::Proxy::APP_NAME}",
-        linkUrl: 'http://sisproject.berkeley.edu',
-        sourceUrl: 'http://sisproject.berkeley.edu',
-        status: 'inprogress',
-        title: result[:descr],
-        notes: result[:descrlong],
-        type: 'task'
+      status = 'inprogress'
+      if %w(Completed Paidoff Waived Cancelled).include?(result[:itemStatus])
+        status = 'completed'
+      end
+      formatted_entry = {
+        emitter: CampusSolutions::Proxy::APP_NAME,
+        linkDescription: result[:checkListDocMgmt][:linkUrlLbl],
+        linkUrl: result[:checkListDocMgmt][:linkUrl],
+        sourceUrl: 'http://sis-project.berkeley.edu',
+        status: status,
+        title: result[:checkListDescr],
+        notes: result[:itemComment],
+        type: 'task',
+        subTitle: result[:responsibleCntctName],
+        showStatus: result[:itemStatus],
+        responsibleContactEmail: result[:responsibleCntctEmail],
+        organization: result[:associationIdName]
       }
+      if status == 'completed'
+        format_date_into_entry!(convert_date(result[:statusDt]), formatted_entry, :completedDate)
+        formatted_entry[:completedDate][:hasTime] = false # CS dates never have times
+      end
+      formatted_entry
     end
 
     def format_date_and_bucket(formatted_entry, date)
+      # Tasks are not overdue until the end of the day. Advance forward one day and back one second to cover
+      # the possibility of daylight savings transitions.
+      date = Time.at((date + 1).in_time_zone.to_datetime.to_i - 1).to_datetime
       format_date_into_entry!(date, formatted_entry, :dueDate)
       formatted_entry[:bucket] = determine_bucket(date, formatted_entry, @now_time, @starting_date)
     end
 
     def format_checklist(result)
-      unless result.is_a?(Hash) && result[:descr].present?
+      unless result.is_a?(Hash) && result[:checkListDescr].present?
         return nil
       end
       formatted_entry = entry_from_result result

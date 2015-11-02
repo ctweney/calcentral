@@ -13,7 +13,7 @@
     "url": "https://github.com/ets-berkeley-edu/calcentral.git"
   },
   "bugs": {
-    "url": "https://ets.berkeley.edu/forms/request-calcentral-support-feedback"
+    "url": "https://www.ets.berkeley.edu/discover-services/calcentral/students-getting-started"
   },
   "author": {
     "name": "CalCentral Developers",
@@ -53,7 +53,7 @@
     "gulp-util": "^3.0.6",
     "js-natural-sort": "^0.8.1",
     "jscs": "^2.0.0",
-    "jshint": "^2.8.0",
+    "jshint": "2.8.0",
     "minimist": "^1.1.2",
     "moment": "^2.10.6",
     "pikaday": "^1.3.3",

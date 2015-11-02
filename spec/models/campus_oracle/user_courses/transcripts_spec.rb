@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe CampusOracle::UserCourses::Transcripts do
   let (:transcripts) { CampusOracle::UserCourses::Transcripts.new(user_id: random_id).get_all_transcripts }
 
@@ -19,6 +17,7 @@ describe CampusOracle::UserCourses::Transcripts do
       'catalog_id' => random_id,
       'grade' => random_grade,
       'transcript_unit' => rand(1.0..5.0).round(1),
+      'transfer_unit' => 0,
       'line_type' => 'U',
       'memo_or_title' => 'INTRO TO BIOLOGY'
     }
@@ -32,6 +31,7 @@ describe CampusOracle::UserCourses::Transcripts do
       'catalog_id' => '',
       'grade' => '',
       'transcript_unit' => 0,
+      'transfer_unit' => 0,
       'line_type' => '',
       'memo_or_title' => ''
     }
@@ -71,18 +71,34 @@ describe CampusOracle::UserCourses::Transcripts do
     end
   end
 
-  context 'when transcript data includes REMOVED and LAPSED notations' do
+  context 'when transcript data includes LAPSED notations' do
     let (:transcript_data) do
       data = 10.times.map { transcript_row }
-      data << transcript_row.merge('memo_or_title' => '***REMOVED***')
       data << transcript_row.merge('memo_or_title' => '***LAPSED***')
     end
 
     it 'excludes them' do
       transcripts[:semesters].each do |term_key, data|
-        expect(data[:courses].select { |c| c[:title].include? 'REMOVED'}).to be_empty
         expect(data[:courses].select { |c| c[:title].include? 'LAPSED'}).to be_empty
       end
+    end
+  end
+
+  context 'when transcript data includes REMOVED notations' do
+    let(:removed_incomplete) { transcript_row.merge({'memo_or_title' => '   IREMOVED 2014-05-10', 'dept_name' => 'BRYOLOGY' }) }
+    let(:transcript_data) do
+      data = 10.times.map { transcript_row }
+      data << blank_transcript_row.merge(removed_incomplete)
+    end
+
+    it 'presents them as nicely as possible' do
+      transcript_semester = transcripts[:semesters]["#{removed_incomplete['term_yr']}-#{removed_incomplete['term_cd']}"]
+      transcript_row = transcript_semester[:courses].select { |row| row[:title] == 'Incomplete Removed' }
+      expect(transcript_row).to have(1).item
+      expect(transcript_row.first[:units]).to eq removed_incomplete['transcript_unit']
+      expect(transcript_row.first[:grade]).to eq removed_incomplete['grade']
+      expect(transcript_row.first[:dept]).to eq removed_incomplete['dept_name']
+      expect(transcript_row.first[:courseCatalog]).to eq removed_incomplete['catalog_id']
     end
   end
 
@@ -103,6 +119,38 @@ describe CampusOracle::UserCourses::Transcripts do
       expect(transcripts[:additional_credits].count).to eq 1
       expect(transcripts[:additional_credits][0][:units]).to eq ap_unit_count
       expect(transcripts[:additional_credits][0][:title]).to eq ap_course_title.sub('ADV PLACEMEN', 'AP ')
+    end
+  end
+
+  context 'when transcript data includes transfer credits' do
+    let (:transfers) { [{units: 16, memo: 'HAHVAHD UNIV EXTENSION'}, {units: 79, memo: 'EL CERRITO COL, 11 TRM SP02-FA07'}] }
+    let (:transcript_data) do
+      data = 10.times.map { transcript_row }
+      transfers.each do |transfer|
+        data << blank_transcript_row.merge({
+            'term_yr' => '0',
+            'transcript_unit' => 0,
+            'transfer_unit' => 0,
+            'line_type' => 'J',
+            'memo_or_title' => transfer[:memo]
+          })
+        data << blank_transcript_row.merge({
+            'term_yr' => '0',
+            'transcript_unit' => 0,
+            'transfer_unit' => transfer[:units],
+            'line_type' => 'J',
+            'memo_or_title' => ''
+          })
+      end
+      data
+    end
+
+    it 'includes them as additional credits' do
+      expect(transcripts[:additional_credits].count).to eq 2
+      transfers.each_index do |i|
+        expect(transcripts[:additional_credits][i][:units]).to eq transfers[i][:units]
+        expect(transcripts[:additional_credits][i][:title]).to eq transfers[i][:memo]
+      end
     end
   end
 

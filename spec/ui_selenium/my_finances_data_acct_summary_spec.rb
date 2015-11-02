@@ -1,17 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require 'csv'
-require 'json'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/splash_page'
-require_relative 'pages/api_my_status_page'
-require_relative 'pages/api_my_financials_page'
-require_relative 'pages/my_finances_pages'
-require_relative 'pages/my_finances_details_page'
-
 describe 'My Finances Billing Summary', :testui => true do
 
   if ENV["UI_TEST"]
@@ -46,18 +32,18 @@ describe 'My Finances Billing Summary', :testui => true do
 
           begin
             splash_page = CalCentralPages::SplashPage.new(driver)
-            splash_page.load_page(driver)
-            splash_page.basic_auth(driver, uid)
+            splash_page.load_page
+            splash_page.basic_auth uid
             status_api_page = ApiMyStatusPage.new(driver)
             status_api_page.get_json(driver)
             has_finances_tab = status_api_page.has_finances_tab?
             fin_api_page = ApiMyFinancialsPage.new(driver)
             fin_api_page.get_json(driver)
             my_finances_page = CalCentralPages::MyFinancesPages::MyFinancesDetailsPage.new(driver)
-            my_finances_page.load_page(driver)
-            my_finances_page.wait_for_billing_summary(driver)
+            my_finances_page.load_page
+            my_finances_page.billing_summary_spinner_element.when_not_visible(timeout=WebDriverUtils.page_load_timeout)
 
-            my_fin_no_cars_msg = my_finances_page.has_no_cars_data_msg?
+            my_fin_no_cars_msg = my_finances_page.no_cars_data_msg?
 
             if fin_api_page.has_cars_data?
               testable_users.push(uid)

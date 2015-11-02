@@ -19,15 +19,13 @@ textbooks_proxy:
 terms:
   # Keyed to H2 test data
   fake_now: 2013-10-11 04:20:00
-sakai_proxy:
-  fake: false
-  # Keyed to H2 test data
-  fake_now: 2013-03-11 04:20:00
 cal_link_proxy:
   fake: true
 cal1card_proxy:
   fake: true
 calmail_proxy:
+  fake: true
+calnet_crosswalk_proxy:
   fake: true
 
 # To avoid "Illegal key size" errors on systems which we can't modify (e.g., Travis),
@@ -57,8 +55,10 @@ features:
   advising: true
   cs_fin_aid: true
   cs_profile: true
+  cs_sir: true
   webcast_sign_up_on_calcentral: true
   service_alerts_rss: true
+  show_notifications_archive_link: true
 
 cache:
   store: "memory"

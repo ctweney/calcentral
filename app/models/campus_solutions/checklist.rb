@@ -1,11 +1,12 @@
 module CampusSolutions
-  class Checklist < Proxy
+  class Checklist < DirectProxy
 
     include Cache::UserCacheExpiry
     include ProfileFeatureFlagged
+    include CampusSolutionsIdRequired
 
     def initialize(options = {})
-      super(Settings.cs_checklist_proxy, options)
+      super options
       initialize_mocks if @fake
     end
 
@@ -13,9 +14,8 @@ module CampusSolutions
       'checklist.xml'
     end
 
-    def build_feed(response)
-      response.parsed_response['SCC_GET_CHKLST_RESP']
+    def url
+      "#{@settings.base_url}/UC_CC_CHECKLIST.v1/get/checklist?EMPLID=#{@campus_solutions_id}"
     end
-
   end
 end

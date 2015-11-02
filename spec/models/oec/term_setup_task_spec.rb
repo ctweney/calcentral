@@ -1,127 +1,122 @@
-include OecSpecHelper
-
 describe Oec::TermSetupTask do
 
-  let(:term_code) { '2015-D' }
+  let(:term_code) { '2013-B' }
+  let(:today) { '2015-08-31' }
+  let(:now) { '09:22:22' }
+  let(:logfile) { "#{now} term setup task.log" }
+  before { allow(DateTime).to receive(:now).and_return DateTime.strptime("#{today} #{now}", '%F %H:%M:%S') }
+
   subject { described_class.new(term_code: term_code) }
 
-  let(:fake_sheets_manager) { double() }
-  before { allow(GoogleApps::SheetsManager).to receive(:new).and_return fake_sheets_manager }
+  let (:fake_remote_drive) { double() }
+  before { allow(Oec::RemoteDrive).to receive(:new).and_return fake_remote_drive }
 
-  shared_context 'expecting folder creation' do
+  shared_context 'remote drive interaction' do
+    before(:each) do
+      allow(fake_remote_drive).to receive(:find_nested).and_return mock_google_drive_item
+    end
+
+    let(:term_folder) { mock_google_drive_item term_code }
+    let(:logs_today_folder) { mock_google_drive_item today }
+    let(:overrides_folder) { mock_google_drive_item Oec::Folder.overrides }
+
     before do
-      expect_folder_creation(term_code, 'root', read_after_creation: true)
-      %w(departments exports imports supplemental_sources).each do |folder_name|
-        expect_folder_creation(folder_name, term_code)
+      expect(fake_remote_drive).to receive(:find_folders).with(no_args).and_return []
+      expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)
+        .with(term_code, nil, anything).and_return term_folder
+
+      [:confirmations, :logs, :merged_confirmations, :published, :sis_imports].each do |folder_type|
+        expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)
+          .with(Oec::Folder::FOLDER_TITLES[folder_type], term_folder, anything)
+          .and_return mock_google_drive_item(Oec::Folder::FOLDER_TITLES[folder_type])
       end
+
+      expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)
+        .with(Oec::Folder.overrides, term_folder, anything).and_return overrides_folder
+
+      expect(fake_remote_drive).to receive(:copy_item_to_folder)
+        .with(anything, "#{Oec::Folder.confirmations}_id", 'TEMPLATE').and_return mock_google_drive_item
+
+      %w(courses course_instructors course_supervisors instructors supervisors).each do |sheet|
+        expect(fake_remote_drive).to receive(:check_conflicts_and_upload)
+          .with(kind_of(Oec::Worksheet), sheet, Oec::Worksheet, overrides_folder, anything)
+          .and_return mock_google_drive_item(sheet)
+      end
+
+      expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)
+        .with(today, anything, anything).and_return logs_today_folder
+      expect(fake_remote_drive).to receive(:check_conflicts_and_upload)
+        .with(kind_of(Pathname), logfile, 'text/plain', logs_today_folder, anything)
+        .and_return mock_google_drive_item(logfile)
     end
   end
 
-  shared_context 'expecting logging' do
-    let(:today) { '2015-08-31' }
-    let(:now) { '092222' }
-    let(:logfile) { "#{now}_term_setup_task.log" }
-
-    before do
-      allow(DateTime).to receive(:now).and_return DateTime.strptime("#{today} #{now}", '%F %H%M%S')
-      expect_folder_creation('reports', term_code, read_after_creation: true)
-      expect_folder_creation(today, 'reports')
-      expect(fake_sheets_manager).to receive(:find_items_by_title)
-        .with(logfile, parent_id: mock_file(today).id)
-        .and_return []
-      expect(fake_sheets_manager).to receive(:upload_file)
-        .with(logfile, '', mock_file(today).id, 'text/plain', Rails.root.join('tmp', 'oec', logfile).to_s)
-        .and_return mock_file(logfile)
-    end
-  end
-
-  context 'when no previous term data is found in remote drive' do
-    include_context 'expecting folder creation'
-    include_context 'expecting logging'
-
-    before { allow(fake_sheets_manager).to receive(:find_folders).with(no_args).and_return [] }
-
-    it 'checks CSV existence and uploads header-only CSVs as supplemental sources' do
-      %w(course_instructors.csv course_supervisors.csv courses.csv instructors.csv supervisors.csv).each do |csv_name|
-        expect_sheet_upload(csv_name, 'supplemental_sources')
-      end
+  context 'successful term setup' do
+    include_context 'remote drive interaction'
+    it 'creates folders, uploads sheets, and writes log' do
       subject.run
     end
-
-    context 'when existing files would be overwritten' do
-      before do
-        %w(course_instructors course_supervisors courses instructors supervisors).each do |sheet_name|
-          allow(fake_sheets_manager).to receive(:find_items_by_title)
-            .with(sheet_name, parent_id: mock_file('supplemental_sources').id)
-            .and_return [mock_file(sheet_name)]
-          end
-      end
-      it 'aborts the task and logs error' do
-        expect(Rails.logger).to receive(:error) do |error_message|
-          expect(error_message.lines.first).to match /Oec::TermSetupTask aborted with error.*already exists.*could not upload/
-        end
-        subject.run
-      end
-    end
   end
 
-  context 'when previous term data is found in remote drive' do
-    include_context 'expecting folder creation'
-    include_context 'expecting logging'
-
-    before do
-      @mock_existing_csvs = {}
-      %w(course_supervisors instructors supervisors).each do |sheet_name|
-        @mock_existing_csvs[sheet_name] = mock_file(sheet_name)
-      end
-      expect(fake_sheets_manager).to receive(:find_folders).with(no_args).and_return [mock_file('2015-B'), mock_file('2015-C')]
-      %w(supplemental_sources exports).each do |folder_name|
-        expect(fake_sheets_manager).to receive(:find_folders_by_title)
-          .with(folder_name, mock_file('2015-C').id)
-          .and_return [mock_file(folder_name)]
-      end
-      expect(fake_sheets_manager).to receive(:find_folders)
-        .with(mock_file('exports').id)
-        .and_return [mock_file('2015-06-04'), mock_file('2015-06-22')]
-      expect(fake_sheets_manager).to receive(:find_items_by_title)
-        .with('course_supervisors', parent_id: mock_file('2015-06-22').id)
-        .and_return [@mock_existing_csvs['course_supervisors']]
+  context 'logging to cache' do
+    let(:api_task_id) { Oec::ApiTaskWrapper.generate_task_id }
+    subject do
+      described_class.new({
+        api_task_id: api_task_id,
+        log_to_cache: true,
+        term_code: term_code
+      })
     end
+    include_context 'remote drive interaction'
 
-    it 'copies existing files and uploads others' do
-      %w(instructors supervisors).each do |csv_name|
-        expect(fake_sheets_manager).to receive(:find_items_by_title)
-          .with(csv_name, parent_id: mock_file('supplemental_sources').id)
-          .at_least(2).times
-          .and_return([@mock_existing_csvs[csv_name]], [])
-        expect(fake_sheets_manager).to receive(:copy_item_to_folder)
-          .with(@mock_existing_csvs[csv_name], mock_file('supplemental_sources').id)
-          .and_return @mock_existing_csvs[csv_name]
-      end
-      expect(fake_sheets_manager).to receive(:find_items_by_title)
-        .with('course_supervisors', parent_id: mock_file('supplemental_sources').id)
-        .and_return []
-      expect(fake_sheets_manager).to receive(:copy_item_to_folder)
-        .with(@mock_existing_csvs['course_supervisors'], mock_file('supplemental_sources').id)
-        .and_return @mock_existing_csvs['course_supervisors']
-      %w(course_instructors.csv courses.csv).each do |csv_name|
-        expect_sheet_upload(csv_name, 'supplemental_sources')
-      end
+    it 'allows status and log retrieval by cache key' do
       subject.run
+      task_status = Oec::Task.fetch_from_cache api_task_id
+      expect(task_status[:status]).to eq 'Success'
+      expect(task_status[:log]).to have_at_least(3).items
+      expect(task_status[:log][0]).to include 'Starting Oec::TermSetupTask'
+      expect(task_status[:log][1]).to include 'Will create initial folders and files'
+      expect(task_status[:log].last).to include 'Exporting log file'
     end
   end
 
   context 'Google Drive connection error' do
     before do
-      expect(fake_sheets_manager).to receive(:find_folders_by_title)
-        .at_least(1).times
+      expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder).at_least(1).times
+        .and_raise Errors::ProxyError, 'A confounding error'
+      expect(fake_remote_drive).to receive(:find_nested).at_least(1).times
         .and_raise Errors::ProxyError, 'A confounding error'
     end
+
     it 'logs errors' do
       expect(Rails.logger).to receive(:error).at_least(1).times do |error_message|
         expect(error_message.lines.first).to include 'A confounding error'
       end
       subject.run
+    end
+  end
+
+  context 'local-write mode' do
+    subject { described_class.new(term_code: term_code, local_write: 'Y') }
+
+    before do
+      allow(fake_remote_drive).to receive(:find_nested).and_return mock_google_drive_item
+      expect(fake_remote_drive).to receive(:find_folders).with(no_args).and_return []
+    end
+
+    it 'reads from but does not write to remote drive' do
+      expect(fake_remote_drive).not_to receive(:check_conflicts_and_upload)
+      expect(fake_remote_drive).not_to receive(:copy_item_to_folder)
+      subject.run
+    end
+
+    it 'sets default term dates as overrides' do
+      subject.run
+      courses = Oec::Courses.from_csv File.read(Rails.root.join 'tmp', 'oec', 'courses.csv')
+      expect(courses.first).to include({
+        'START_DATE' => '01-22-2013',
+        'END_DATE' => '05-12-2013'
+      })
     end
   end
 end

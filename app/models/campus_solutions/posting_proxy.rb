@@ -1,10 +1,10 @@
 module CampusSolutions
-  class PostingProxy < Proxy
+  class PostingProxy < DirectProxy
 
     attr_reader :params
 
     def initialize(settings, options = {})
-      super(settings, options)
+      super options
       @params = options[:params]
       initialize_mocks if @fake
     end
@@ -20,12 +20,13 @@ module CampusSolutions
     def request_options
       updateable_params = filter_updateable_params params
       cs_post = construct_cs_post updateable_params
-      logger.debug "POST Body: #{cs_post}"
       super.merge(method: :post, body: cs_post)
     end
 
     def default_post_params
-      {}
+      {
+        EMPLID: @campus_solutions_id
+      }
     end
 
     # lets us restrict updated params to what's on the whitelist of field mappings.

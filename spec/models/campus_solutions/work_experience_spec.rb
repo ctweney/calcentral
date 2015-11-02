@@ -1,10 +1,10 @@
-require 'spec_helper'
-
 describe CampusSolutions::WorkExperience do
+
+  let(:user_id) { '12351' }
 
   context 'post' do
     let(:params) { {} }
-    let(:proxy) { CampusSolutions::WorkExperience.new(fake: true, user_id: random_id, params: params) }
+    let(:proxy) { CampusSolutions::WorkExperience.new(fake: true, user_id: user_id, params: params) }
 
     context 'filtering out fields not on the whitelist' do
       let(:params) { {
@@ -44,14 +44,11 @@ describe CampusSolutions::WorkExperience do
       }
       it_should_behave_like 'a simple proxy that returns errors'
       it_behaves_like 'a proxy that properly observes the profile feature flag'
-      it 'should make a successful post' do
-        expect(subject[:statusCode]).to eq 200
-        expect(subject[:feed][:status]).to be
-      end
+      it_behaves_like 'a proxy that got data successfully'
     end
   end
 
-  context 'with a real external service', :testext => true do
+  context 'with a real external service', testext: true, ignore: true  do
     let(:params) { {
       extOrganizationId: '9000000008',
       isRetired: 'N',
@@ -72,17 +69,14 @@ describe CampusSolutions::WorkExperience do
       currencyCd: 'USD',
       payFrequency: 'M'
     } }
-    let(:proxy) { CampusSolutions::WorkExperience.new(fake: false, user_id: random_id, params: params) }
+    let(:proxy) { CampusSolutions::WorkExperience.new(fake: false, user_id: user_id, params: params) }
 
     context 'performing a real post' do
       subject {
         proxy.get
       }
       it_should_behave_like 'a simple proxy that returns errors'
-      it 'should make a successful REAL post' do
-        expect(subject[:statusCode]).to eq 200
-        expect(subject[:feed][:status]).to be
-      end
+      it_behaves_like 'a proxy that got data successfully'
     end
   end
 end

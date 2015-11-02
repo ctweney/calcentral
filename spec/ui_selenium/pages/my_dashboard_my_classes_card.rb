@@ -1,9 +1,3 @@
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'cal_central_pages'
-require_relative 'my_dashboard_page'
-require_relative '../util/web_driver_utils'
-
 module CalCentralPages
 
   class MyDashboardMyClassesCard < MyDashboardPage
@@ -35,7 +29,8 @@ module CalCentralPages
 
     h3(:other_sites_heading, :xpath => '//h3[text()="Other Site Memberships"]')
     div(:other_sites_div, :xpath => '//div[@data-ng-class="\'cc-widget-classes-other\'"]')
-    elements(:other_course_site_link, :link, :xpath => '//div[@data-ng-class="\'cc-widget-classes-other\'"]//div[@data-ng-bind="class.name"]')
+    elements(:other_course_site_link, :link, :xpath => '//div[@data-ng-class="\'cc-widget-classes-other\'"]//a[@data-ng-switch-when="other"]')
+    elements(:other_course_site_name, :link, :xpath => '//div[@data-ng-class="\'cc-widget-classes-other\'"]//div[@data-ng-bind="class.name"]')
     elements(:other_course_site_desc, :div, :xpath => '//div[@data-ng-class="\'cc-widget-classes-other\'"]//div[@data-ng-bind="class.shortDescription"]')
 
     def enrolled_course_codes
@@ -97,7 +92,7 @@ module CalCentralPages
 
     def other_course_site_names
       names = []
-      other_course_site_link_elements.each { |link| names << link.text.gsub("\n- opens in new window", '') }
+      other_course_site_name_elements.each { |name| names << name.text.gsub("\n- opens in new window", '') }
       names
     end
 

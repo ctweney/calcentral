@@ -26,6 +26,10 @@ class AuthenticationStatePolicy
     can_administrate? || Canvas::Admins.new.admin_user?(@user.user_id)
   end
 
+  def can_administer_oec?
+    can_administrate? || Oec::Administrator.is_admin?(@user.user_id)
+  end
+
   def can_author?
     @user.real_user_auth.active? && (@user.real_user_auth.is_superuser? || @user.real_user_auth.is_author?)
   end
@@ -39,6 +43,10 @@ class AuthenticationStatePolicy
     !Rails.env.production? || can_administrate?
   end
 
+  def can_reload_yaml_settings?
+    !Rails.env.production? || can_administrate?
+  end
+
   def can_create_canvas_project_site?
     can_administrate_canvas? || CampusOracle::UserAttributes.new(:user_id => @user.user_id).is_staff_or_faculty?
   end
@@ -49,11 +57,6 @@ class AuthenticationStatePolicy
 
   def can_add_current_official_sections?
     Canvas::CurrentTeacher.new(@user.user_id).user_currently_teaching?
-  end
-
-  def can_refresh_log_settings?
-    # Only superusers are allowed to change logging settings in production, but in development mode, anyone can.
-    !Rails.env.production? || can_administrate?
   end
 
   def can_view_as?

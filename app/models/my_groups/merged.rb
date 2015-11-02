@@ -7,9 +7,8 @@ module MyGroups
     def get_feed_internal
       groups = []
       [
-        Callink,
-        Canvas,
-        Sakai
+        MyGroups::Callink,
+        MyGroups::Canvas
       ].each do |provider|
         groups.concat(provider.new(@uid).fetch)
       end

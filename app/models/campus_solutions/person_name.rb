@@ -2,6 +2,7 @@ module CampusSolutions
   class PersonName < PostingProxy
 
     include ProfileFeatureFlagged
+    include CampusSolutionsIdRequired
 
     def initialize(options = {})
       super(Settings.campus_solutions_proxy, options)
@@ -26,8 +27,7 @@ module CampusSolutions
           FieldMapping.required(:preferredFirstName, :PREF_FIRST_NAME),
           FieldMapping.required(:partnerLastName, :PARTNER_LAST_NAME),
           FieldMapping.required(:partnerRoyalPrefix, :PARTNER_ROY_PREFIX),
-          FieldMapping.required(:lastNamePrefNld, :LAST_NAME_PREF_NLD),
-          FieldMapping.required(:countryNameFormat, :COUNTRY_NM_FORMAT)
+          FieldMapping.required(:lastNamePrefNld, :LAST_NAME_PREF_NLD)
         ]
       )
     end
@@ -41,13 +41,10 @@ module CampusSolutions
     end
 
     def default_post_params
-      # TODO ID is hardcoded until we can use ID crosswalk service to convert CalNet ID to CS Student ID
-      {
-        EMPLID: '25738808',
-        EFFDT: '27-JUL-15', # TODO fix hardcoding
-        EFF_STATUS: 'A',
-        COUNTRY_NM_FORMAT: '' # TODO ask Babu what this is
-      }
+      super.merge(
+        {
+          COUNTRY_NM_FORMAT: '001'
+        })
     end
 
     def url

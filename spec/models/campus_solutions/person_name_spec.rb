@@ -1,10 +1,10 @@
-require 'spec_helper'
-
 describe CampusSolutions::PersonName do
+
+  let(:user_id) { '12345' }
 
   context 'post' do
     let(:params) { {} }
-    let(:proxy) { CampusSolutions::PersonName.new(fake: true, user_id: random_id, params: params) }
+    let(:proxy) { CampusSolutions::PersonName.new(fake: true, user_id: user_id, params: params) }
 
     context 'filtering out fields not on the whitelist' do
       let(:params) { {
@@ -14,7 +14,7 @@ describe CampusSolutions::PersonName do
       } }
       subject { proxy.filter_updateable_params(params) }
       it 'should strip out invalid fields' do
-        expect(subject.keys.length).to eq 17
+        expect(subject.keys.length).to eq 16
         expect(subject[:bogus]).to be_nil
         expect(subject[:invalid]).to be_nil
         expect(subject[:firstName]).to eq 'Joe'
@@ -46,14 +46,11 @@ describe CampusSolutions::PersonName do
       }
       it_should_behave_like 'a simple proxy that returns errors'
       it_behaves_like 'a proxy that properly observes the profile feature flag'
-      it 'should make a successful post' do
-        expect(subject[:statusCode]).to eq 200
-        expect(subject[:feed][:status]).to be
-      end
+      it_behaves_like 'a proxy that got data successfully'
     end
   end
 
-  context 'with a real external service', :testext => true do
+  context 'with a real external service', testext: true do
     let(:params) { {
       type: 'LEG',
       firstName: 'Joe',
@@ -70,20 +67,16 @@ describe CampusSolutions::PersonName do
       preferredFirstName: '',
       partnerLastName: '',
       partnerRoyalPrefix: '',
-      lastNamePrefNld: '',
-      countryNameFormat: '001'
+      lastNamePrefNld: ''
     } }
-    let(:proxy) { CampusSolutions::PersonName.new(fake: false, user_id: random_id, params: params) }
+    let(:proxy) { CampusSolutions::PersonName.new(fake: false, user_id: user_id, params: params) }
 
     context 'performing a real post' do
       subject {
         proxy.get
       }
       it_should_behave_like 'a simple proxy that returns errors'
-      it 'should make a successful REAL post' do
-        expect(subject[:statusCode]).to eq 200
-        expect(subject[:feed][:status]).to be
-      end
+      it_behaves_like 'a proxy that got data successfully'
     end
   end
 end
