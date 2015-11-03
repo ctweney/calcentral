@@ -64,14 +64,31 @@ angular.module('calcentral.services').service('finaidService', function($rootSco
   };
 
   /**
-   * Set the default Finaid year, usually the first one in the list
+   * Find the aid year which has the default=true attribute
+   */
+  var findDefaultFinaidYear = function(finaidYears) {
+    return _.find(finaidYears, function(finaidYear) {
+      return finaidYear.default;
+    });
+  };
+
+  /**
+   * Set the default Finaid year
    */
   var setDefaultFinaidYear = function(data, finaidYearId) {
     if (data && data.finaidSummary && data.finaidSummary.finaidYears) {
       if (finaidYearId) {
         setFinaidYear(findFinaidYear(data, finaidYearId));
       } else {
-        setFinaidYear(data.finaidSummary.finaidYears[0]);
+        // If no aid year has been selected before, select the default one
+        var finaidYear = findDefaultFinaidYear(data.finaidSummary.finaidYears);
+
+        // If no default is found, use the first one
+        if (!finaidYear) {
+          finaidYear = data.finaidSummary.finaidYears[0];
+        }
+
+        setFinaidYear(finaidYear);
       }
     }
     return options.finaidYear;
