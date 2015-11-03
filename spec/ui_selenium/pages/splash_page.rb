@@ -18,5 +18,12 @@ module CalCentralPages
       WebDriverUtils.wait_for_page_and_click sign_in_element
     end
 
+    def log_into_dashboard(driver, cal_net_page, username, password)
+      load_page
+      click_sign_in_button
+      cal_net_page.login(username, password)
+      CalCentralPages::MyDashboardPage.new(driver)
+    end
+
   end
 end

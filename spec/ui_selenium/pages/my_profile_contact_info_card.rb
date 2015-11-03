@@ -5,7 +5,7 @@ require_relative 'my_profile_page'
 require_relative '../util/web_driver_utils'
 
 module CalCentralPages
-  class MyProfileContactInfoPage < MyProfilePage
+  class MyProfileContactInfoCard < MyProfilePage
 
     include PageObject
     include ClassLogger

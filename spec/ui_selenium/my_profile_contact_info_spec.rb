@@ -1,13 +1,3 @@
-require 'spec_helper'
-require 'selenium-webdriver'
-require 'page-object'
-require_relative 'util/web_driver_utils'
-require_relative 'util/user_utils'
-require_relative 'pages/cal_central_pages'
-require_relative 'pages/cal_net_auth_page'
-require_relative 'pages/splash_page'
-require_relative 'pages/my_profile_contact_info_page'
-
 describe 'My Profile Contact Info', :testui => true do
 
   if ENV['UI_TEST'] && Settings.ui_selenium.layer != 'production'
@@ -18,41 +8,6 @@ describe 'My Profile Contact Info', :testui => true do
     end
 
     describe 'phone number' do
-
-      # PHONES - DISPLAY
-      describe 'display' do
-        it 'shows an "Add" button' # TODO
-        context 'when a user has no phones' do
-          it 'shows no "Edit" buttons'
-          it 'shows a meaningful message'
-        end
-        context 'when a user has phones' do
-          it 'shows an "Edit" button for each'
-          it 'shows the phone type for each'
-          it 'shows the phone number for each'
-          it 'indicates which is preferred'
-          context 'with extensions' do
-            it 'shows the phone extensions'
-          end
-          context 'without extensions' do
-            it 'shows no phone extensions'
-          end
-        end
-      end
-
-      # PHONES - ADDING
-      describe 'adding' do
-        it 'allows a user to add a new preferred phone'
-        it 'allows a user to add a new non-preferred phone'
-        it 'prevents a user adding a phone of the same type as an existing one'
-        it 'requires that a phone number be entered'
-        it 'allows a maximum of BLAH phone number characters to be entered' # TODO
-        it 'allows a phone extension to be entered'
-        it 'does not require that a phone extension be entered'
-        it 'allows a maximum of BLAH phone extension characters to be entered' # TODO
-        it 'allows a user to cancel the new phone'
-        it 'allows a user to save the new phone'
-      end
 
       # PHONES - EDITING
       describe 'editing' do
@@ -81,32 +36,6 @@ describe 'My Profile Contact Info', :testui => true do
     end
 
     describe 'email address' do
-
-      # EMAIL - DISPLAY
-      describe 'display' do
-        it 'shows an "Add" button' # TODO
-        context 'when a user has no email addresses' do
-          it 'shows no "Edit" buttons'
-          it 'shows a meaningful message'
-        end
-        context 'when a user has email addresses' do
-          it 'shows an "Edit" button for each'
-          it 'shows the email type for each'
-          it 'shows the email address for each'
-          it 'indicates which is preferred'
-        end
-      end
-
-      # EMAIL - ADDING
-      describe 'adding' do
-        it 'allows a user to add a new preferred email'
-        it 'allows a user to add a new non-preferred email'
-        it 'prevents a user adding an email of the same type as an existing one'
-        it 'requires that an email address be entered'
-        it 'allows a maximum of BLAH phone number characters to be entered' # TODO
-        it 'allows a user to cancel the new email'
-        it 'allows a user to save the new email'
-      end
 
       # EMAIL - EDITING
       describe 'editing' do
