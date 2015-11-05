@@ -95,6 +95,15 @@
           <span class="cc-visuallyhidden" data-ng-bind-template="- {{ task.title }}"></span>
         </a>
 
+        <div data-ng-if="task.uploadUrl" class="cc-widget-tasks-upload">
+          <a class="cc-button"
+          data-ng-click="api.util.preventBubble($event);api.analytics.trackExternalLink('Tasks', 'Upload CS Document', task.uploadUrl)"
+          data-cc-campus-solutions-link-directive="task.uploadUrl"
+          data-cc-outbound-enabled="false">
+            <span>Upload</span>
+          </a>
+        </div>
+
         <button class="cc-button cc-button-blue"
         data-ng-show="task.emitter=='Google'"
         data-ng-click="enableEditor()">Edit</button>
