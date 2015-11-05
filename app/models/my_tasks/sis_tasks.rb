@@ -41,6 +41,7 @@ module MyTasks
         emitter: CampusSolutions::Proxy::APP_NAME,
         linkDescription: result[:checkListDocMgmt][:linkUrlLbl],
         linkUrl: result[:checkListDocMgmt][:linkUrl],
+        uploadUrl: result[:checkListDocMgmt][:docUploadLink],
         sourceUrl: 'http://sis-project.berkeley.edu',
         status: status,
         title: result[:checkListDescr],
