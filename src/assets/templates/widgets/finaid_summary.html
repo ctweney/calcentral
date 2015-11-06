@@ -68,6 +68,7 @@
             <hr class="cc-hr-spacing-5" />
             <div data-cc-finaid-summary-item-directive data-item="finaidSummaryData.netCost.total"></div>
           </div>
+          <hr data-ng-if="!finaidSummaryData.netCost && finaidSummaryData.fundingOffered" />
           <div data-ng-if="finaidSummaryData.fundingOffered" class="cc-widget-finaid-summary-funding-offered">
             <div class="cc-text-bold" data-cc-finaid-summary-item-directive data-item="finaidSummaryData.fundingOffered.total"></div>
             <div>
