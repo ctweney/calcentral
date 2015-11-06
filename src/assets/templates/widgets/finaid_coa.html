@@ -42,9 +42,7 @@
                 <td data-ng-repeat="total in item.totals track by $index" data-cc-amount-directive="total" data-cc-amount-directive-color="false" class="cc-table-right"></td>
               </tr>
               <tr data-ng-if="item.show && item.subItems.length" data-ng-repeat="subItem in item.subItems">
-                <td class="cc-widget-finaid-coa-budget-table-title-sub">
-                  &bull; <span data-ng-bind="subItem.title"></span>
-                </td>
+                <td class="cc-widget-finaid-coa-budget-table-title-sub" data-ng-bind="subItem.title"></td>
                 <td data-ng-repeat="amount in subItem.amounts track by $index" data-cc-amount-directive="amount" data-cc-amount-directive-color="false" class="cc-table-right"></td>
                 <td data-cc-amount-directive="subItem.total" data-cc-amount-directive-color="false" class="cc-table-right"></td>
               </tr>
