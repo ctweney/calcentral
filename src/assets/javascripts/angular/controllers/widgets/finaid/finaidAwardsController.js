@@ -27,9 +27,9 @@ angular.module('calcentral.controllers').controller('FinaidAwardsController', fu
 
   var addColors = function(feed) {
     _.mapValues(feed.awards, function(value, key) {
-      if (_.includes(keysLoans, key)) {
+      if (value && _.includes(keysLoans, key)) {
         value.color = 'blue-dark';
-      } else if (_.includes(keysGiftWork, key)) {
+      } else if (value && _.includes(keysGiftWork, key)) {
         value.color = 'blue-light';
       }
       return value;

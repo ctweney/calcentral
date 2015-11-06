@@ -13,6 +13,7 @@
           data-ng-repeat="key in finaidAwardsInfo.keysGiftWork"
           data-ng-include="'widgets/finaid_awards_section.html'"
           data-onload="section = finaidAwards.awards[key]"
+          data-ng-if="finaidAwards.awards[key]"
         ></div>
         <div
           data-ng-if="finaidAwards.hasLoans"
@@ -22,6 +23,7 @@
           data-ng-repeat="key in finaidAwardsInfo.keysLoans"
           data-ng-include="'widgets/finaid_awards_section.html'"
           data-onload="section = finaidAwards.awards[key]"
+          data-ng-if="finaidAwards.awards[key]"
         ></div>
         <div
           data-ng-if="finaidAwards.awards.grandtotal.total.amount"
