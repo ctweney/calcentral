@@ -1,0 +1,14 @@
+<div class="cc-flex cc-flex-space-between cc-flex-space-between-horizontal-5 cc-flex-align-base cc-page-finaid-header-container cc-page-finaid-header-container-dark cc-widget-finaid-awards-section-item-loans">
+  <div>
+    <h3 class="cc-page-finaid-header cc-text-uppercase">Loans</h3>
+  </div>
+  <div data-ng-if="finaidAwards.awards.loans.links">
+    <a data-ng-repeat="link in finaidAwards.awards.loans.links"
+      data-cc-campus-solutions-link-directive="link.url"
+      data-cc-campus-solutions-link-directive-enabled="{{link.isCsLink}}"
+      data-cc-outbound-enabled="{{!link.isCsLink}}"
+      data-ng-bind="link.title"
+      data-ng-class="{'cc-widget-finaid-awards-section-link-separator': ($index > 0)}">
+    </a>
+  </div>
+</div>

@@ -14,7 +14,7 @@
       <div data-ng-if="finaidProfile.categories.length">
         <div data-ng-repeat="category in finaidProfile.categories" class="cc-clearfix-container">
           <div class="cc-clearfix-container">
-            <h3 class="cc-widget-finaid-profile-category-title cc-left" data-ng-bind="category.title"></h3>
+            <h3 class="cc-page-finaid-header cc-left" data-ng-bind="category.title"></h3>
             <button class="cc-button-link cc-widget-finaid-profile-button-toggle" data-ng-click="api.widget.toggleShow($event, finaidProfile.categories, category, 'Financial Aid - Profile')">
               <span data-ng-if="!category.show">Show</span>
               <span data-ng-if="category.show">Hide</span>

@@ -56,26 +56,6 @@
     margin-top: 5px;
   }
   .cc-widget-tasks-list {
-    border-left: 4px solid $cc-color-button-grey;
-    clear: both;
-    margin: 0;
-    padding: 0;
-
-    li {
-      border-bottom: 1px solid $cc-color-widget-background;
-      margin-right: 10px;
-      &:first-child {
-        border-top: 1px solid $cc-color-widget-background;
-        margin-top: 12px;
-      }
-      .cc-widget-tasks-form {
-        .row {
-          padding-bottom: 0;
-          padding-top: 0;
-        }
-      }
-    }
-
     input[type="checkbox"] {
       margin-left: 2px;
     }
@@ -94,12 +74,6 @@
       font-size: 11px;
       text-transform: uppercase;
     }
-  }
-  .cc-widget-tasks-list-green {
-    border-left-color: $cc-color-green-label;
-  }
-  .cc-widget-tasks-list-red {
-    border-left-color: $cc-color-red;
   }
   .cc-widget-tasks-more {
     padding-left: 30px;

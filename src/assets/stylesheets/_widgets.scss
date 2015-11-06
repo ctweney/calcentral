@@ -36,6 +36,37 @@
     }
   }
 }
+.cc-widget-list-color {
+  border-left: 4px solid $cc-color-button-grey;
+  clear: both;
+
+  li {
+    border-bottom: 1px solid $cc-color-widget-background;
+    margin-right: 10px;
+    &:first-child {
+      border-top: 1px solid $cc-color-widget-background;
+      margin-top: 12px;
+    }
+    .cc-widget-tasks-form {
+      .row {
+        padding-bottom: 0;
+        padding-top: 0;
+      }
+    }
+  }
+}
+.cc-widget-list-color-blue-dark {
+  border-left-color: $cc-color-widget-list-blue-dark;
+}
+.cc-widget-list-color-blue-light {
+  border-left-color: $cc-color-widget-list-blue-light;
+}
+.cc-widget-list-color-green {
+  border-left-color: $cc-color-green-label;
+}
+.cc-widget-list-color-red {
+  border-left-color: $cc-color-red;
+}
 .cc-widget-list-subtitle {
   font-size: 11px;
   line-height: 8px;
