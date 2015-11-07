@@ -1,11 +1,12 @@
 module HubEdos
   class Student < Proxy
 
+    include Cache::UserCacheExpiry
+
     SENSITIVE_KEYS = ['addresses', 'names', 'phones', 'emails', 'emergencyContacts']
 
     def initialize(options = {})
       super(Settings.hub_edos_proxy, options)
-      initialize_mocks if @fake
     end
 
     def url
@@ -41,7 +42,9 @@ module HubEdos
       # more stuff the Integration Hub should be doing, but the team doesn't have time for.
       response['studentResponse']['students']['students'].each do |student|
         SENSITIVE_KEYS.each do |key|
-          student[key].delete_if { |k| k['uiControl'].present? && k['uiControl']['code'] == 'N' }
+          if student[key].present?
+            student[key].delete_if { |k| k['uiControl'].present? && k['uiControl']['code'] == 'N' }
+          end
         end
       end
       response
