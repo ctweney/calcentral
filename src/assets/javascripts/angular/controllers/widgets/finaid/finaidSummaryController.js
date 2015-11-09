@@ -1,6 +1,7 @@
 'use strict';
 
 var angular = require('angular');
+var _ = require('lodash');
 
 /**
  * Finaid Summary controller
@@ -31,7 +32,7 @@ angular.module('calcentral.controllers').controller('FinaidSummaryController', f
    * Set the default selections on the finaid year and semester options
    */
   var setDefaultSelections = function(data) {
-    if (!data.finaidSummary) {
+    if (!_.get(data, 'finaidSummary.finaidYears.length')) {
       return;
     }
     finaidService.setDefaultFinaidYear(data, $routeParams.finaidYearId);
