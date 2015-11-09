@@ -12,7 +12,13 @@
       padding-top: 5px;
     }
     .cc-widget-finaid-coa-budget-table-title-sub {
-      padding-left: 10px;
+      padding-left: 20px;
+      position: relative;
+      &:before {
+        content: "• ";
+        margin-left: -10px;
+        position: absolute;
+      }
     }
   }
 }
