@@ -1,0 +1,20 @@
+<div class="cc-page-widget-profile-section" data-ng-controller="WorkExperienceSectionController" data-cc-spinner-directive>
+  <div class="cc-page-widget-profile-section-label">
+    Work Experience
+  </div>
+  <div class="cc-page-widget-profile-section-content">
+    <div data-ng-repeat="item in items.content" class="cc-page-widget-profile-section-content-item">
+      <div>
+        <strong data-ng-bind="item.employer"></strong>
+      </div>
+      <div data-ng-if="item.payFrequency.fromDate">
+        <span data-ng-bind="item.payFrequency.fromDate"></span>
+        -
+        <span data-ng-bind="item.payFrequency.toDate"></span>
+      </div>
+    </div>
+    <div data-ng-if="!items.content.length" class="cc-page-widget-profile-section-not-available">
+      There is no work experience available.
+    </div>
+  </div>
+</div>
