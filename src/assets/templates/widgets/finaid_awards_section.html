@@ -35,7 +35,11 @@
           <div class="cc-text-right">
             <div data-ng-if="!item.rightColumn.link.url">
               <div data-cc-amount-directive="item.rightColumn.amount" data-cc-amount-directive-color="false"></div>
-              <div data-ng-bind="item.rightColumn.value" class="cc-text-light cc-text-small cc-text-uppercase"></div>
+              <div
+                data-ng-bind="item.rightColumn.value"
+                class="cc-text-small cc-text-uppercase"
+                data-ng-class="{true:'cc-text-green', false:'cc-text-light'}[item.rightColumn.value === 'Disbursed']"
+              ></div>
             </div>
             <div data-ng-if="item.rightColumn.link.url" class="cc-widget-finaid-awards-section-item-action">
               <a
@@ -69,9 +73,9 @@
                 </tbody>
               </table>
             </div>
-            <div data-ng-if="item.subItems.loanDetails" class="cc-widget-finaid-awards-section-item-margin-top">
-              <strong>Loan Details</strong>
-              <div data-ng-bind="item.subItems.loanDetails"></div>
+            <div data-ng-if="item.subItems.awardMessage" class="cc-widget-finaid-awards-section-item-margin-top">
+              <strong>Award Details</strong>
+              <div data-ng-bind="item.subItems.awardMessage"></div>
             </div>
           </div>
 
