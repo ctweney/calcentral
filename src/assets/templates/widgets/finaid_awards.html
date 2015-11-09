@@ -1,0 +1,38 @@
+<div class="cc-widget cc-widget-finaid-awards" data-ng-controller="FinaidAwardsController">
+  <div class="cc-widget-title">
+    <h2>Awards</h2>
+  </div>
+  <div data-cc-spinner-directive="finaidAwardsInfo.isLoading">
+    <div data-ng-if="errored" class="cc-widget-text">
+      An error occurred while trying to retrieve your data.
+    </div>
+    <div data-ng-if="!errored">
+      <div class="cc-widget-text cc-widget-finaid-profile-message" data-ng-bind="finaidAwards.message"></div>
+      <div data-ng-if="finaidAwards.hasAwards">
+        <div
+          data-ng-repeat="key in finaidAwardsInfo.keysGiftWork"
+          data-ng-include="'widgets/finaid_awards_section.html'"
+          data-onload="section = finaidAwards.awards[key]"
+          data-ng-if="finaidAwards.awards[key]"
+        ></div>
+        <div
+          data-ng-if="finaidAwards.hasLoans"
+          data-ng-include="'widgets/finaid_awards_loans.html'"
+        ></div>
+        <div
+          data-ng-repeat="key in finaidAwardsInfo.keysLoans"
+          data-ng-include="'widgets/finaid_awards_section.html'"
+          data-onload="section = finaidAwards.awards[key]"
+          data-ng-if="finaidAwards.awards[key]"
+        ></div>
+        <div
+          data-ng-if="finaidAwards.awards.grandtotal.total.amount"
+          data-ng-include="'widgets/finaid_awards_grandtotal.html'"
+        ></div>
+      </div>
+      <div data-ng-if="!finaidAwards.hasAwards">
+        There is currently no awards information available for this aid year.
+      </div>
+    </div>
+  </div>
+</div>

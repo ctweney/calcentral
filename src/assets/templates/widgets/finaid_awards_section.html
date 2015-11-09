@@ -1,0 +1,87 @@
+<div class="cc-widget-finaid-awards-section">
+  <div class="cc-page-finaid-header-container cc-flex cc-flex-space-between cc-flex-align-base">
+    <div>
+      <h3 data-ng-bind="section.total.title" class="cc-page-finaid-header"></h3>
+    </div>
+    <div>
+      <a data-ng-repeat="link in section.links"
+        data-cc-campus-solutions-link-directive="link.url"
+        data-cc-campus-solutions-link-directive-enabled="{{link.isCsLink}}"
+        data-cc-outbound-enabled="{{!link.isCsLink}}"
+        data-ng-bind="link.title"
+        data-ng-class="{'cc-widget-finaid-awards-section-link-separator': ($index > 0)}">
+      </a>
+    </div>
+  </div>
+
+  <ul class="cc-widget-list-color" data-ng-class="'cc-widget-list-color-' + section.color">
+    <li
+      data-ng-repeat="item in section.items"
+      data-ng-class="{'cc-widget-list-selected': item.show}">
+
+      <div class="cc-widget-list-hover cc-widget-finaid-awards-section-item"
+        data-ng-class="{'cc-widget-list-hover-opened': (item.show)}"
+        data-cc-accessible-focus-directive
+        data-ng-click="api.widget.toggleShow($event, section.items, item, 'Finaid Awards')">
+
+        <div data-ng-bind="item.title"></div>
+        <div data-ng-bind="item.subtitle" class="cc-text-light cc-text-small cc-text-uppercase"></div>
+
+        <div class="cc-flex cc-flex-space-between cc-widget-finaid-awards-section-item-margin-top">
+          <div>
+            <div data-cc-amount-directive="item.leftColumn.amount" data-cc-amount-directive-color="false" data-cc-amount-directive-initial-space="false"></div>
+            <div data-ng-bind="item.leftColumn.value" class="cc-text-light cc-text-small cc-text-uppercase"></div>
+          </div>
+          <div class="cc-text-right">
+            <div data-ng-if="!item.rightColumn.link.url">
+              <div data-cc-amount-directive="item.rightColumn.amount" data-cc-amount-directive-color="false"></div>
+              <div data-ng-bind="item.rightColumn.value" class="cc-text-light cc-text-small cc-text-uppercase"></div>
+            </div>
+            <div data-ng-if="item.rightColumn.link.url" class="cc-widget-finaid-awards-section-item-action">
+              <a
+                class="cc-button cc-button-blue"
+                data-cc-campus-solutions-link-directive="item.rightColumn.link.url"
+                data-cc-campus-solutions-link-directive-enabled="{{item.rightColumn.link.isCsLink}}"
+                data-cc-outbound-enabled="{{!item.rightColumn.link.isCsLink}}"
+                data-ng-bind="item.rightColumn.link.title"
+              ></a>
+            </div>
+          </div>
+        </div>
+
+        <div data-ng-if="item.show">
+          <div data-ng-if="item.subItems.termDetails.length" class="cc-widget-finaid-awards-section-item-margin-top">
+            <div class="cc-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Term</th>
+                    <th scope="col" class="cc-table-right">Offered</th>
+                    <th scope="col" class="cc-table-right">Disbursed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-ng-repeat="termItem in item.subItems.termDetails">
+                    <td data-ng-bind="termItem.term"></td>
+                    <td class="cc-table-right" data-cc-amount-directive="termItem.offered" data-cc-amount-directive-color="false"></td>
+                    <td class="cc-table-right" data-cc-amount-directive="termItem.disbursed" data-cc-amount-directive-color="false"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div data-ng-if="item.subItems.loanDetails" class="cc-widget-finaid-awards-section-item-margin-top">
+              <strong>Loan Details</strong>
+              <div data-ng-bind="item.subItems.loanDetails"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <div data-ng-if="section.total.amount" class="cc-text-right cc-widget-finaid-awards-section-total">
+    <div class="cc-text-small cc-text-uppercase cc-text-light" data-ng-bind-template="{{section.total.title}} total"></div>
+    <div class="cc-text-big" data-cc-amount-directive="section.total.amount" data-cc-amount-directive-color="false"></div>
+  </div>
+</div>

@@ -40,7 +40,7 @@
         <div data-ng-hide="counts.scheduled === 0">
           <div class="cc-clearfix-container cc-widget-tasks-bottom-margin">
             <h3 class="cc-widget-tasks-section-label"><span data-ng-class="{'cc-widget-tasks-section-label-red': overdueTasks.length}">Overdue</span> <span class="cc-widget-tasks-section-label-count" data-ng-class="{'cc-widget-tasks-section-label-count-red': overdueTasks.length}" data-ng-bind="overdueTasks.length"></span> <span class="cc-right">Due</span></h3>
-            <ul class="cc-widget-tasks-list cc-widget-tasks-list-red">
+            <ul class="cc-widget-tasks-list cc-widget-list-color cc-widget-list-color-red">
               <li
                 data-ng-repeat="task in overdueTasks | limitTo: overdueLimit"
                 data-ng-class="{'cc-widget-list-selected': task.show}">
@@ -55,7 +55,7 @@
 
           <div class="cc-clearfix-container cc-widget-tasks-bottom-margin">
             <h3 class="cc-widget-tasks-section-label">Today <span class="cc-widget-tasks-section-label-count cc-widget-tasks-section-label-count-green" data-ng-bind="dueTodayTasks.length"></span></h3>
-            <ul class="cc-widget-tasks-list cc-widget-tasks-list-green">
+            <ul class="cc-widget-tasks-list cc-widget-list-color cc-widget-list-color-green">
               <li
                 data-ng-repeat="task in dueTodayTasks | limitTo: dueTodayLimit"
                 data-ng-class="{'cc-widget-list-selected': task.show}">
@@ -70,7 +70,7 @@
 
           <div class="cc-clearfix-container">
             <h3 class="cc-widget-tasks-section-label">Future <span class="cc-widget-tasks-section-label-count" data-ng-bind="futureTasks.length"></span></h3>
-            <ul class="cc-widget-tasks-list">
+            <ul class="cc-widget-tasks-list cc-widget-list-color">
               <li
                 data-ng-repeat="task in futureTasks | limitTo: futureLimit"
                 data-ng-class="{'cc-widget-list-selected': task.show}">
@@ -88,7 +88,7 @@
       <div data-ng-switch-when="unscheduled" role="tabpanel" aria-live="polite">
         <div data-ng-include src="'dashboard_task_noitems.html'" data-onload="tasksModeOpposite='scheduled'"></div>
         <h3 class="cc-widget-tasks-section-label">Unscheduled <span class="cc-widget-tasks-section-label-count" data-ng-bind="unscheduledTasks.length"></span> <span class="cc-right">Last Modified</span></h3>
-        <ul class="cc-widget-tasks-list">
+        <ul class="cc-widget-tasks-list cc-widget-list-color">
           <li
             data-ng-repeat="task in unscheduledTasks | limitTo:unscheduledLimit"
             data-ng-class="{'cc-widget-list-selected': task.show}">
@@ -104,7 +104,7 @@
       <div data-ng-switch-when="completed" role="tabpanel" aria-live="polite">
         <h3 class="cc-widget-tasks-section-label">Total <span class="cc-widget-tasks-section-label-count" data-ng-bind="completedTasks.length"></span> <span class="cc-right">Completed</span></h3>
 
-        <ul class="cc-widget-tasks-list">
+        <ul class="cc-widget-tasks-list cc-widget-list-color">
           <li
             data-ng-repeat="task in completedTasks | limitTo:completedLimit"
             data-ng-class="{'cc-widget-list-selected': task.show}">
