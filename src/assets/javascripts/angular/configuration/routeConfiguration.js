@@ -45,6 +45,10 @@ angular.module('calcentral.config').config(function($routeProvider) {
     controller: 'DashboardController',
     fireUpdatedFeeds: true
   }).
+  when('/welcome_delegate', {
+    templateUrl: 'welcome_delegate.html',
+    controller: 'WelcomeDelegateController'
+  }).
   when('/finances', {
     templateUrl: 'myfinances.html',
     controller: 'MyFinancesController'
