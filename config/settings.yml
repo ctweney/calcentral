@@ -318,6 +318,7 @@ features:
   cs_profile_visible_for_legacy_users: true
   show_notifications_archive_link: false
   cs_sir: false
+  cs_delegated_access: false
   slate_checklist: false
   webcast_sign_up_on_calcentral: false
   service_alerts_rss: true
