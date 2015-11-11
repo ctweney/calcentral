@@ -14,8 +14,6 @@ module HubEdos
     end
 
     def xml_filename
-      # student_edo.json contains the bmeta contract as defined at http://bmeta.berkeley.edu/common/personExampleV0.json
-      # student_api_via_hub.json contains dummy of what we really get from ihub api
       'student.xml'
     end
 
