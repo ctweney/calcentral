@@ -28,10 +28,10 @@ angular.module('calcentral.services').factory('profileMenuService', function() {
         }
       ]
     },
-    /* TODO - On hold till we have designs for these & after the profile sprint
     {
       'label': 'Privacy & Permissions',
       'categories': [
+        /* TODO - On hold till we have designs for these & after the profile sprint
         {
           'id': 'recordaccess',
           'name': 'Record Access'
@@ -40,12 +40,13 @@ angular.module('calcentral.services').factory('profileMenuService', function() {
           'id': 'ferpa',
           'name': 'FERPA Restrictions'
         },
+        */
         {
           'id': 'title4',
           'name': 'Title IV Release'
         }
       ]
-    }*/
+    },
     {
       'label': 'Credentials',
       'categories': [

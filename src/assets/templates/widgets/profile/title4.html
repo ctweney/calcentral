@@ -1,1 +1,39 @@
-TBD
+<div
+  class="cc-widget-text cc-page-widget-profile-title4"
+  data-ng-controller="Title4Controller"
+  data-cc-spinner-directive="title4.isLoading"
+>
+
+  <div data-ng-if="!title4.hasFinaid" data-ng-include="'widgets/finaid_not_available.html'"></div>
+
+  <div data-ng-if="title4.hasFinaid">
+    <p>
+      I have <span data-ng-if="!title4.isApproved">not</span> authorized UC Berkeley to pay non-institutional charges with my Title IV financial aid funds.
+      <button class="cc-button-link" data-ng-if="!title4.showMessage" data-ng-click="title4.showMessage = !title4.showMessage">Show more</button>
+      <button class="cc-button-link" data-ng-if="title4.showMessage" data-ng-click="title4.showMessage = !title4.showMessage">Show less</button>
+    </p>
+
+    <p data-ng-if="title4.showMessage" data-ng-bind="title4.longMessage" class="cc-text-pre-line"></p>
+
+    <p>
+      <form class="cc-page-widget-profile-title4-form">
+        <input
+          type="checkbox"
+          id="cc-page-widget-profile-title4-check"
+          data-ng-model="title4.isApproved"
+          data-ng-change="sendResponseT4(title4.isApproved ? 'Y' : 'N')"
+        />
+        <label for="cc-page-widget-profile-title4-check">
+          <strong>
+            <span data-ng-if="title4.isApproved">I have authorized use of Title IV aid for charges</span>
+            <span data-ng-if="!title4.isApproved">Authorized use of Title IV aid for charges</span>
+          </strong>
+        </label>
+      </form>
+    </p>
+
+    <div>
+      If you have any questions or would like to speak with a financial aid representative, feel free to open a case or call us at (510) 664-9181.
+    </div>
+  </div>
+</div>

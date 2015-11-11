@@ -24,6 +24,7 @@
             <div data-ng-repeat="item in items" class="cc-clearfix-container">
               <div class="cc-left">
                 <strong data-ng-bind="item.title"></strong>
+                <a data-ng-if="item.title === 'Title IV'" href="/profile/title4">Update</a>
               </div>
               <div class="cc-right" data-ng-bind="item.value" data-ng-if="item.value"></div>
               <div class="cc-right" data-ng-if="item.values">
