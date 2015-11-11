@@ -1,8 +1,46 @@
 .cc-page-welcome-delegate {
-  background: $cc-color-white;
-  h1 {
-    margin: 0 10px;
-    padding-top: 20px;
+  .cc-delegate-row-margin {
+    padding-left: 0;
   }
-
+  .cc-widget-link-student {
+    background: $cc-color-white;
+    .cc-widget-link-student-padding {
+      padding: 5px 5px;
+    }
+    .cc-link-student-title {
+      width: 100%;
+    }
+    .cc-widget-link-student {
+      margin: 7px 5px 0;
+    }
+    .cc-widget-link-student-form {
+      background: transparent;
+      border: 0;
+      .cc-widget-link-student-form-label {
+        font-size: inherit;
+        text-align: left;
+      }
+      .cc-widget-link-student-form-check {
+        display: block;
+        float: left;
+        margin: 2px;
+      }
+    }
+    .cc-page-widget-link-student-footer {
+      .cc-page-widget-link-student-footnote-number {
+        color: $cc-color-lighter-medium-grey;
+        width: 5%;
+        float: left;
+        margin: 0px 0px 0px 0px;
+        padding: 0px 0px 5px 5px;
+      }
+      .cc-page-widget-link-student-footnote-text {
+        color: $cc-color-lighter-medium-grey;
+        width: 95%;
+        float: left;
+        margin: 0px 0px 0px 0px;
+        padding: 0px 0px 5px 5px;
+      }
+    }
+  }
 }
