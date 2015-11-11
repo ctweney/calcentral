@@ -100,7 +100,8 @@ module HubEdos
     end
 
     def parse_response(response)
-      MultiXml.parse response.body.force_encoding('UTF-8')
+      # Use Nori to parse because it has smart typecasting (necessary to handle booleans in the feed)
+      Nori.new(strip_namespaces: true).parse(response.body.force_encoding('UTF-8'))
     end
 
     def build_feed(response)

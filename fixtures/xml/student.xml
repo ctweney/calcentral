@@ -192,8 +192,8 @@
             <r:description>Other</r:description>
           </c:type>
           <c:emailAddress>oski@gmail.com</c:emailAddress>
-          <c:primary type="boolean">true</c:primary>
-          <c:disclose type="boolean">false</c:disclose>
+          <c:primary>true</c:primary>
+          <c:disclose>false</c:disclose>
           <c:uiControl>
             <r:code>F</r:code>
             <r:description>Full Edit</r:description>
@@ -205,8 +205,8 @@
             <r:description>CAMPUS</r:description>
           </c:type>
           <c:emailAddress>oski@berkeley.edu</c:emailAddress>
-          <c:primary type="boolean">false</c:primary>
-          <c:disclose type="boolean">false</c:disclose>
+          <c:primary>false</c:primary>
+          <c:disclose>false</c:disclose>
           <c:uiControl>
             <r:code>F</r:code>
             <r:description>Full Edit</r:description>
