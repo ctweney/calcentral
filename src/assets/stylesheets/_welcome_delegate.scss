@@ -5,7 +5,7 @@
   .cc-widget-link-student {
     background: $cc-color-white;
     .cc-widget-link-student-padding {
-      padding: 5px 5px;
+      padding: 5px;
     }
     .cc-link-student-title {
       width: 100%;
@@ -29,17 +29,17 @@
     .cc-page-widget-link-student-footer {
       .cc-page-widget-link-student-footnote-number {
         color: $cc-color-lighter-medium-grey;
-        width: 5%;
         float: left;
-        margin: 0px 0px 0px 0px;
-        padding: 0px 0px 5px 5px;
+        margin: 0;
+        padding: 0 0 5px 5px;
+        width: 5%;
       }
       .cc-page-widget-link-student-footnote-text {
         color: $cc-color-lighter-medium-grey;
-        width: 95%;
         float: left;
-        margin: 0px 0px 0px 0px;
-        padding: 0px 0px 5px 5px;
+        margin: 0;
+        padding: 0 0 5px 5px;
+        width: 95%;
       }
     }
   }
