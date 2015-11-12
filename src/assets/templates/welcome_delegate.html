@@ -1,18 +1,5 @@
 <div class="cc-page-welcome-delegate">
-
   <div class="medium-4 columns cc-delegate-row-margin" ng-if="api.user.profile.features.csDelegatedAccess">
     <div data-ng-include src="'widgets/delegated_access/student_linking.html'"></div>
-  </div>
-  <div data-ng-if="!api.user.profile.features.csDelegatedAccess" data-ng-cloak>
-    <div class="small-12 columns">
-      <h2>Service not available</h2>
-      <p>
-        The service that would link your account to students is not available at this time.
-      </p>
-      <p>
-        If you believe you are seeing this message in error,
-        please <a href="https://www.ets.berkeley.edu/find-support/request-forms/request-support-or-give-feedback">let us know</a>.
-      </p>
-    </div>
   </div>
 </div>

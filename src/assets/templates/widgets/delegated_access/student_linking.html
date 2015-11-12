@@ -2,47 +2,41 @@
   <div class="cc-widget-title">
     <h2>Linking Your Account</h2>
   </div>
-  <div class="cc-widget-link-student-padding">
-    <form class="cc-widget-link-student-form">
-      <h3 class="cc-left cc-link-student-title">Link Your Account with Your Student</h3>
+  <div class="cc-widget-text">
+    <form>
+      <h3 class="cc-widget-link-student-title">Link Your Account with Your Student</h3>
       <div>Enter information from the email message you received:</div>
       <div>
-        <label for="cc-page-widget-link-student-key" class="cc-widget-link-student-form-label">
+        <label for="cc-page-widget-link-student-key">
           Security Key: <span class="cc-required-field-indicator">*</span>
         </label>
       </div>
       <div>
-        <input type="text" id="cc-page-widget-link-student-key" data-ng-model="currentObject.data.securityKey" required aria-required="true" />
+        <input type="text" id="cc-page-widget-link-student-key" data-ng-model="currentObject.data.securityKey" aria-required="true" />
       </div>
       <div>
-        <label for="cc-page-widget-link-student-email" class="cc-widget-link-student-form-label">
+        <label for="cc-page-widget-link-student-email">
           Email Address [1]: <span class="cc-required-field-indicator">*</span>
         </label>
       </div>
       <div>
-        <input type="text" id="cc-page-widget-link-student-email" data-ng-model="currentObject.data.email" required aria-required="true" />
-      </div>
-      <div class="cc-widget-show-more">
-        <div>
-          <input type="checkbox" id="cc-page-widget-link-student-terms" data-ng-model="currentObject.data.agreeToTerms" class="ng-valid ng-dirty ng-valid-parse ng-touched">
-          <span for="cc-page-widget-link-student-terms">I agree to the Terms and Conditions.</span>
-          <button class="cc-button-link" data-ng-show="!showTerms" data-ng-click="showTerms=!showTerms">Show</button>
-        </div>
-        <div>
-          <p data-ng-if="showTerms" class="ng-scope" data-ng-bind="termsAndConditions"></p>
-        </div>
+        <input type="text" id="cc-page-widget-link-student-email" data-ng-model="currentObject.data.email" aria-required="true" />
       </div>
       <div>
-        <button class="cc-button cc-button-blue" type="submit" data-ng-click="linkAccounts()" data-ng-disabled="isSaving">
+        <input type="checkbox" id="cc-page-widget-link-student-terms" data-ng-model="currentObject.data.agreeToTerms">
+        <label for="cc-page-widget-link-student-terms">I agree to the Terms and Conditions.</label>
+        <button class="cc-button-link" data-ng-if="!agreement.showing" data-ng-click="getTermsAndConditions()">Show</button>
+        <p class="cc-page-widget-link-student-agreement" data-ng-if="agreement.showing" data-ng-bind="agreement.text"></p>
+      </div>
+      <div>
+        <button class="cc-button cc-button-blue" type="submit" data-ng-submit="linkAccounts()" data-ng-disabled="isSaving">
           <span data-ng-if="!isSaving">Link</span>
           <span data-ng-if="isSaving">Updating...</span>
         </button>
       </div>
       <hr class="cc-hr-spacing-5" />
-      <div class="cc-page-widget-link-student-footer">
-        <span class="cc-page-widget-link-student-footnote-number">[1]</span>
-        <span class="cc-page-widget-link-student-footnote-text">Email address where you received your delegate message.</span>
-      </div>
+      <span class="cc-page-widget-link-student-footer cc-page-widget-link-student-footnote-ref">[1]</span>
+      <span class="cc-page-widget-link-student-footer cc-page-widget-link-student-footnote-text">Email address where you received your delegate message.</span>
     </form>
   </div>
 </div>
