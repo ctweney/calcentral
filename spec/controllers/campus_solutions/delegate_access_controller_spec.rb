@@ -23,6 +23,14 @@ describe CampusSolutions::DelegateAccessController do
       expect(json['statusCode']).to eq 200
       expect(json['feed']['status']).to be_present
     end
+
+    it 'should get terms and conditions' do
+      get :get
+      expect(response.status).to eq 200
+      json = JSON.parse(response.body)
+      expect(json['statusCode']).to eq 200
+      expect(json['feed']['daAgreeToTerms']['termsAndConditions']).to include 'Excepteur sint occaecat'
+    end
   end
 
 end

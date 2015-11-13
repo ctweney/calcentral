@@ -2,7 +2,7 @@
   .cc-delegate-row-margin {
     padding-left: 0;
   }
-  .cc-widget-link-student {
+  .cc-widget-link-delegate {
     background: $cc-color-white;
     form {
       background: transparent;
@@ -18,20 +18,20 @@
         margin-bottom: 2px;
       }
     }
-    .cc-widget-link-student-title {
+    .cc-widget-link-delegate-title {
       width: 100%;
     }
-    .cc-widget-link-student {
+    .cc-widget-link-delegate {
       margin: 7px 5px 0;
     }
-    .cc-page-widget-link-student-agreement {
+    .cc-page-widget-link-delegate-agreement {
       background: $cc-color-light-grey;
     }
-    .cc-page-widget-link-student-footer {
+    .cc-page-widget-link-delegate-footer {
       color: $cc-color-lighter-medium-grey;
     }
-    .cc-page-widget-link-student-footnote {
-      width: 8%;
+    .cc-page-widget-link-delegate-footnote {
+      width: 5%;
     }
   }
 }
