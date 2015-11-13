@@ -13,7 +13,7 @@ module HubEdos
         },
         statusCode: 200
       }
-      [HubEdos::Contacts, HubEdos::Demographics].each do |proxy|
+      [HubEdos::Contacts, HubEdos::Demographics, HubEdos::Affiliations].each do |proxy|
         feed = proxy.new({user_id: @uid}).get
         if feed[:statusCode] > 400
           merged[:statusCode] = 500

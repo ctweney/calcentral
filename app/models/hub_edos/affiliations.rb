@@ -1,5 +1,5 @@
 module HubEdos
-  class Demographics < Student
+  class Affiliations < Student
 
     include Cache::UserCacheExpiry
 
@@ -8,15 +8,15 @@ module HubEdos
     end
 
     def url
-      "#{@settings.base_url}/#{@campus_solutions_id}/demographic"
+      "#{@settings.base_url}/#{@campus_solutions_id}/affiliation"
     end
 
     def json_filename
-      'demographics.json'
+      'affiliations.json'
     end
 
     def include_fields
-      %w(ethnicities languages usaCountry foreignCountries birth gender)
+      %w(affiliations)
     end
 
   end
