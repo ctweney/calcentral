@@ -37,10 +37,10 @@ angular.module('calcentral.controllers').controller('FinaidSummaryController', f
     }
     finaidService.setDefaultFinaidYear(data, $routeParams.finaidYearId);
     finaidService.setDefaultSemesterOption($routeParams.semesterOptionId);
+    updateCanSeeFinaid();
     selectFinaidYear();
     selectSemesterOption();
     updateFinaidUrl();
-    updateCanSeeFinaid();
   };
 
   var updateFinaidUrl = function() {
@@ -63,6 +63,9 @@ angular.module('calcentral.controllers').controller('FinaidSummaryController', f
   };
 
   var getFinaidYearData = function() {
+    if (!$scope.canSeeFinaidData) {
+      return;
+    }
     return finaidFactory.getFinaidYearInfo({
       finaidYearId: finaidService.options.finaidYear.id
     }).success(parseFinaidYearData);

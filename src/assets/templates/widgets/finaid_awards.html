@@ -7,8 +7,8 @@
       An error occurred while trying to retrieve your data.
     </div>
     <div data-ng-if="!errored">
-      <div class="cc-widget-text cc-widget-finaid-profile-message" data-ng-bind="finaidAwards.message"></div>
       <div data-ng-if="finaidAwards.hasAwards">
+        <div class="cc-widget-text cc-widget-finaid-profile-message" data-ng-bind="finaidAwards.message"></div>
         <div
           data-ng-repeat="key in finaidAwardsInfo.keysGiftWork"
           data-ng-include="'widgets/finaid_awards_section.html'"
@@ -30,7 +30,7 @@
           data-ng-include="'widgets/finaid_awards_grandtotal.html'"
         ></div>
       </div>
-      <div data-ng-if="!finaidAwards.hasAwards">
+      <div class="cc-widget-text" data-ng-if="!finaidAwards.hasAwards">
         There is currently no awards information available for this aid year.
       </div>
     </div>
