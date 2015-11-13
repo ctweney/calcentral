@@ -11,8 +11,8 @@ module HubEdos
       "#{@settings.base_url}/#{@campus_solutions_id}/contacts"
     end
 
-    def json_filename
-      'student_contacts.json'
+    def xml_filename
+      'contacts.xml'
     end
 
     def include_fields

@@ -11,8 +11,8 @@ module HubEdos
       "#{@settings.base_url}/#{@campus_solutions_id}/affiliation"
     end
 
-    def json_filename
-      'affiliations.json'
+    def xml_filename
+      'affiliations.xml'
     end
 
     def include_fields
