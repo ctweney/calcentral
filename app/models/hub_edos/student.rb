@@ -20,21 +20,19 @@ module HubEdos
     end
 
     def build_feed(response)
-      transformed_response = filter_fields(redact_sensitive_keys(transform_address_keys(parse_response(response))))
+      transformed_response = redact_sensitive_keys(transform_address_keys(parse_response(response)))
       {
-        'student' => transformed_response
+        'student' => transformed_response['studentResponse']['students']['students'][0]
       }
     end
 
     def transform_address_keys(response)
       # this should really be done in the Integration Hub, but they won that argument due to time constraints.
       response['studentResponse']['students']['students'].each do |student|
-        if student['addresses'].present?
-          student['addresses'].each do |address|
-            address['state'] = address.delete('stateCode')
-            address['postal'] = address.delete('postalCode')
-            address['country'] = address.delete('countryCode')
-          end
+        student['addresses'].each do |address|
+          address['state'] = address.delete('stateCode')
+          address['postal'] = address.delete('postalCode')
+          address['country'] = address.delete('countryCode')
         end
       end
       response
@@ -50,22 +48,6 @@ module HubEdos
         end
       end
       response
-    end
-
-    def filter_fields(response)
-      # only include the fields that this proxy is responsible for
-      if include_fields.nil?
-        return response['studentResponse']['students']['students'][0]
-      end
-      result = {}
-      response['studentResponse']['students']['students'][0].keys.each do |field|
-        result[field] = response['studentResponse']['students']['students'][0][field] if include_fields.include?(field)
-      end
-      result
-    end
-
-    def include_fields
-      nil
     end
 
   end
