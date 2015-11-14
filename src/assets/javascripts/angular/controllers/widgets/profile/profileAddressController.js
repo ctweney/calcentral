@@ -88,12 +88,20 @@ angular.module('calcentral.controllers').controller('ProfileAddressController', 
     }));
   };
 
+  /**
+   * Remove the current error message
+   */
+  var removeErrorMessage = function() {
+    $scope.errorMessage = '';
+  };
+
   var countryWatch = function(countryCode) {
     if (!countryCode) {
       return;
     }
     if (!initialEdit.load) {
       removePreviousAddressData();
+      removeErrorMessage();
     }
     $scope.currentObject.stateFieldLoading = true;
     initialEdit.load = false;
