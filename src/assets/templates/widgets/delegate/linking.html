@@ -1,0 +1,44 @@
+<div class="cc-widget cc-widget-link-delegate" data-ng-controller="DelegateLinkingController">
+  <div class="cc-widget-title">
+    <h2>Linking Your Account</h2>
+  </div>
+  <div class="cc-widget-text">
+    <form>
+      <h3 class="cc-widget-link-delegate-title">Link Your Account with Your Student</h3>
+      <div>Enter information from the email message you received:</div>
+      <div>
+        <label for="cc-page-widget-link-delegate-key">
+          Security Key: <span class="cc-required-field-indicator">*</span>
+        </label>
+      </div>
+      <div>
+        <input type="text" id="cc-page-widget-link-delegate-key" data-ng-model="currentObject.data.securityKey" required="true" aria-required="true" />
+      </div>
+      <div>
+        <label for="cc-page-widget-link-delegate-email">
+          Email Address [1]: <span class="cc-required-field-indicator">*</span>
+        </label>
+      </div>
+      <div>
+        <input type="text" id="cc-page-widget-link-delegate-email" data-ng-model="currentObject.data.email" required="true" aria-required="true" />
+      </div>
+      <div>
+        <input type="checkbox" id="cc-page-widget-link-delegate-terms" data-ng-model="currentObject.data.agreeToTerms">
+        <label for="cc-page-widget-link-delegate-terms">I agree to the Terms and Conditions.</label>
+        <button class="cc-button-link" data-ng-if="!showTermsAndConditions" data-ng-click="getTermsAndConditions()">Show</button>
+        <p class="cc-page-widget-link-delegate-agreement" data-ng-if="showTermsAndConditions" data-ng-bind="feed.daAgreeToTerms.termsAndConditions"></p>
+      </div>
+      <div>
+        <button class="cc-button cc-button-blue" type="submit" data-ng-submit="linkAccounts()" data-ng-disabled="isSaving">
+          <span data-ng-if="!isSaving">Link</span>
+          <span data-ng-if="isSaving">Updating...</span>
+        </button>
+      </div>
+      <hr class="cc-hr-spacing-5" />
+      <div class="cc-flex cc-page-widget-link-delegate-footer">
+        <div class="cc-page-widget-link-delegate-footnote">[1]</div>
+        <div>Email address where you received your delegate message.</div>
+      </div>
+    </form>
+  </div>
+</div>
