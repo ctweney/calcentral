@@ -157,6 +157,7 @@ Calcentral::Application.routes.draw do
   get '/api/campus_solutions/financial_aid_data' => 'campus_solutions/financial_aid_data#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/financial_aid_funding_sources' => 'campus_solutions/financial_aid_funding_sources#get', :via => :get, :defaults => { :format => 'json' }
   get '/api/campus_solutions/delegate_access' => 'campus_solutions/delegate_access#get_terms_and_conditions', :via => :get, :defaults => { :format => 'json' }
+  get '/api/campus_solutions/delegate_access/students' => 'campus_solutions/delegate_access#get_students', :via => :get, :defaults => { :format => 'json' }
   post '/api/campus_solutions/address' => 'campus_solutions/address#post', :via => :post, :defaults => { :format => 'json' }
   post '/api/campus_solutions/delegate_access' => 'campus_solutions/delegate_access#post', :via => :post, :defaults => { :format => 'json' }
   post '/api/campus_solutions/email' => 'campus_solutions/email#post', :via => :post, :defaults => { :format => 'json' }
