@@ -25,7 +25,7 @@ describe CampusSolutions::DelegateAccessController do
     end
 
     it 'should get terms and conditions' do
-      get :get
+      get :get_terms_and_conditions
       expect(response.status).to eq 200
       json = JSON.parse(response.body)
       expect(json['statusCode']).to eq 200
