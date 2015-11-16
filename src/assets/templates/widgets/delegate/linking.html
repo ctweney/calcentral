@@ -2,8 +2,12 @@
   <div class="cc-widget-title">
     <h2>Linking Your Account</h2>
   </div>
+  <div class="cc-page-widget-link-delegate-content-error cc-text-red" data-ng-if="errorMessage">
+    <i class="cc-icon-red fa fa-exclamation-circle"></i>
+    <span data-ng-bind="errorMessage"></span>
+  </div>
   <div class="cc-widget-text">
-    <form>
+    <form data-ng-submit="save(currentObject.data)">
       <h3 class="cc-widget-link-delegate-title">Link Your Account with Your Student</h3>
       <div>Enter information from the email message you received:</div>
       <div>
@@ -20,7 +24,7 @@
         </label>
       </div>
       <div>
-        <input type="text" id="cc-page-widget-link-delegate-email" data-ng-model="currentObject.data.email" required="true" aria-required="true" />
+        <input type="text" id="cc-page-widget-link-delegate-email" data-ng-model="currentObject.data.proxyEmailAddress" required="true" aria-required="true" />
       </div>
       <div>
         <input type="checkbox" id="cc-page-widget-link-delegate-terms" data-ng-model="currentObject.data.agreeToTerms">
@@ -29,7 +33,7 @@
         <p class="cc-page-widget-link-delegate-agreement" data-ng-if="showTermsAndConditions" data-ng-bind="feed.daAgreeToTerms.termsAndConditions"></p>
       </div>
       <div>
-        <button class="cc-button cc-button-blue" type="submit" data-ng-submit="linkAccounts()" data-ng-disabled="isSaving">
+        <button class="cc-button cc-button-blue" type="submit" data-ng-disabled="isSaving">
           <span data-ng-if="!isSaving">Link</span>
           <span data-ng-if="isSaving">Updating...</span>
         </button>

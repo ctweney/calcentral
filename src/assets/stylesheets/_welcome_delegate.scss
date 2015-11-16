@@ -1,4 +1,11 @@
 .cc-page-welcome-delegate {
+  .cc-page-widget-link-delegate-content-error {
+    background-color: $cc-color-red-light;
+    border-bottom: 1px solid $cc-color-red;
+    margin: -10px -10px 10px;
+    padding: 10px;
+    white-space: pre-line;
+  }
   .cc-delegate-row-margin {
     padding-left: 0;
   }
