@@ -73,17 +73,20 @@ module CalcentralConfig
     files
   end
 
-  def update_rails_logger_level(level_name)
-    new_level = Log4r::LNAMES.index level_name
+  def update_rails_logger_level(new_level)
     old_level = Rails.logger.level
-    if new_level.nil?
-      Rails.logger.warn "The new logger level is invalid: #{Settings.logger.level}"
+    if invalid_logger_level? new_level
+      Rails.logger.warn "The new logger level is invalid: #{new_level}"
     elsif new_level == old_level
       Rails.logger.warn "No change to logger level: #{Log4r::LNAMES[Rails.logger.level]}"
     else
       Rails.logger.level = new_level
       Rails.logger.warn "Logger level changed (old -> new): #{Log4r::LNAMES[old_level]} -> #{Log4r::LNAMES[Rails.logger.level]}"
     end
+  end
+
+  def invalid_logger_level?(level)
+    (0...Log4r::LNAMES.length).to_a.exclude? level
   end
 
 end
