@@ -110,13 +110,17 @@ module User
       save
     end
 
+    def is_new_campus_solutions_student?
+      is_campus_solutions_student? && @edo_attributes[:campus_solutions_id].to_s.length >= 10
+    end
+
     def is_campus_solutions_student?
       # no, really, BCS users are identified by having 10-digit IDs.
-      @edo_attributes.present? && @edo_attributes[:campus_solutions_id].present? && @edo_attributes[:campus_solutions_id].to_s.length >= 10
+      @edo_attributes.present? && @edo_attributes[:campus_solutions_id].present? && @edo_attributes[:student_id].present?
     end
 
     def is_sis_profile_visible?
-      is_cs_profile_feature_enabled && (is_campus_solutions_student? || is_profile_visible_for_legacy_users)
+      is_cs_profile_feature_enabled && is_campus_solutions_student? && (is_new_campus_solutions_student? || is_profile_visible_for_legacy_users)
     end
 
     def get_feed_internal
@@ -156,7 +160,7 @@ module User
         :uid => @uid,
         :sid => @student_id,
         :campusSolutionsID => get_campus_attribute('campus_solutions_id'),
-        :isCampusSolutionsStudent => is_campus_solutions_student?,
+        :isCampusSolutionsStudent => is_new_campus_solutions_student?,
         :showSisProfileUI => is_sis_profile_visible?
       }
     end

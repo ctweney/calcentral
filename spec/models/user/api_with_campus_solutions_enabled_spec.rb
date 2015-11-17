@@ -53,6 +53,7 @@ describe User::Api do
         double(
         get: {
           :person_name => @default_name,
+          :student_id => 12345678,
           :campus_solutions_id => 12345678,    # note: 8-digit ID means legacy
           :roles => {
             :student => true,
@@ -150,7 +151,9 @@ describe User::Api do
     end
     before do
       HubEdos::UserAttributes.stub(:new).and_return(double(get: {
-        roles: test_roles
+        roles: test_roles,
+        student_id: 12345678,
+        campus_solutions_id: 12345678
       }))
     end
     subject {User::Api.new(@random_id).get_feed[:hasFinancialsTab]}
