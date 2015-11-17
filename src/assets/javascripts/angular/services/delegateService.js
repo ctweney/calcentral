@@ -2,15 +2,15 @@
 
 var angular = require('angular');
 
-angular.module('calcentral.services').service('delegateService', function() {
+angular.module('calcentral.services').service('delegateService', function($q) {
   /**
    * Fired after an action (e.g., save) has finished
    */
-  var actionCompleted = function($scope, data, callback) {
-    if (data.data.errored) {
-      $scope.errorMessage = data.data.feed.errmsgtext;
+  var actionCompleted = function(data) {
+    if (data.errorMessage) {
+      $q.reject(data.errorMessage);
     } else {
-      callback({
+      $q.resolve({
         refresh: true
       });
     }
