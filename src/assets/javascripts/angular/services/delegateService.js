@@ -7,13 +7,15 @@ angular.module('calcentral.services').service('delegateService', function($q) {
    * Fired after an action (e.g., save) has finished
    */
   var actionCompleted = function(data) {
+    var deferred = $q.defer();
     if (data.errorMessage) {
-      $q.reject(data.errorMessage);
+      deferred.reject(data.errorMessage);
     } else {
-      $q.resolve({
+      deferred.resolve({
         refresh: true
       });
     }
+    return deferred.promise;
   };
 
   /**
