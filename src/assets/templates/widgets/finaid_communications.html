@@ -1,0 +1,20 @@
+<div class="cc-widget" data-ng-controller="FinaidCommunicationsController">
+  <div class="cc-widget-title">
+    <h2>Communications</h2>
+  </div>
+  <div class="cc-widget-text" data-cc-spinner-directive="communications.isLoading">
+    <div data-ng-if="errored">
+      An error occurred while trying to retrieve your data.
+    </div>
+    <div data-ng-if="!errored">
+      <div>
+        <a
+          data-cc-campus-solutions-link-directive="communications.unsolictedResourcesUrl"
+          data-cc-outbound-enabled="false"
+        >
+          Archive of Official Communications 
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
