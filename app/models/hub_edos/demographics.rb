@@ -11,8 +11,8 @@ module HubEdos
       "#{@settings.base_url}/#{@campus_solutions_id}/demographic"
     end
 
-    def xml_filename
-      'demographics.xml'
+    def json_filename
+      'demographics.json'
     end
 
     def include_fields

@@ -1,14 +1,14 @@
 module CampusSolutions
   module PersonDataExpiry
     def self.expire(uid=nil)
-      [HubEdos::Student, HubEdos::MyStudent,
-       HubEdos::Contacts, HubEdos::Demographics, HubEdos::Affiliations].each do |klass|
+      [HubEdos::Person, HubEdos::Student, HubEdos::Contacts, HubEdos::Demographics,
+       HubEdos::Affiliations, HubEdos::MyPerson, HubEdos::MyStudent].each do |klass|
         klass.expire uid
       end
     end
 
     def self.expire_on_profile_change(uid=nil)
-      [HubEdos::MyStudent, HubEdos::Contacts].each do |klass|
+      [HubEdos::Contacts, HubEdos::MyStudent].each do |klass|
         klass.expire uid
       end
     end
