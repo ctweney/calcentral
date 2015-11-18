@@ -21,11 +21,9 @@ angular.module('calcentral.controllers').controller('DelegateLinkingController',
 
   var saveCompleted = function(data) {
     $scope.isSaving = false;
-    actionCompleted(data);
-  };
-
-  var actionCompleted = function(data) {
-    apiService.delegate.actionCompleted($scope, data, showLinkedStudents);
+    apiService.delegate.actionCompleted(data).then(showLinkedStudents, function(errorMessage) {
+      $scope.errorMessage = errorMessage;
+    });
   };
 
   var showLinkedStudents = function() {

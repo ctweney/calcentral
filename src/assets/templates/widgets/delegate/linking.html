@@ -2,12 +2,12 @@
   <div class="cc-widget-title">
     <h2>Linking Your Account</h2>
   </div>
-  <div class="cc-delegate-linking-error cc-text-red" data-ng-if="errorMessage">
-    <i class="cc-icon-red fa fa-exclamation-circle"></i>
-    <span data-ng-bind="errorMessage"></span>
-  </div>
   <div class="cc-widget-text">
-    <form data-ng-submit="save(currentObject.data)">
+    <div class="cc-delegate-linking-error cc-text-red" data-ng-if="errorMessage">
+      <i class="cc-icon-red fa fa-exclamation-circle"></i>
+      <span data-ng-bind="errorMessage"></span>
+    </div>
+    <form data-ng-submit="save(currentObject.data)" name="cc_delegate_linking_form">
       <h3 class="cc-delegate-linking-title">Link Your Account with Your Student</h3>
       <div>Enter information from the email message you received:</div>
       <div>
@@ -16,7 +16,7 @@
         </label>
       </div>
       <div>
-        <input type="text" id="cc-delegate-linking-key" data-ng-model="currentObject.data.securityKey" required="true" aria-required="true" />
+        <input type="text" id="cc-delegate-linking-key" data-ng-model="currentObject.data.securityKey" required aria-required="true" />
       </div>
       <div>
         <label for="cc-delegate-linking-email">
@@ -24,16 +24,16 @@
         </label>
       </div>
       <div>
-        <input type="text" id="cc-delegate-linking-email" data-ng-model="currentObject.data.proxyEmailAddress" required="true" aria-required="true" />
+        <input type="text" id="cc-delegate-linking-email" data-ng-model="currentObject.data.proxyEmailAddress" required aria-required="true" />
       </div>
       <div>
-        <input type="checkbox" id="cc-delegate-linking-terms" data-ng-model="currentObject.data.agreeToTerms">
+        <input type="checkbox" id="cc-delegate-linking-terms" data-ng-model="currentObject.data.agreeToTerms" required aria-required="true">
         <label for="cc-delegate-linking-terms">I agree to the Terms and Conditions.</label>
         <button class="cc-button-link" data-ng-if="!showTermsAndConditions" data-ng-click="getTermsAndConditions()">Show</button>
         <p class="cc-delegate-linking-agreement" data-ng-if="showTermsAndConditions" data-ng-bind="feed.daAgreeToTerms.termsAndConditions"></p>
       </div>
       <div>
-        <button class="cc-button cc-button-blue" type="submit" data-ng-disabled="isSaving">
+        <button class="cc-button cc-button-blue" type="submit" data-ng-disabled="cc_delegate_linking_form.$invalid || isSaving">
           <span data-ng-if="!isSaving">Link</span>
           <span data-ng-if="isSaving">Updating...</span>
         </button>

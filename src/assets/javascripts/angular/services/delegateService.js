@@ -8,8 +8,8 @@ angular.module('calcentral.services').service('delegateService', function($q) {
    */
   var actionCompleted = function(data) {
     var deferred = $q.defer();
-    if (data.errorMessage) {
-      deferred.reject(data.errorMessage);
+    if (data.data.errored) {
+      deferred.reject(data.data.feed.errmsgtext);
     } else {
       deferred.resolve({
         refresh: true
