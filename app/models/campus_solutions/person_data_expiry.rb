@@ -8,7 +8,7 @@ module CampusSolutions
     end
 
     def self.expire_on_profile_change(uid=nil)
-      [HubEdos::MyStudent, HubEdos::Contacts].each do |klass|
+      [HubEdos::Contacts, HubEdos::MyStudent].each do |klass|
         klass.expire uid
       end
     end
