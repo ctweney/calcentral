@@ -25,5 +25,6 @@ describe CampusSolutions::DelegateAccessCreate do
     subject { proxy.get }
     it_should_behave_like 'a simple proxy that returns errors'
     it_should_behave_like 'a proxy that got data successfully'
+    it_should_behave_like 'a proxy that properly observes the delegated access feature flag'
   end
 end

@@ -5,6 +5,7 @@ describe CampusSolutions::DelegateStudents do
 
   it_should_behave_like 'a simple proxy that returns errors'
   it_should_behave_like 'a proxy that got data successfully'
+  it_should_behave_like 'a proxy that properly observes the delegated access feature flag'
 
   it 'returns expected mock data' do
     students = subject[:feed][:students]

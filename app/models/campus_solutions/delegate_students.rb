@@ -1,6 +1,8 @@
 module CampusSolutions
   class DelegateStudents < DirectProxy
 
+    include DelegatedAccessFeatureFlagged
+
     def initialize(options = {})
       super options
       initialize_mocks if @fake
