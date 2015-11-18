@@ -2,7 +2,7 @@ module CampusSolutions
   class Deposit < DirectProxy
 
     include Cache::UserCacheExpiry
-    include ProfileFeatureFlagged
+    include SirFeatureFlagged
     include Cache::RelatedCacheKeyTracker
     include CampusSolutionsIdRequired
 

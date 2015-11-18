@@ -1,7 +1,7 @@
 module CampusSolutions
   class SirConfig < DirectProxy
 
-    include ProfileFeatureFlagged
+    include SirFeatureFlagged
 
     def initialize(options = {})
       super options
