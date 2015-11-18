@@ -1,6 +1,8 @@
 module CampusSolutions
   class DelegateAccessCreate < PostingProxy
 
+    include DelegatedAccessFeatureFlagged
+
     def initialize(options = {})
       super(Settings.campus_solutions_proxy, options)
       initialize_mocks if @fake

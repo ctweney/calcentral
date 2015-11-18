@@ -31,6 +31,7 @@ features:
   cal1card: true
   audio: true
   advising: true
+  cs_delegated_access: true
   cs_fin_aid: true
   cs_profile: true
   cs_sir: true

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<ROOT>
+  <STUDENT_DELEGATED_ACCESS>
+    <STUDENTS type="array">
+      <STUDENT>
+        <EMPLID>16777216</EMPLID>
+        <NAME>Tom Tulliver</NAME>
+        <ROLENAMES type="array">
+          <ROLENAME>UC DA InPerson Call Access</ROLENAME>
+        </ROLENAMES>
+      </STUDENT>
+      <STUDENT>
+        <EMPLID>1073741824</EMPLID>
+        <NAME>Maggie Tulliver</NAME>
+        <ROLENAMES type="array">
+          <ROLENAME>UC DA Financial View</ROLENAME>
+          <ROLENAME>UC DA InPerson Call Access</ROLENAME>
+        </ROLENAMES>
+      </STUDENT>
+    </STUDENTS>
+  </STUDENT_DELEGATED_ACCESS>
+</ROOT>
