@@ -1,7 +1,7 @@
 module CampusSolutions
   class SirResponse < PostingProxy
 
-    include ProfileFeatureFlagged
+    include SirFeatureFlagged
     include CampusSolutionsIdRequired
 
     def initialize(options = {})
