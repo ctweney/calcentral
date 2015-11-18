@@ -17,13 +17,13 @@ module HubEdos
       return merged unless is_cs_profile_feature_enabled
 
       [HubEdos::Contacts, HubEdos::Demographics, HubEdos::Affiliations].each do |proxy|
-        feed = proxy.new({user_id: @uid}).get
-        if feed[:statusCode] > 400
+        hub_response = proxy.new({user_id: @uid}).get
+        if hub_response[:noStudentId] || hub_response[:statusCode] > 400
           merged[:statusCode] = 500
           merged[:errored] = true
           logger.error("Got errors in merged student feed on #{proxy} for uid #{@uid}")
         else
-          merged[:feed][:student].merge!(feed[:feed]['student'])
+          merged[:feed][:student].merge!(hub_response[:feed]['student'])
         end
       end
       merged
