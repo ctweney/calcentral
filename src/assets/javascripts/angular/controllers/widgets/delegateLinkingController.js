@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash');
 var angular = require('angular');
 
 /**
@@ -7,11 +8,16 @@ var angular = require('angular');
  */
 angular.module('calcentral.controllers').controller('DelegateLinkingController', function(apiService, delegateFactory, $scope) {
   angular.extend($scope, {
-    currentObject: {},
-    isSaving: false
+    delegate: {
+      currentObject: {},
+      isLoading: true,
+      termsAndConditionsVisible: false,
+      isSaving: false
+    }
   });
 
   $scope.save = function(item) {
+    $scope.delegate.isSaving = true;
     apiService.delegate.save($scope, delegateFactory.linkAccounts, {
       securityKey: item.securityKey,
       proxyEmailAddress: item.proxyEmailAddress,
@@ -20,9 +26,9 @@ angular.module('calcentral.controllers').controller('DelegateLinkingController',
   };
 
   var saveCompleted = function(data) {
-    $scope.isSaving = false;
+    $scope.delegate.isSaving = false;
     apiService.delegate.actionCompleted(data).then(showLinkedStudents, function(errorMessage) {
-      $scope.errorMessage = errorMessage;
+      $scope.delegate.errorMessage = errorMessage;
     });
   };
 
@@ -32,10 +38,16 @@ angular.module('calcentral.controllers').controller('DelegateLinkingController',
 
   $scope.getTermsAndConditions = function() {
     delegateFactory.getTermsAndConditions().success(function(data) {
-      angular.extend($scope, data);
-      $scope.showTermsAndConditions = true;
+      angular.extend($scope, _.get(data, 'feed'));
+      $scope.delegate.termsAndConditionsVisible = true;
     }).error(function() {
-      $scope.displayError = 'failure';
+      $scope.delegate.errorMessage = 'The system failed to get Terms and Conditions.';
     });
   };
+
+  var loadInformation = function() {
+    $scope.delegate.isLoading = false;
+  };
+
+  loadInformation();
 });

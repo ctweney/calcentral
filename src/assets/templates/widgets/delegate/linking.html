@@ -1,13 +1,16 @@
-<div class="cc-widget cc-delegate-linking-widget" data-ng-controller="DelegateLinkingController">
+<div class="cc-widget cc-delegate-linking-widget"
+  data-ng-controller="DelegateLinkingController"
+  data-cc-spinner-directive="delegate.isLoading"
+>
   <div class="cc-widget-title">
     <h2>Linking Your Account</h2>
   </div>
   <div class="cc-widget-text">
-    <div class="cc-delegate-linking-error cc-text-red" data-ng-if="errorMessage">
+    <div class="cc-delegate-linking-error cc-text-red" data-ng-if="delegate.errorMessage">
       <i class="cc-icon-red fa fa-exclamation-circle"></i>
-      <span data-ng-bind="errorMessage"></span>
+      <span data-ng-bind="delegate.errorMessage"></span>
     </div>
-    <form data-ng-submit="save(currentObject.data)" name="cc_delegate_linking_form">
+    <form data-ng-submit="save(delegate.currentObject.data)" name="cc_delegate_linking_form">
       <h3 class="cc-delegate-linking-title">Link Your Account with Your Student</h3>
       <div>Enter information from the email message you received:</div>
       <div>
@@ -16,7 +19,7 @@
         </label>
       </div>
       <div>
-        <input type="text" id="cc-delegate-linking-key" data-ng-model="currentObject.data.securityKey" required aria-required="true" />
+        <input type="text" id="cc-delegate-linking-key" data-ng-model="delegate.currentObject.data.securityKey" required aria-required="true" />
       </div>
       <div>
         <label for="cc-delegate-linking-email">
@@ -24,18 +27,18 @@
         </label>
       </div>
       <div>
-        <input type="text" id="cc-delegate-linking-email" data-ng-model="currentObject.data.proxyEmailAddress" required aria-required="true" />
+        <input type="text" id="cc-delegate-linking-email" data-ng-model="delegate.currentObject.data.proxyEmailAddress" required aria-required="true" />
       </div>
       <div>
-        <input type="checkbox" id="cc-delegate-linking-terms" data-ng-model="currentObject.data.agreeToTerms" required aria-required="true">
+        <input type="checkbox" id="cc-delegate-linking-terms" data-ng-model="delegate.currentObject.data.agreeToTerms" required aria-required="true">
         <label for="cc-delegate-linking-terms">I agree to the Terms and Conditions.</label>
-        <button class="cc-button-link" data-ng-if="!showTermsAndConditions" data-ng-click="getTermsAndConditions()">Show</button>
-        <p class="cc-delegate-linking-agreement" data-ng-if="showTermsAndConditions" data-ng-bind="feed.daAgreeToTerms.termsAndConditions"></p>
+        <button class="cc-button-link" data-ng-if="!delegate.termsAndConditionsVisible" data-ng-click="getTermsAndConditions()">Show</button>
+        <p class="cc-delegate-linking-agreement" data-ng-if="delegate.termsAndConditionsVisible" data-ng-bind="daAgreeToTerms.termsAndConditions"></p>
       </div>
       <div>
-        <button class="cc-button cc-button-blue" type="submit" data-ng-disabled="cc_delegate_linking_form.$invalid || isSaving">
-          <span data-ng-if="!isSaving">Link</span>
-          <span data-ng-if="isSaving">Updating...</span>
+        <button class="cc-button cc-button-blue" type="submit" data-ng-disabled="cc_delegate_linking_form.$invalid || delegate.isSaving">
+          <span data-ng-if="!delegate.isSaving">Link</span>
+          <span data-ng-if="delegate.isSaving">Linking...</span>
         </button>
       </div>
       <hr class="cc-hr-spacing-5" />
