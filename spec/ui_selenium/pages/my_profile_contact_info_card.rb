@@ -10,104 +10,378 @@ module CalCentralPages
     include PageObject
     include ClassLogger
 
-    elements(:phone, :div, :xpath => '//div[@data-ng-repeat="phone in phones.content"]')
-    button(:add_phone_button, :xpath => '//button[@data-ng-click="showAddPhone()"]')
+    div(:phone_section, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]')
+    div(:phone_label, :xpath => '//div[text()="Phone Number"]')
+    elements(:phone, :div, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//div[@data-ng-repeat="item in items.content"]')
+    elements(:phone_type, :div, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//div[@data-ng-repeat="item in items.content"]//strong')
+    elements(:phone_number, :span, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//div[@data-ng-repeat="item in items.content"]//span[@data-ng-bind="item.number"]')
+    elements(:phone_extension, :span, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//div[@data-ng-repeat="item in items.content"]//span[@data-ng-if="item.extension"]')
+    elements(:phone_edit_button, :button, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//div[@data-ng-repeat="item in items.content"]//button[text()="Edit"]')
+
+    button(:add_phone_button, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//button[@data-ng-click="showAdd()"]')
+    button(:save_phone_button, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//button[contains(.,"Save")]')
+    button(:cancel_phone_button, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//button[contains(.,"Cancel")]')
+    button(:delete_phone_button, :xpath => '//div[@data-ng-controller="ProfilePhoneController"]//button[contains(.,"Delete phone number")]')
+
+    form(:add_phone_form, :name => 'cc_page_widget_profile_phone')
     select_list(:phone_type, :id => 'cc-page-widget-profile-phone-type')
     text_area(:phone_number_input, :id => 'cc-page-widget-profile-phone-number')
     text_area(:phone_ext_input, :id => 'cc-page-widget-profile-phone-extension')
     checkbox(:phone_preferred_cbx, :id => 'cc-page-widget-profile-phone-preferred')
-    button(:phone_save_button, :xpath => '//div[@data-ng-if="phone.isModifying"]//button[contains(.,"Save")]')
-    button(:phone_cancel_button, :xpath => '//div[@data-ng-if="phone.isModifying"]//button[contains(.,"Cancel")]')
+    span(:phone_validation_error, :xpath => '//span[@data-ng-bind="errorMessage"]')
 
-    elements(:email, :div, :xpath => '//div[@data-ng-repeat="email in emails.content"]')
-    button(:add_email_button, :xpath => '//button[@data-ng-click="showAddEmail()"]')
-    select_list(:email_type, :xpath => '//select[@data-ng-options="emailType.fieldvalue as emailType.xlatlongname for emailType in emailTypes"]')
-    text_area(:email_address, :id => 'cc-page-widget-profile-email-address')
-    checkbox(:email_preferred_cbx, :id => 'cc-page-widget-profile-email-preferred')
-    button(:email_save_button, :xpath => '//div[@data-ng-if="email.isModifying"]//button[contains(.,"Save")]')
-    button(:email_cancel_button, :xpath => '//div[@data-ng-if="email.isModifying"]//button[contains(.,"Cancel")]')
+    def load_page
+      navigate_to "#{WebDriverUtils.base_url}/profile/contact"
+    end
 
-    elements(:address, :div, :xpath => '//div[@data-ng-repeat="address in addresses.content"]')
-    button(:add_address_button, :xpath => '') # TODO
+    # PHONES
 
-    # PHONE
-
-    def phone_type(index)
-      phone_elements[index].div_element(:xpath => '//strong')
+    def phone_types
+      types = []
+      phones= phone_type_elements
+      phones.each { |type| types << type.text.sub(' Phone', '') }
+      types
     end
 
     def phone_primary?(index)
-      true unless phone_elements[index].span_element(:xpath => '//span[@data-ng-if="phone.primary"]').nil?
+      phone_elements[index].text.include? 'preferred'
     end
 
-    def phone_number(index)
-      phone_elements[index].div_element(:xpath => '//div[@data-ng-bind="phone.number"]')
+    def phone_numbers
+      numbers = []
+      phone_number_elements.each { |number| numbers << number.text }
+      numbers
     end
 
-    def phone_edit_button(index)
-      phone_elements[index].button_element(:xpath => '//button[text()="Edit"]')
+    def phone_extensions
+      # for each phone, try to find extension.  if none push nil
+      extensions = []
+      phone_elements.each do |phone|
+        extension = span_element(:xpath => "//div[@data-ng-controller='ProfilePhoneController']//div[@data-ng-repeat='item in items.content'][#{(phone_elements.index(phone) + 1).to_s}]//span[@data-ng-if='item.extension']")
+        extension.exists? ? extensions << extension.text : extensions << nil
+      end
+      extensions
     end
 
-    def edit_phone(index, type, number, ext, pref)
-      phone_edit_button(index).click
-      phone_type_element.when_visible timeout=WebDriverUtils.page_event_timeout
-      self.phone_type = type
-      self.phone_number_input = number unless number.nil?
-      self.phone_ext_input = ext unless ext.nil?
-      check_phone_preferred_cbx if pref
+    def phone_type_index(type)
+      phone_types.index(type)
     end
 
-    def save_phone
-      phone_save_button
+    def click_add_phone
+      cancel_phone_button if cancel_phone_button_element.visible?
+      WebDriverUtils.wait_for_element_and_click add_phone_button_element
     end
 
-    def cancel_phone
-      phone_cancel_button
+    def click_edit_phone(index)
+      cancel_phone_button if cancel_phone_button_element.visible?
+      WebDriverUtils.wait_for_element_and_click phone_edit_button_elements[index]
+    end
+
+    def click_save_phone
+      WebDriverUtils.wait_for_element_and_click save_phone_button_element
+    end
+
+    def click_cancel_phone
+      WebDriverUtils.wait_for_element_and_click cancel_phone_button_element
+    end
+
+    def click_delete_phone
+      WebDriverUtils.wait_for_element_and_click delete_phone_button_element
+    end
+
+    def enter_phone(type, number, ext, pref)
+      logger.info "Entering phone of type #{type}, number #{number}, extension #{ext}"
+      WebDriverUtils.wait_for_element_and_type(phone_number_input_element, number) unless number.nil?
+      WebDriverUtils.wait_for_element_and_type(phone_ext_input_element, ext) unless ext.nil?
+      sleep 1
+      WebDriverUtils.wait_for_element_and_select(phone_type_element, type) unless type.nil?
+      pref ? check_phone_preferred_cbx : uncheck_phone_preferred_cbx unless pref.nil?
+    end
+
+    def add_new_phone(type, number, ext, pref)
+      click_add_phone
+      enter_phone(type, number, ext, pref)
+      click_save_phone
+    end
+
+    def edit_phone(index, number, ext, pref)
+      click_edit_phone index
+      enter_phone(nil, number, ext, pref)
+      click_save_phone
+    end
+
+    def delete_phone(index)
+      logger.info "Deleting phone at index #{index}"
+      phone = phone_elements[index]
+      click_edit_phone index
+      click_delete_phone
+      phone.when_not_present WebDriverUtils.page_load_timeout
+      sleep 3
+    end
+
+    def delete_all_phones
+      phone_count = phone_elements.length
+      logger.info "There are #{phone_count.to_s} phones"
+      (1..phone_count).each do
+        phone_count = phone_elements.length
+        # Don't try to delete the first phone if it will trigger a validation error
+        logger.info "Phone count is #{phone_count.to_s}"
+        (phone_primary?(0) && phone_count > 2) ? index = 1 : index = 0
+        delete_phone index
+      end
     end
 
     # EMAIL ADDRESS
 
-    def email_type(index)
-      email_elements[index].div_element(:xpath => '//strong')
+    div(:email_section, :xpath => '//div[@data-ng-controller="ProfileEmailController"]')
+    div(:email_label, :xpath => '//div[text()="Email"]')
+    elements(:email, :div, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]')
+    elements(:email_type, :div, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]//strong')
+    elements(:email_address, :span, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]//span[@data-ng-bind="item.emailAddress"]')
+
+    button(:add_email_button, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//button[@data-ng-click="showAdd()"]')
+    button(:save_email_button, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//button[contains(.,"Save")]')
+    button(:edit_email_button, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//button[@data-ng-click="showEdit(item)"]')
+    button(:cancel_email_button, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//button[contains(.,"Cancel")]')
+    button(:delete_email_button, :xpath => '//button[text()="Delete email"]')
+
+    form(:email_form, :name => 'cc_page_widget_profile_email')
+    select_list(:email_type, :id => 'cc-page-widget-profile-email-type')
+    text_area(:email_input, :id => 'cc-page-widget-profile-email-address')
+    checkbox(:email_preferred_cbx, :id => 'cc-page-widget-profile-email-preferred')
+    span(:email_validation_error, :xpath => '//span[contains(.,"Invalid email address")]')
+
+    def email_types
+      types = []
+      email_type_elements.each { |type| types << type.text.sub(' Email', '') }
+      types
     end
 
     def email_primary?(index)
-      true unless email_elements[index].span_element(:xpath => '//span[@data-ng-if="phone.primary"]').nil?
+      email_elements[index].text.include? 'preferred'
     end
 
-    def email_address(index)
-      email_elements[index].div_element(:xpath => '//div[@data-ng-bind="phone.number"]')
+    def email_addresses
+      addresses = []
+      email_address_elements.each { |address| addresses << address.text }
+      addresses
     end
 
-    def email_edit_button(index)
-      email_elements[index].button_element(:xpath => '//button[text()="Edit"]')
+    def email_type_index(type)
+      email_types.index(type)
     end
 
-    def edit_email(index, type, address, pref)
-      email_edit_button(index).click
-      email_type_element.when_visible timeout=WebDriverUtils.page_event_timeout
-      self.email_type = type
-      self.email_address = address unless address.nil?
-      check_email_preferred_cbx if pref
+    def click_add_email
+      cancel_email_button if cancel_email_button_element.visible?
+      WebDriverUtils.wait_for_element_and_click add_email_button_element
+    end
+
+    def click_edit_email
+      cancel_email_button if cancel_email_button_element.visible?
+      WebDriverUtils.wait_for_element_and_click edit_email_button_element
+    end
+
+    def click_save_email
+      WebDriverUtils.wait_for_element_and_click save_email_button_element
+    end
+
+    def click_cancel_email
+      WebDriverUtils.wait_for_element_and_click cancel_email_button_element
+    end
+
+    def enter_email(address, pref)
+      logger.info "Entering email address '#{address}'"
+      WebDriverUtils.wait_for_element_and_type(email_input_element, address) unless address.nil?
+      pref ? check_email_preferred_cbx : uncheck_email_preferred_cbx unless pref.nil?
+    end
+
+    def add_email(type, address, pref)
+      click_add_email
+      enter_email(address, pref)
+      click_save_email
+      wait_until(WebDriverUtils.page_load_timeout, "Visible email types are '#{email_types}'") { email_types.include? type }
+    end
+
+    def edit_email(address, pref)
+      click_edit_email
+      enter_email(address, pref)
+      click_save_email
+    end
+
+    def delete_email
+      if edit_email_button?
+        click_edit_email
+        WebDriverUtils.wait_for_element_and_click delete_email_button_element
+        add_email_button_element.when_visible WebDriverUtils.page_load_timeout
+      end
     end
 
     # ADDRESS
 
-    def address_type(index)
-      address_elements[index].div_element(:xpath => '//strong')
+    div(:address_section, :xpath => '//div[@data-ng-controller="ProfileAddressController"]')
+    div(:address_label, :xpath => '//div[text()="Address"]')
+    elements(:address, :div, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//div[@data-ng-repeat="item in items.content"]')
+    elements(:address_type, :div, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//div[@data-ng-repeat="item in items.content"]//strong')
+    elements(:address_formatted, :div, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//div[@data-ng-repeat="item in items.content"]//div[@data-ng-bind-html="item.formattedAddress"]')
+    elements(:address_edit_button, :button, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//div[@data-ng-repeat="item in items.content"]//button[text()="Edit"]')
+
+    button(:add_address_button, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//button[@data-ng-click="showAdd()"]')
+    button(:save_address_button, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//button[contains(.,"Save")]')
+    button(:cancel_address_button, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//button[contains(.,"Cancel")]')
+    button(:delete_address_button, :xpath => '//button[text()="Delete address"]')
+
+    select_list(:country_select, :id => 'cc-page-widget-profile-address-country')
+    span(:address_validation_error, :xpath => '//div[@data-ng-controller="ProfileAddressController"]//span[@data-ng-bind="errorMessage"]')
+
+    def address_types
+      types= []
+      address_type_elements.each { |type| types << type.text.sub(' Address', '') }
+      types
     end
 
-    def address_primary?(index)
-      true unless address_elements[index].span_element(:xpath => '//span[@data-ng-if="address.primary"]').nil?
+    def addresses_formatted
+      addresses = []
+      address_formatted_elements.each { |address| addresses << address.text }
+      addresses
     end
 
-    def address_1(index)
-      address_elements[index].div_element(:xpath => '//div[@data-ng-bind="address.street1"]')
+    def formatted_address(index)
+      address_formatted_elements[index].text
     end
 
-    def address_edit_button(index)
-      address_elements[index].button_element(:xpath => '//button[text()="Edit"]')
+    def address_type_index(type)
+      address_types.index(type)
+    end
+
+    def click_add_address
+      click_cancel_address if cancel_address_button_element.visible?
+      WebDriverUtils.wait_for_element_and_click add_address_button_element
+    end
+
+    def click_edit_address(index)
+      click_cancel_address if cancel_address_button_element.visible?
+      wait_until(WebDriverUtils.page_load_timeout) { address_edit_button_elements.any? }
+      WebDriverUtils.wait_for_element_and_click address_edit_button_elements[index]
+    end
+
+    def click_save_address
+      # Scroll to the bottom of the page in case the Save button is not in view
+      execute_script('window.scrollTo(0, document.body.scrollHeight);')
+      WebDriverUtils.wait_for_element_and_click save_address_button_element
+    end
+
+    def click_cancel_address
+      # Scroll to the bottom of the page in case the Cancel button is not in view
+      execute_script('window.scrollTo(0, document.body.scrollHeight);')
+      WebDriverUtils.wait_for_element_and_click cancel_address_button_element
+      sleep 1
+    end
+
+    def load_country_form(address)
+      WebDriverUtils.wait_for_element_and_select(country_select_element, address['country'])
+      sleep 3
+      # Scroll to the bottom of the page to bring the complete form into view
+      execute_script('window.scrollTo(0, document.body.scrollHeight);')
+    end
+
+    def enter_address(address, inputs, selections)
+      load_country_form address
+      inputs.each do |input|
+        WebDriverUtils.wait_for_element_and_type(text_area_element(:id => "cc-page-widget-profile-field-#{input['index'].to_s}"), input['text'])
+      end
+      unless selections.nil?
+        selections.each do |select|
+          WebDriverUtils.wait_for_element_and_select(select_list_element(:id => "cc-page-widget-profile-field-#{select['index'].to_s}"), select['option'])
+        end
+      end
+    end
+
+    def clear_address_fields(address, inputs, selections)
+      logger.info 'Removing all input and selections'
+      load_country_form address
+      unless inputs.nil?
+        inputs.each do |input|
+          WebDriverUtils.wait_for_element_and_type(text_area_element(:id => "cc-page-widget-profile-field-#{input['index'].to_s}"), '')
+        end
+      end
+      unless selections.nil?
+        selections.each do |select|
+          select_element = select_list_element(:id => "cc-page-widget-profile-field-#{select['index'].to_s}")
+          default_option = select_element.options.find { |option| option.text.include? 'Choose' }
+          select_element.select default_option.text
+        end
+      end
+    end
+
+    def add_address(address, inputs, selections)
+      click_add_address
+      enter_address(address, inputs, selections)
+      click_save_address
+    end
+
+    def edit_address(index, address, inputs, selections)
+      click_edit_address index
+      enter_address(address, inputs, selections)
+    end
+
+    def verify_address(index, inputs, selections)
+      logger.info "About to check the text displayed for #{inputs.length} inputs"
+      sleep 2
+      logger.info "Address displayed is \n#{formatted_address(index)}"
+      inputs.each do |input|
+        logger.debug "Checking that #{input['text']} is visible"
+        wait_until(2, "The text '#{input['text'].slice(0..(input['max'] - 1))}' is not present") do
+          formatted_address(index).include? input['text'].slice(0..(input['max'] - 1)).strip
+        end
+      end
+      unless selections.nil?
+        logger.info "About to check the text displayed for #{selections.length} selections"
+        selections.each do |select|
+          logger.debug "Checking that #{select['option']} is visible"
+          wait_until(2, "The option '#{select['option']}' i  s not present") do
+            formatted_address(index).include? select['option']
+          end
+        end
+      end
+    end
+
+    def verify_address_labels(address)
+      address['inputs'].each do |input|
+        logger.debug "Checking that there is an input labeled #{input['label']}"
+        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{input['index'].to_s}']/span")
+        label.when_visible(1)
+        wait_until(1, "The label #{input['label']} is not present") do
+          label.text == input['label']
+        end
+      end
+      address['selects'].each do |select|
+        logger.debug "Checking that there is a drop-down labeled #{select['label']}"
+        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{select['index'].to_s}']/span")
+        label.when_visible(1)
+        wait_until(1, "The label #{select['label']} is not present") do
+          label.text == select['label']
+        end
+      end
+    end
+
+    def verify_req_field_error(address)
+      req_inputs = address['inputs'].select { |input| input['req'] }
+      nonreq_inputs = address['inputs'].reject { |input| input['req'] }
+      address_validation_error_element.when_visible WebDriverUtils.page_event_timeout
+      logger.debug "Validation error says #{address_validation_error}"
+      req_inputs.each do |req|
+        wait_until(1, "Error message does not include '#{req['label']}'") do
+          address_validation_error.include? req['label']
+        end
+      end
+      nonreq_inputs.each do |nonreq|
+        wait_until(1, "Error message includes '#{nonreq['label']}'") do
+          !address_validation_error.include? nonreq['label']
+        end
+      end
     end
 
   end
+
 end
+
