@@ -1,5 +1,5 @@
 module CampusSolutions
-  class DelegateTermsAndConditions < DirectProxy
+  class DelegateManagementURL < DirectProxy
 
     include DelegatedAccessFeatureFlagged
 
@@ -9,11 +9,11 @@ module CampusSolutions
     end
 
     def xml_filename
-      'delegate_terms_and_conditions.xml'
+      'delegate_management_url.xml'
     end
 
     def url
-      "#{@settings.base_url}/UC_DA_T_C.v1/get"
+      "#{@settings.base_url}/UC_CC_DELEGATED_ACCESS_URL.v1/get"
     end
 
   end

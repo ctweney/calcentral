@@ -31,6 +31,12 @@ angular.module('calcentral.services').factory('profileMenuService', function() {
     {
       'label': 'Privacy & Permissions',
       'categories': [
+        /* TODO - On hold until GoLive 5
+        {
+          'id': 'delegate',
+          'name': 'Delegate Access'
+        },
+        */
         /* TODO - On hold till we have designs for these & after the profile sprint
         {
           'id': 'recordaccess',

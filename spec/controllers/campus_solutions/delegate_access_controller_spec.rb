@@ -51,6 +51,14 @@ describe CampusSolutions::DelegateAccessController do
       expect(json['statusCode']).to eq 200
       expect(json['feed']['daAgreeToTerms']['termsAndConditions']).to include 'Excepteur sint occaecat'
     end
+
+    it 'should get Campus Solutions URL for managing delegates' do
+      get :get_delegate_management_url
+      expect(response.status).to eq 200
+      json = JSON.parse(response.body)
+      expect(json['statusCode']).to eq 200
+      expect(json['feed']['delegatedAccessUrl']['url']).to eq 'https://bcs-web-dev-03.is.berkeley.edu:8443/psc/bcsdev/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SS_CC_DA_SHAREINFO.GBL?Page=SS_CC_DA_HDR&Action=A&ForceSearch=Y&TargetFrameName=None'
+    end
   end
 
 end
