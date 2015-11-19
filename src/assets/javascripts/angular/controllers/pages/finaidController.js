@@ -11,7 +11,8 @@ angular.module('calcentral.controllers').controller('FinaidController', function
 
   $scope.isMainFinaid = true;
   $scope.finaid = {
-    isLoading: true
+    isLoading: true,
+    backToText: 'My Finances'
   };
 
   /**
