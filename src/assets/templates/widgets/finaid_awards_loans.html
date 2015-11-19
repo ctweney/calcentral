@@ -6,6 +6,7 @@
     <a data-ng-repeat="link in finaidAwards.awards.loans.links"
       data-cc-campus-solutions-link-directive="link.url"
       data-cc-campus-solutions-link-directive-enabled="{{link.isCsLink}}"
+      data-cc-campus-solutions-link-directive-text="finaid.backToText"
       data-cc-outbound-enabled="{{!link.isCsLink}}"
       data-ng-bind="link.title"
       data-ng-class="{'cc-widget-finaid-awards-section-link-separator': ($index > 0)}">
