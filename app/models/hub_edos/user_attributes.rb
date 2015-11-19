@@ -59,12 +59,14 @@ module HubEdos
     end
 
     def find_name(type, edo, result)
-      edo[:names].each do |name|
-        if name[:type].present? && name[:type][:code].present? && name[:type][:code].upcase == type.upcase
-          result[:first_name] = name[:givenName]
-          result[:last_name] = name[:familyName]
-          result[:person_name] = name[:formattedName]
-          return true
+      if edo[:names].present?
+        edo[:names].each do |name|
+          if name[:type].present? && name[:type][:code].present? && name[:type][:code].upcase == type.upcase
+            result[:first_name] = name[:givenName]
+            result[:last_name] = name[:familyName]
+            result[:person_name] = name[:formattedName]
+            return true
+          end
         end
       end
       false
@@ -87,12 +89,14 @@ module HubEdos
     end
 
     def extract_emails(edo, result)
-      edo[:emails].each do |email|
-        if email[:primary] == true
-          result[:email_address] = email[:emailAddress]
-        end
-        if email[:type].present? && email[:type][:code] == 'CAMP'
-          result[:official_bmail_address] = email[:emailAddress]
+      if edo[:emails].present?
+        edo[:emails].each do |email|
+          if email[:primary] == true
+            result[:email_address] = email[:emailAddress]
+          end
+          if email[:type].present? && email[:type][:code] == 'CAMP'
+            result[:official_bmail_address] = email[:emailAddress]
+          end
         end
       end
     end

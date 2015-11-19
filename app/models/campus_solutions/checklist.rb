@@ -2,7 +2,7 @@ module CampusSolutions
   class Checklist < DirectProxy
 
     include Cache::UserCacheExpiry
-    include ProfileFeatureFlagged
+    include SirFeatureFlagged
     include CampusSolutionsIdRequired
 
     def initialize(options = {})
