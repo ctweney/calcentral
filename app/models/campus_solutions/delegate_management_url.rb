@@ -1,13 +1,11 @@
 module CampusSolutions
   class DelegateManagementURL < DirectProxy
 
+    include DelegatedAccessFeatureFlagged
+
     def initialize(options = {})
       super options
       initialize_mocks if @fake
-    end
-
-    def response_root_xml_node
-      'DELEGATED_ACCESS_URL'
     end
 
     def xml_filename

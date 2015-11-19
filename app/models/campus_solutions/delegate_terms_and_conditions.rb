@@ -8,10 +8,6 @@ module CampusSolutions
       initialize_mocks if @fake
     end
 
-    def response_root_xml_node
-      'DA_AGREE_TO_TERMS'
-    end
-
     def xml_filename
       'delegate_terms_and_conditions.xml'
     end
