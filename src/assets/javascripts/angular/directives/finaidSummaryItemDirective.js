@@ -9,7 +9,8 @@ angular.module('calcentral.directives').directive('ccFinaidSummaryItemDirective'
   return {
     templateUrl: 'directives/finaid_summary_item.html',
     scope: {
-      item: '='
+      item: '=',
+      fadeTotal: '='
     }
   };
 });
