@@ -11,6 +11,9 @@
   .cc-widget-finaid-summary-available-semesters {
     margin-left: 75px;
   }
+  .cc-widget-finaid-summary-indent {
+    margin-left: 10px;
+  }
   .cc-widget-finaid-summary-message-title {
     display: block;
     margin-bottom: 5px;
@@ -28,7 +31,7 @@
   }
   .cc-widget-finaid-summary-funding-offered-category {
     border-left: 5px solid $cc-finaid-summary-blue-1;
-    margin-top: 10px;
+    margin-top: 15px;
     padding-left: 5px;
   }
   .cc-widget-finaid-summary-funding-offered-category:nth-child(2) {
