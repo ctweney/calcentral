@@ -1,4 +1,4 @@
-describe 'MyTasks' do
+describe 'MyTasks::Merged' do
   before(:each) do
     @user_id = rand(99999).to_s
     @fake_google_tasks_list_proxy = GoogleApps::TasksList.new({fake: true})
@@ -293,6 +293,21 @@ describe 'MyTasks' do
     end
   end
 
+  context 'when a provider combusts' do
+    before do
+      allow(GoogleApps::Proxy).to receive(:access_granted?).and_return true
+      allow(Canvas::Proxy).to receive(:access_granted?).and_return true
+      allow_any_instance_of(MyTasks::SisTasks).to receive(:fetch_tasks).and_raise NoMethodError
+    end
+
+    it 'reports the error and returns what it can' do
+      allow(Rails.logger).to receive(:error).with anything
+      expect(Rails.logger).to receive(:error).with /Failed to merge MyTasks::SisTasks for UID #{@user_id}: NoMethodError/
+      feed = MyTasks::Merged.new(@user_id).get_feed
+      expect(feed[:tasks]).not_to be_empty
+      expect(feed[:errors]).to eq ['MyTasks::SisTasks']
+    end
+  end
 end
 
 def get_task_list_id_and_task_id

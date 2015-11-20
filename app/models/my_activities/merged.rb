@@ -4,19 +4,15 @@ module MyActivities
     include Cache::LiveUpdatesEnabled
     include Cache::FreshenOnWarm
     include Cache::JsonAddedCacher
+    include MergedModel
 
-    attr_accessor :site_proxies
-    attr_accessor :proxies
-
-    def initialize(uid, options={})
-      super(uid, options)
-      @site_proxies = [
-        MyActivities::CanvasActivities      ]
-      @proxies = [
+    def self.providers
+      [
         MyActivities::NotificationActivities,
         MyActivities::RegBlocks,
         MyActivities::Webcasts,
-        MyActivities::CampusSolutionsMessages
+        MyActivities::CampusSolutionsMessages,
+        MyActivities::CanvasActivities
       ]
     end
 
@@ -24,20 +20,32 @@ module MyActivities
       @cutoff_date ||= (Settings.terms.fake_now || Time.zone.today.in_time_zone).to_datetime.advance(days: -10).to_time.to_i
     end
 
-    # Note that MyActivities feed processing has a direct dependency on MyClasses and MyGroups.
     def get_feed_internal
-      activities = []
-      dashboard_sites = MyActivities::DashboardSites.fetch(@uid, @options)
-      self.site_proxies.each { |proxy| proxy.append!(@uid, dashboard_sites, activities) }
-      self.proxies.each { |proxy| proxy.append!(@uid, activities) }
-      result = {
-        activities: activities
+      feed = {
+        activities: [],
+        archiveUrl: cs_dashboard_url
       }
-      cs_dashboard_url_feed = CampusSolutions::DashboardUrl.new.get
-      if cs_dashboard_url_feed.present? && cs_dashboard_url_feed[:feed].present? && cs_dashboard_url_feed[:feed][:url].present?
-        result.merge!({archiveUrl: cs_dashboard_url_feed[:feed][:url]})
+
+      # Note that some providers require MyActivities::DashboardSites, which in turn has a direct dependency on
+      # MyClasses and MyGroups.
+      handling_provider_exceptions(feed, self.class.providers) do |provider|
+        if provider.respond_to? :append_with_dashboard_sites!
+          provider.append_with_dashboard_sites!(@uid, feed[:activities], dashboard_sites)
+        else
+          provider.append!(@uid, feed[:activities])
+        end
       end
-      result
+
+      feed
+    end
+
+    def cs_dashboard_url
+      cs_dashboard_url_feed = CampusSolutions::DashboardUrl.new.get
+      cs_dashboard_url_feed && cs_dashboard_url_feed[:feed] && cs_dashboard_url_feed[:feed][:url]
+    end
+
+    def dashboard_sites
+      MyActivities::DashboardSites.fetch(@uid, @options)
     end
 
   end
