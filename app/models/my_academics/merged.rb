@@ -4,9 +4,9 @@ module MyAcademics
     include Cache::LiveUpdatesEnabled
     include Cache::FreshenOnWarm
     include Cache::JsonAddedCacher
+    include MergedModel
 
-    def get_feed_internal
-      feed = {}
+    def self.providers
       # Provider ordering is significant! In particular, Semesters/Teaching must
       # be merged before course sites.
       [
@@ -20,8 +20,13 @@ module MyAcademics
         Exams,
         Telebears,
         CanvasSites
-      ].each do |provider|
-        provider.new(@uid).merge(feed)
+      ]
+    end
+
+    def get_feed_internal
+      feed = {}
+      handling_provider_exceptions(feed, self.class.providers) do |provider|
+        provider.new(@uid).merge feed
       end
       feed
     end

@@ -39,6 +39,18 @@ describe MyClasses::Merged do
           expect(feed[:classes]).to be_empty
         end
       end
+
+      context 'when the course site provider freaks out' do
+        before { allow_any_instance_of(MyClasses::Canvas).to receive(:merge_sites).and_raise NoMethodError }
+        subject { feed[:classes] }
+        it_should_behave_like 'a feed with instructor classes'
+
+        it 'logs error and returns feed without course sites' do
+          expect(Rails.logger).to receive(:error).with /Failed to merge MyClasses::Canvas for UID #{user_id}: NoMethodError/
+          expect(feed[:classes]).to be_present
+          expect(feed[:errors]).to eq ['MyClasses::Canvas']
+        end
+      end
     end
   end
 

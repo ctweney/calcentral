@@ -1,11 +1,8 @@
 describe MyAcademics::Merged do
-
-  # TODO: this test needs more bite, not that familiar about the underlying implementation but
-  # it should be testing merging logic
-  it "should call the merge method on all the Academic submodules" do
-
-    model_classes = [
+  let(:provider_classes) do
+    [
       MyAcademics::CollegeAndLevel,
+      MyAcademics::TransitionTerm,
       MyAcademics::GpaUnits,
       MyAcademics::Requirements,
       MyAcademics::Regblocks,
@@ -15,14 +12,54 @@ describe MyAcademics::Merged do
       MyAcademics::Telebears,
       MyAcademics::CanvasSites
     ]
-    model_classes.each do |klass|
-      model = klass.new "61889"
-      klass.stub(:new).and_return(model)
-      klass.stub(:merge).and_return({})
-      model.should_receive(:merge)
-    end
-
-    MyAcademics::Merged.new("61889").get_feed
   end
 
+  let(:uid) { '61889' }
+
+  let(:oski_providers) do
+    provider_classes.each_with_object({}) do |provider_class, providers|
+      providers[provider_class] = provider_class.new uid
+    end
+  end
+
+  def set_mock_merge(providers)
+    providers.each_value do |provider|
+      expect(provider).to receive(:merge) do |feed|
+        feed[provider.class.to_s] = true
+      end
+    end
+  end
+
+  before do
+    oski_providers.each do |provider_class, oski_provider|
+      allow(provider_class).to receive(:new).and_return oski_provider
+    end
+  end
+
+  context 'when providers are well behaved' do
+    before { set_mock_merge oski_providers }
+
+    it 'should merge all providers into hash' do
+      feed = described_class.new(uid).get_feed
+      provider_classes.each { |provider_class| expect(feed[provider_class.to_s]).to eq true }
+      expect(feed[:errors]).to be_blank
+    end
+  end
+
+  context 'when a provider misbehaves' do
+    before do
+      bad_provider = oski_providers.delete MyAcademics::Telebears
+      expect(bad_provider).to receive(:merge).and_raise NoMethodError
+      set_mock_merge oski_providers
+    end
+
+    it 'should merge other providers and report error' do
+      expect(Rails.logger).to receive(:error).with /Failed to merge MyAcademics::Telebears for UID #{uid}: NoMethodError/
+      feed = described_class.new(uid).get_feed
+      well_behaved_classes = provider_classes - [MyAcademics::Telebears]
+      well_behaved_classes.each { |well_behaved_class| expect(feed[well_behaved_class.to_s]).to eq true }
+      expect(feed).not_to include 'MyAcademics::Telebears'
+      expect(feed[:errors]).to eq ['MyAcademics::Telebears']
+    end
+  end
 end
