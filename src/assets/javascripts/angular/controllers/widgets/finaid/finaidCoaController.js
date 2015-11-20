@@ -6,11 +6,10 @@ var angular = require('angular');
  * Finaid COA (Cost of Attendance) controller
  */
 angular.module('calcentral.controllers').controller('FinaidCoaController', function($scope, finaidFactory, finaidService) {
-  var views = ['fullYear', 'semester'];
+  var views = ['fullyear', 'semester'];
   $scope.coa = {
     isLoading: true,
-    // TODO make this views[0] as soon as fullYear is available
-    currentView: views[1]
+    currentView: views[0]
   };
 
   /**
