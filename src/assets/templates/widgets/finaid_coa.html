@@ -8,9 +8,16 @@
     </div>
     <div data-ng-if="!errored">
       <div data-ng-bind="coa.message"></div>
-      <hr />
-      <div data-ng-if="!coa[coa.currentView].data.length">Currently we don't have your data available for this aid year.</div>
+      <div data-ng-if="!coa[coa.currentView].data.length" class="cc-widget-finaid-coa-text-padding">Currently we don't have your data available for this aid year.</div>
       <div data-ng-if="coa[coa.currentView].data.length">
+        <div class="cc-widget-finaid-coa-text-padding">
+          <button data-ng-click="toggleView()" class="cc-button-link">
+            View
+            <span data-ng-if="coa.currentView === 'fullyear'">Term</span>
+            <span data-ng-if="coa.currentView !== 'fullyear'">Annual</span>
+            Amount
+          </button>
+        </div>
         <div
           class="cc-table cc-widget-finaid-coa-table"
           data-ng-class="{'cc-widget-finaid-coa-table-grand-total':(category.title === 'Grand Total')}"
