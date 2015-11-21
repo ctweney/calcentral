@@ -42,7 +42,9 @@
             for the most current information.
           </div>
           <div data-ng-if="!api.user.profile.roles.registered" class="cc-widget-profile-message-text">
-            You are not currently registered as a student.
+            You are not registered as a student for the <span data-ng-bind="collegeAndLevel.termName"></span> term. Please
+            check <a href="https://sis.berkeley.edu/bearfacts/student/studentMain.do?bfaction=welcome">Bear Facts</a>
+            for information on other terms.
           </div>
         </div>
         <div class="cc-academics-nocontent-container" data-ng-if="!isAcademicInfoAvailable">
