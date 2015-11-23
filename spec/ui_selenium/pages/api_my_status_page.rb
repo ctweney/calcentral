@@ -66,4 +66,8 @@ class ApiMyStatusPage
     @parsed['hasFinancialsTab']
   end
 
+  def has_toolbox_tab?
+    @parsed['hasToolboxTab']
+  end
+
 end

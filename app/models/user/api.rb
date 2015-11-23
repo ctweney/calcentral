@@ -146,6 +146,7 @@ module User
           has_instructor_history || has_student_history
         ),
         :hasFinancialsTab => (roles[:student] || roles[:exStudent]),
+        :hasToolboxTab => current_user_policy.can_administrate? || current_user_policy.can_view_as?,
         :hasPhoto => User::Photo.has_photo?(@uid),
         :inEducationAbroadProgram => @oracle_attributes[:education_abroad],
         :googleEmail => google_mail,

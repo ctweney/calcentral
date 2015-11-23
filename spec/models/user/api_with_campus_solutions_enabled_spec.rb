@@ -168,6 +168,53 @@ describe User::Api do
     end
   end
 
+  describe 'My Toolbox tab' do
+    context 'superuser' do
+      before { User::Auth.new_or_update_superuser! @random_id }
+      it 'should show My Toolbox tab' do
+        user_api = User::Api.new(@random_id)
+        expect(user_api.get_feed[:hasToolboxTab]).to be true
+      end
+    end
+    context 'can_view_as' do
+      before {
+        user = User::Auth.new uid: @random_id
+        user.is_viewer = true
+        user.active = true
+        user.save
+      }
+      subject { User::Api.new(@random_id).get_feed[:hasToolboxTab] }
+      it { should be true }
+    end
+    context 'ordinary profiles' do
+      let(:profiles) do
+        {
+          :student   => { :student => true,  :exStudent => false, :faculty => false, :staff => false },
+          :faculty   => { :student => false, :exStudent => false, :faculty => true,  :staff => false },
+          :staff     => { :student => false, :exStudent => false, :faculty => true,  :staff => true }
+        }
+      end
+      before do
+        allow(CampusOracle::UserAttributes).to receive(:new).and_return double get_feed: {
+          roles: user_roles
+        }
+      end
+      subject { User::Api.new(@random_id).get_feed[:hasToolboxTab] }
+      context 'student' do
+        let(:user_roles) { profiles[:student] }
+        it { should be false }
+      end
+      context 'faculty' do
+        let(:user_roles) { profiles[:faculty] }
+        it { should be false }
+      end
+      context 'staff' do
+        let(:user_roles) { profiles[:staff] }
+        it { should be false }
+      end
+    end
+  end
+
   it "should not explode when HubEdos returns empty feeds" do
     HubEdos::UserAttributes.stub(:new).and_return(double(get: {
     }))
@@ -223,6 +270,7 @@ describe User::Api do
     it "should pass the superuser status" do
       subject[:isSuperuser].should be_truthy
       subject[:isViewer].should be_truthy
+      expect(subject[:hasToolboxTab]).to be true
     end
   end
 
@@ -237,8 +285,8 @@ describe User::Api do
     it "should pass the viewer status" do
       subject[:isSuperuser].should be_falsey
       subject[:isViewer].should be_truthy
+      expect(subject[:hasToolboxTab]).to be true
     end
   end
 
 end
-
