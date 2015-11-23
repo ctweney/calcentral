@@ -1673,6 +1673,23 @@
       ]
     },
     {
+      "name": "Loan Repayment Calculator",
+      "description": "Loan repayment calculator",
+      "url": "https://studentloans.gov/myDirectLoan/whatYouNeed.action?page=repayEst",
+      "roles": {
+        "student": true,
+        "staff": false,
+        "faculty": false,
+        "exStudent": true
+      },
+      "categories": [
+        {
+          "topcategory": "Finances",
+          "subcategory": "Financial Assistance"
+        }
+      ]
+    },
+    {
       "name": "Finding Your Way (L\u0026S)",
       "description": "Academic advising for students in the Residence Halls under the college of Letters and Science",
       "url": "http://ls-yourway.berkeley.edu/",
