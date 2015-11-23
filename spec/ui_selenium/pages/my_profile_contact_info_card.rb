@@ -38,7 +38,7 @@ module CalCentralPages
 
     def phone_types
       types = []
-      phones= phone_type_elements
+      phones = phone_type_elements
       phones.each { |type| types << type.text.sub(' Phone', '') }
       types
     end
@@ -57,7 +57,7 @@ module CalCentralPages
       # for each phone, try to find extension.  if none push nil
       extensions = []
       phone_elements.each do |phone|
-        extension = span_element(:xpath => "//div[@data-ng-controller='ProfilePhoneController']//div[@data-ng-repeat='item in items.content'][#{(phone_elements.index(phone) + 1).to_s}]//span[@data-ng-if='item.extension']")
+        extension = span_element(:xpath => "//div[@data-ng-controller='ProfilePhoneController']//div[@data-ng-repeat='item in items.content'][#{(phone_elements.index(phone) + 1)}]//span[@data-ng-if='item.extension']")
         extension.exists? ? extensions << extension.text : extensions << nil
       end
       extensions
@@ -93,41 +93,68 @@ module CalCentralPages
       logger.info "Entering phone of type #{type}, number #{number}, extension #{ext}"
       WebDriverUtils.wait_for_element_and_type(phone_number_input_element, number) unless number.nil?
       WebDriverUtils.wait_for_element_and_type(phone_ext_input_element, ext) unless ext.nil?
-      sleep 1
-      WebDriverUtils.wait_for_element_and_select(phone_type_element, type) unless type.nil?
-      pref ? check_phone_preferred_cbx : uncheck_phone_preferred_cbx unless pref.nil?
+      sleep WebDriverUtils.campus_solutions_timeout
+      if phone_type? && !type.nil?
+        WebDriverUtils.wait_for_element_and_select(phone_type_element, type)
+      end
+      pref ? check_phone_preferred_cbx : uncheck_phone_preferred_cbx
     end
 
-    def add_new_phone(type, number, ext, pref)
+    def add_new_phone(phone, pref = false)
       click_add_phone
-      enter_phone(type, number, ext, pref)
+      enter_phone(phone['type'], phone['phoneNumberInput'], phone['phoneExt'], pref)
       click_save_phone
     end
 
-    def edit_phone(index, number, ext, pref)
+    def edit_phone(index, phone, pref = false)
       click_edit_phone index
-      enter_phone(nil, number, ext, pref)
+      enter_phone(phone['type'], phone['phoneNumberInput'], phone['phoneExt'], pref)
       click_save_phone
     end
 
     def delete_phone(index)
-      logger.info "Deleting phone at index #{index}"
+      logger.info 'Deleting a phone'
       phone = phone_elements[index]
+      click_cancel_phone if cancel_phone_button_element.visible?
       click_edit_phone index
       click_delete_phone
       phone.when_not_present WebDriverUtils.page_load_timeout
-      sleep 3
+      sleep WebDriverUtils.campus_solutions_timeout
     end
 
     def delete_all_phones
       phone_count = phone_elements.length
-      logger.info "There are #{phone_count.to_s} phones"
+      logger.debug "There are #{phone_count} phones to delete"
       (1..phone_count).each do
         phone_count = phone_elements.length
         # Don't try to delete the first phone if it will trigger a validation error
-        logger.info "Phone count is #{phone_count.to_s}"
         (phone_primary?(0) && phone_count > 2) ? index = 1 : index = 0
         delete_phone index
+      end
+    end
+
+    # Preferred flag defaults to false
+    def verify_phone(phone, pref = false)
+      sleep WebDriverUtils.campus_solutions_timeout
+      wait_until(WebDriverUtils.page_load_timeout, "Phone type '#{phone['type']}' is not present") do
+        phone_types.include? phone['type']
+      end
+      index = phone_type_index(phone['type'])
+      wait_until(1, 'Phone preferred flag is not as expected') do
+        phone_primary?(index) == pref
+      end
+      # Phone number is 24 characters max
+      number = phone['phoneNumberDisplay'].slice(0..23)
+      wait_until(1, "Phone number should be '#{number}' but instead it is '#{phone_numbers[index]}'") do
+        phone_numbers[index] == number
+      end
+      # Phone extension is 6 characters max
+      ext = phone['phoneExt']
+      unless ext.nil?
+        ext = ext.slice(0..5)
+        wait_until(1, "Phone extension should be '#{ext}' but instead it is '#{phone_extensions[index]}'") do
+          phone_extensions[index] == "ext. #{ext}"
+        end
       end
     end
 
@@ -189,20 +216,19 @@ module CalCentralPages
       WebDriverUtils.wait_for_element_and_click cancel_email_button_element
     end
 
-    def enter_email(address, pref)
+    def enter_email(address, pref = nil)
       logger.info "Entering email address '#{address}'"
       WebDriverUtils.wait_for_element_and_type(email_input_element, address) unless address.nil?
-      pref ? check_email_preferred_cbx : uncheck_email_preferred_cbx unless pref.nil?
+      pref ? check_email_preferred_cbx : uncheck_email_preferred_cbx
     end
 
-    def add_email(type, address, pref)
+    def add_email(address, pref = false)
       click_add_email
       enter_email(address, pref)
       click_save_email
-      wait_until(WebDriverUtils.page_load_timeout, "Visible email types are '#{email_types}'") { email_types.include? type }
     end
 
-    def edit_email(address, pref)
+    def edit_email(address, pref = false)
       click_edit_email
       enter_email(address, pref)
       click_save_email
@@ -261,6 +287,7 @@ module CalCentralPages
     def click_edit_address(index)
       click_cancel_address if cancel_address_button_element.visible?
       wait_until(WebDriverUtils.page_load_timeout) { address_edit_button_elements.any? }
+      execute_script('window.scrollTo(0, document.body.scrollHeight);')
       WebDriverUtils.wait_for_element_and_click address_edit_button_elements[index]
     end
 
@@ -274,24 +301,25 @@ module CalCentralPages
       # Scroll to the bottom of the page in case the Cancel button is not in view
       execute_script('window.scrollTo(0, document.body.scrollHeight);')
       WebDriverUtils.wait_for_element_and_click cancel_address_button_element
-      sleep 1
+      sleep WebDriverUtils.campus_solutions_timeout
     end
 
     def load_country_form(address)
       WebDriverUtils.wait_for_element_and_select(country_select_element, address['country'])
-      sleep 3
+      sleep WebDriverUtils.campus_solutions_timeout
       # Scroll to the bottom of the page to bring the complete form into view
       execute_script('window.scrollTo(0, document.body.scrollHeight);')
     end
 
     def enter_address(address, inputs, selections)
+      logger.info "Entering an address in #{address['country']}"
       load_country_form address
       inputs.each do |input|
-        WebDriverUtils.wait_for_element_and_type(text_area_element(:id => "cc-page-widget-profile-field-#{input['index'].to_s}"), input['text'])
+        WebDriverUtils.wait_for_element_and_type(text_area_element(:id => "cc-page-widget-profile-field-#{input['index']}"), input['text'])
       end
       unless selections.nil?
         selections.each do |select|
-          WebDriverUtils.wait_for_element_and_select(select_list_element(:id => "cc-page-widget-profile-field-#{select['index'].to_s}"), select['option'])
+          WebDriverUtils.wait_for_element_and_select(select_list_element(:id => "cc-page-widget-profile-field-#{select['index']}"), select['option'])
         end
       end
     end
@@ -301,12 +329,12 @@ module CalCentralPages
       load_country_form address
       unless inputs.nil?
         inputs.each do |input|
-          WebDriverUtils.wait_for_element_and_type(text_area_element(:id => "cc-page-widget-profile-field-#{input['index'].to_s}"), '')
+          WebDriverUtils.wait_for_element_and_type(text_area_element(:id => "cc-page-widget-profile-field-#{input['index']}"), '')
         end
       end
       unless selections.nil?
         selections.each do |select|
-          select_element = select_list_element(:id => "cc-page-widget-profile-field-#{select['index'].to_s}")
+          select_element = select_list_element(:id => "cc-page-widget-profile-field-#{select['index']}")
           default_option = select_element.options.find { |option| option.text.include? 'Choose' }
           select_element.select default_option.text
         end
@@ -324,20 +352,34 @@ module CalCentralPages
       enter_address(address, inputs, selections)
     end
 
+    def wait_for_saved_address(addresses_length)
+      logger.debug 'Waiting for address update to complete'
+      wait_until(WebDriverUtils.page_load_timeout, 'Address update has timed out') do
+        address_formatted_elements.length == addresses_length
+      end
+    end
+
     def verify_address(index, inputs, selections)
       logger.info "About to check the text displayed for #{inputs.length} inputs"
-      sleep 2
-      logger.info "Address displayed is \n#{formatted_address(index)}"
+      sleep WebDriverUtils.campus_solutions_timeout
+      logger.debug "Address displayed is \n#{formatted_address(index)}"
       inputs.each do |input|
-        logger.debug "Checking that #{input['text']} is visible"
-        wait_until(2, "The text '#{input['text'].slice(0..(input['max'] - 1))}' is not present") do
-          formatted_address(index).include? input['text'].slice(0..(input['max'] - 1)).strip
+        if input['display'].nil?
+          logger.debug "Checking that '#{input['text']}' is visible"
+          wait_until(2, "The text '#{input['text'].slice(0..(input['max'] - 1))}' is not present") do
+            formatted_address(index).include? input['text'].slice(0..(input['max'] - 1)).strip
+          end
+        elsif !input['display']
+          logger.debug "Checking that '#{input['text']}' is not visible"
+          wait_until(2, "The text '#{input['text']}' is present but it should not be") do
+            !formatted_address(index).include? input['text'].slice(0..(input['max'] - 1)).strip
+          end
         end
       end
       unless selections.nil?
-        logger.info "About to check the text displayed for #{selections.length} selections"
+        logger.debug "About to check the text displayed for #{selections.length} selections"
         selections.each do |select|
-          logger.debug "Checking that #{select['option']} is visible"
+          logger.debug "Checking that '#{select['option']}' is visible"
           wait_until(2, "The option '#{select['option']}' i  s not present") do
             formatted_address(index).include? select['option']
           end
@@ -348,18 +390,20 @@ module CalCentralPages
     def verify_address_labels(address)
       address['inputs'].each do |input|
         logger.debug "Checking that there is an input labeled #{input['label']}"
-        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{input['index'].to_s}']/span")
+        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{input['index']}']/span")
         label.when_visible(1)
-        wait_until(1, "The label #{input['label']} is not present") do
+        wait_until(1, "The label '#{input['label']}' is not present") do
           label.text == input['label']
         end
       end
-      address['selects'].each do |select|
-        logger.debug "Checking that there is a drop-down labeled #{select['label']}"
-        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{select['index'].to_s}']/span")
-        label.when_visible(1)
-        wait_until(1, "The label #{select['label']} is not present") do
-          label.text == select['label']
+      unless address['selects'].nil?
+        address['selects'].each do |select|
+          logger.debug "Checking that there is a drop-down labeled #{select['label']}"
+          label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{select['index']}']/span")
+          label.when_visible(1)
+          wait_until(1, "The label '#{select['label']}' is not present") do
+            label.text == select['label']
+          end
         end
       end
     end
@@ -368,7 +412,7 @@ module CalCentralPages
       req_inputs = address['inputs'].select { |input| input['req'] }
       nonreq_inputs = address['inputs'].reject { |input| input['req'] }
       address_validation_error_element.when_visible WebDriverUtils.page_event_timeout
-      logger.debug "Validation error says #{address_validation_error}"
+      logger.debug "Validation error says '#{address_validation_error}'"
       req_inputs.each do |req|
         wait_until(1, "Error message does not include '#{req['label']}'") do
           address_validation_error.include? req['label']
