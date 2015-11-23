@@ -95,7 +95,7 @@
           <span class="cc-visuallyhidden" data-ng-bind-template="- {{ task.title }}"></span>
         </a>
 
-        <div data-ng-if="task.uploadUrl" class="cc-widget-tasks-upload">
+        <div data-ng-if="task.uploadUrl && (task.showStatus === 'Initiated' || task.showStatus === 'Incomplete')" class="cc-widget-tasks-upload">
           <a class="cc-button"
           data-ng-click="api.util.preventBubble($event);api.analytics.trackExternalLink('Tasks', 'Upload CS Document', task.uploadUrl)"
           data-cc-campus-solutions-link-directive="task.uploadUrl"
