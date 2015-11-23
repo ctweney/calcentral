@@ -25,6 +25,13 @@
               <div class="cc-left">
                 <strong data-ng-bind="item.title"></strong>
                 <a data-ng-if="item.title === 'Title IV'" href="/profile/title4">Update</a>
+                <a data-ng-if="item.link.url"
+                   data-cc-campus-solutions-link-directive="item.link.url"
+                   data-cc-campus-solutions-link-directive-enabled="{{item.link.isCsLink}}"
+                   data-cc-campus-solutions-link-directive-text="finaid.backToText"
+                   data-cc-outbound-enabled="{{!item.link.isCsLink}}"
+                   data-ng-bind="item.link.title"
+                ></a>
               </div>
               <div class="cc-right" data-ng-bind="item.value" data-ng-if="item.value"></div>
               <div class="cc-right" data-ng-if="item.values">
