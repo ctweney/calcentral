@@ -1,21 +1,20 @@
-# TODO collapse this class into Bearfacts::Profile
 module MyAcademics
   class CollegeAndLevel
     include AcademicsModule, ClassLogger
 
     def merge(data)
-      response = Bearfacts::Profile.new({:user_id => @uid}).get
-      feed = response.delete(:feed)
+      response = Bearfacts::Profile.new(user_id: @uid).get
+      feed = response.delete :feed
 
       # The Bear Facts API can return empty profiles if the user is no longer (or not yet) considered an active student.
       # Partial profiles can be returned for incoming students around the start of the term.
-      if (feed.nil? ||
-          feed['studentProfile']['studentGeneralProfile'].blank? ||
-          feed['studentProfile']['ugGradFlag'].blank?)
-        response.merge!(empty: true)
+      if (feed.nil? || feed['studentProfile']['studentGeneralProfile'].blank? || feed['studentProfile']['ugGradFlag'].blank?)
+        response[:empty] = true
       else
         response.merge! parse_feed(feed)
       end
+      response[:termName] = parse_term_name feed
+
       data[:collegeAndLevel] = response
     end
 
@@ -41,8 +40,8 @@ module MyAcademics
       primary_major = Berkeley::Majors.get(general_profile['majorPrimary'].to_text)
 
       # this code block is not very DRY, but that makes it easier to understand the wacky requirements. See CLC-2017 for background.
-      if primary_college_abbv.in?(["GRAD DIV", "LAW", "CONCURNT"])
-        if primary_major == "Double" || primary_major == "Triple"
+      if primary_college_abbv.in?(['GRAD DIV', 'LAW', 'CONCURNT'])
+        if primary_major == 'Double' || primary_major == 'Triple'
           colleges << {
             :college => (general_profile['collegeSecond'].blank? ? primary_college : Berkeley::Colleges.get(general_profile['collegeSecond'].to_text)),
             :major => Berkeley::Majors.get(general_profile['majorSecond'].to_text)
@@ -51,7 +50,7 @@ module MyAcademics
             :college => Berkeley::Colleges.get(general_profile['collegeThird'].to_text),
             :major => Berkeley::Majors.get(general_profile['majorThird'].to_text)
           }
-          if primary_major == "Triple"
+          if primary_major == 'Triple'
             colleges << {
               :college => Berkeley::Colleges.get(general_profile['collegeFourth'].to_text),
               :major => Berkeley::Majors.get(general_profile['majorFourth'].to_text)
@@ -64,18 +63,18 @@ module MyAcademics
           }
         end
       else
-        if primary_major == "Double" || primary_major == "Triple"
+        if primary_major == 'Double' || primary_major == 'Triple'
           colleges << {
             :college => primary_college,
             :major => Berkeley::Majors.get(general_profile['majorSecond'].to_text)
           }
           colleges << {
-            :college => "",
+            :college => '',
             :major => Berkeley::Majors.get(general_profile['majorThird'].to_text)
           }
-          if primary_major == "Triple"
+          if primary_major == 'Triple'
             colleges << {
-              :college => "",
+              :college => '',
               :major => Berkeley::Majors.get(general_profile['majorFourth'].to_text)
             }
           end
@@ -87,16 +86,21 @@ module MyAcademics
         end
       end
 
-      termName = "#{feed['studentProfile']['termName'].to_text} #{feed['studentProfile']['termYear'].to_text}"
-
       {
         standing: standing,
         level: level,
         nonApLevel: nonAPLevel,
         futureTelebearsLevel: futureTBLevel,
-        colleges: colleges,
-        termName: termName
+        colleges: colleges
       }
+    end
+
+    def parse_term_name(feed)
+      if (feed.nil? || feed['studentProfile']['termName'].blank? || feed['studentProfile']['termYear'].blank?)
+        Berkeley::Terms.fetch.current.to_english
+      else
+        "#{feed['studentProfile']['termName'].to_text} #{feed['studentProfile']['termYear'].to_text}"
+      end
     end
   end
 end
