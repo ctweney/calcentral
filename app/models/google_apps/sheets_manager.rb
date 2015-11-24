@@ -1,6 +1,24 @@
 module GoogleApps
   class SheetsManager < DriveManager
 
+    # Wrapper to avoid extra copies of large CSV tables.
+    class CsvAsUpdates
+      def initialize(csv)
+        @csv = csv
+      end
+      def each(&block)
+        row = 1
+        @csv.each do |row_values|
+          col = 1
+          row_values.each do |value|
+            yield [row, col], value
+            col += 1
+          end
+          row += 1
+        end
+      end
+    end
+
     def initialize(uid, options = {})
       super uid, options
       auth = get_google_api.authorization
@@ -97,30 +115,11 @@ module GoogleApps
       result.body
     end
 
-    def upload_worksheet(title, description, worksheet, parent_id = 'root', opts={})
-      content = CSV.generate do |csv|
-        headers = worksheet.headers
-        csv << headers
-        worksheet.each_sorted do |row|
-          if opts[:format_numbers] == :text
-            csv_row = headers.map do |header|
-              # A trick to force plaintext formatting in Google Sheets.
-              row[header] =~ /\A\d+\Z/ ? "'#{row[header]}" : row[header]
-            end
-            csv << csv_row
-          else
-            csv << row.values_at(*headers)
-          end
-        end
-      end
-      upload_to_spreadsheet(title, description, StringIO.new(content), parent_id)
-    end
-
-    def upload_to_spreadsheet(title, description, path_or_io, parent_id)
+    def upload_to_spreadsheet(sheets_doc_title, path_or_io, parent_id, worksheet_title = nil)
       client = get_google_api
       drive_api = client.discovered_api('drive', 'v2')
       media = Google::APIClient::UploadIO.new(path_or_io, 'text/csv')
-      metadata = { :title => title, :description => description }
+      metadata = { :title => sheets_doc_title }
       file = drive_api.files.insert.request_schema.new metadata
       file.parents = [{ :id => parent_id }]
       result = @session.execute!(
@@ -129,11 +128,24 @@ module GoogleApps
         :media => media,
         :parameters => { :uploadType => 'multipart', :convert => true })
       log_response result
-      raise Errors::ProxyError, "upload failed with title=#{title}. Error: #{result.data['error']}" if result.error?
-      @session.wrap_api_file result.data
+      raise Errors::ProxyError, "upload failed with title=#{sheets_doc_title}. Error: #{result.data['error']}" if result.error?
+      sheets_doc = @session.wrap_api_file result.data
+      if worksheet_title.present?
+        primary_worksheet = sheets_doc.worksheets.first
+        primary_worksheet.title = worksheet_title
+        primary_worksheet.save
+      end
+      sheets_doc
     rescue Google::APIClient::TransmissionError => e
-      log_transmission_error(e, "upload_to_spreadsheet failed with: #{[title, description, path_or_io, parent_id].to_s}")
+      log_transmission_error(e, "upload_to_spreadsheet failed with: #{[sheets_doc_title, path_or_io, parent_id].to_s}")
       raise e
+    end
+
+    def upload_csv_to_worksheet(sheets_doc, worksheet_title, csv)
+      worksheet = sheets_doc.add_worksheet(worksheet_title, csv.length, csv.first.length)
+      update_worksheet(worksheet, CsvAsUpdates.new(csv))
+      worksheet.save
+      worksheet
     end
 
     private
