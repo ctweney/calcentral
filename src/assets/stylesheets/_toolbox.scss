@@ -1,18 +1,7 @@
 .cc-toolbox {
   background: $cc-color-white;
-  button {
-    &.secondary {
-      text-decoration: none;
-    }
-  }
-  h1 {
-    margin-top: 20px;
-  }
-  h2 {
-    color: $cc-color-medium-grey;
-  }
   .cc-toolbox-section {
-    margin-top: 30px !important;
+    margin-top: 30px;
   }
   .cc-toolbox-apitest-list {
     margin-left: 20px;
