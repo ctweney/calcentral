@@ -19,8 +19,7 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
     '/api/my/tasks': 'tasks',
     '/api/my/up_next': 'items',
     '/api/server_info': 'firstVisited',
-    '/api/smoke_test_routes': 'routes',
-    '/api/tools/styles': 'colors'
+    '/api/smoke_test_routes': 'routes'
   };
 
   $scope.apiTest = {
