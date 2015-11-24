@@ -6,6 +6,7 @@ module CanvasCsv
 
     def initialize
       super(Settings.canvas_proxy.export_directory)
+      @reporter_uid = Settings.canvas_proxy.reporter_uid
     end
 
     def accumulate_user_data(user_ids)
@@ -85,6 +86,16 @@ module CanvasCsv
 
     def csv_count(csv_filename)
       CSV.read(csv_filename, {headers: true}).length
+    end
+
+    def sheets_manager
+      @sheets_manager ||=  @reporter_uid.present? ? GoogleApps::SheetsManager.new(@reporter_uid) : nil
+    end
+
+    def reports_folder
+      @reports_folder ||= sheets_manager.present? ?
+        sheets_manager.find_folders_by_title('bCourses Reports').first || sheets_manager.find_folders_by_title('bCourses Reports', shared: true).first :
+        nil
     end
 
   end

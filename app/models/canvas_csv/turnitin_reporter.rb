@@ -1,16 +1,12 @@
 module CanvasCsv
   class TurnitinReporter < Base
 
-    def self.print_term_report(term_id = nil)
-      term_id ||= default_term_id
-      worker = TurnitinReporter.new(term_id)
-      csv_filename = worker.generate_csv
-      parsed_csv = CSV.read(csv_filename, {headers: true})
-      logger.error("Generated file: #{csv_filename}; #{parsed_csv[parsed_csv.length - 1].to_hash.compact}")
-      print parsed_csv.to_csv
+    def initialize(sis_term_id = nil)
+      super()
+      @sis_term_id = sis_term_id || default_term_id
     end
 
-    def self.default_term_id
+    def default_term_id
       current_date = Settings.terms.fake_now || DateTime.now
       terms = Berkeley::Terms.fetch.campus.values
       # Pick the most recent term that started more than two weeks ago.
@@ -21,9 +17,17 @@ module CanvasCsv
       Canvas::Terms.term_to_sis_id(term.year, term.code)
     end
 
-    def initialize(sis_term_id)
-      super()
-      @sis_term_id = sis_term_id
+    def run
+      csv_filename = generate_csv
+      parsed_csv = CSV.read(csv_filename, {headers: true})
+      logger.warn("Generated file: #{csv_filename}; #{parsed_csv[parsed_csv.length - 1].to_hash.compact}")
+      logger.warn("sheets_manager = #{sheets_manager}")
+      logger.warn("reports_folder = #{reports_folder}")
+      if sheets_manager && reports_folder
+        sheets_file = sheets_manager.upload_to_spreadsheet("TurnItIn Usage #{@sis_term_id} #{DateTime.now.strftime('%F')}",
+          csv_filename, reports_folder.id)
+        logger.warn "Online TurnItIn usage report in Google Drive at #{sheets_file.human_url}, folder = #{reports_folder.title}, title = #{sheets_file.title}"
+      end
     end
 
     def generate_report
