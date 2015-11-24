@@ -68,10 +68,10 @@ angular.module('calcentral.services').service('utilService', function($cacheFact
   };
 
   /**
-   * Redirect to settings page
+   * Redirect to My Toolbox page
    */
-  var redirectToSettings = function() {
-    window.location = '/settings';
+  var redirectToToolbox = function() {
+    window.location = '/toolbox';
   };
 
   /**
@@ -217,7 +217,7 @@ angular.module('calcentral.services').service('utilService', function($cacheFact
     preventBubble: preventBubble,
     printPage: printPage,
     redirect: redirect,
-    redirectToSettings: redirectToSettings,
+    redirectToToolbox: redirectToToolbox,
     setTitle: setTitle,
     supportsLocalStorage: supportsLocalStorage,
     uidPattern: uidPattern

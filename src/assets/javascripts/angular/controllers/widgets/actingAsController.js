@@ -12,6 +12,6 @@ angular.module('calcentral.controllers').controller('ActingAsController', functi
    * Stop acting as someone else
    */
   $scope.admin.stopActAs = function() {
-    adminFactory.stopActAs().success(apiService.util.redirectToSettings).error(apiService.util.redirectToSettings);
+    adminFactory.stopActAs().success(apiService.util.redirectToToolbox).error(apiService.util.redirectToToolbox);
   };
 });

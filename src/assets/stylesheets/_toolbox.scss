@@ -1,0 +1,35 @@
+.cc-toolbox {
+  background: $cc-color-white;
+  .cc-toolbox-section {
+    margin-top: 30px;
+  }
+  .cc-toolbox-apitest-list {
+    margin-left: 20px;
+    .cc-toolbox-apitest-pending {
+      color: $cc-color-dark-grey;
+    }
+    .cc-toolbox-apitest-failed {
+      color: $cc-color-red;
+    }
+    .cc-toolbox-apitest-success {
+      color: $cc-color-green-plus;
+    }
+    .cc-toolbox-apitest-icon {
+      width: 5%;
+    }
+  }
+  .cc-toolbox-table {
+    margin: 20px 10px 30px;
+    table {
+      table-layout: fixed;
+    }
+    td, th {
+      border-bottom: 1px solid $cc-color-widget-background;
+      font-size: 12px;
+      padding: 4px;
+    }
+  }
+  .cc-toolbox-recent-uids {
+    margin-top: 7px;
+  }
+}

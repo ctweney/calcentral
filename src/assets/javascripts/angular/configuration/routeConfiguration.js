@@ -57,13 +57,13 @@ angular.module('calcentral.config').config(function($routeProvider) {
     templateUrl: 'cars_details.html',
     controller: 'MyFinancesController'
   }).
-  when('/oec', {
-    templateUrl: 'oec.html',
-    controller: 'OecController'
-  }).
   when('/finances/finaid/:finaidYearId?', {
     templateUrl: 'finaid.html',
     controller: 'MyFinancesController'
+  }).
+  when('/oec', {
+    templateUrl: 'oec.html',
+    controller: 'OecController'
   }).
   when('/profile/:category?', {
     templateUrl: 'profile.html',
@@ -72,6 +72,10 @@ angular.module('calcentral.config').config(function($routeProvider) {
   when('/settings', {
     templateUrl: 'settings.html',
     controller: 'SettingsController'
+  }).
+  when('/toolbox', {
+    templateUrl: 'toolbox.html',
+    controller: 'MyToolboxController'
   }).
   when('/tools', {
     templateUrl: 'tools_index.html',
