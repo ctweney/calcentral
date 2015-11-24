@@ -1,4 +1,4 @@
-<div class="cc-widget-finaid-awards-section">
+<div class="cc-widget-finaid-awards-section cc-clearfix-container">
   <div class="cc-page-finaid-header-container cc-flex cc-flex-space-between cc-flex-align-base">
     <div>
       <h3 data-ng-bind="section.total.title" class="cc-page-finaid-header"></h3>
@@ -15,7 +15,11 @@
     </div>
   </div>
 
-  <ul class="cc-widget-list-color" data-ng-class="'cc-widget-list-color-' + section.color">
+  <div data-ng-if="!section.items.length && section.total.title === 'Gift Aid'" class="cc-widget-finaid-awards-section-no-items">
+    You currently do not have any gift aid.
+  </div>
+
+  <ul class="cc-widget-list-color" data-ng-class="'cc-widget-list-color-' + section.color" data-ng-if="section.items.length">
     <li
       data-ng-repeat="item in section.items"
       data-ng-class="{'cc-widget-list-selected': item.show}">
