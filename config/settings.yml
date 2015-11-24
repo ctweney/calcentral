@@ -227,6 +227,10 @@ cache:
     CanvasLti::Lti: <%= 5.minutes %>
     Advising::MyAdvising: <%= 2.hours %>
 
+    MyAcademics::CollegeAndLevel: NEXT_08_00
+    MyAcademics::GpaUnits: NEXT_08_00
+    MyAcademics::TransitionTerm: NEXT_08_00
+
     Berkeley::Terms: NEXT_08_00
     Finaid::TimeRange: <%= 4.hours %>
 

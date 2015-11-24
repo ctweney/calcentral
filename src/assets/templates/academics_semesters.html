@@ -1,7 +1,7 @@
 <div class="cc-widget">
   <div class="cc-widget-title">
     <h2 class="cc-left">Semesters</h2>
-    <a data-ng-href="{{transcriptLink}}" class="cc-right cc-widget-title-link">
+    <a data-ng-href="{{transcriptLink}}" class="cc-right cc-widget-title-link" data-ng-if="transcriptLink">
       <strong>Order Transcripts</strong>
     </a>
   </div>
@@ -9,10 +9,10 @@
   <div class="cc-academics-semesters">
     <div class="cc-table cc-academics-semester cc-academics-semester-{{semester.timeBucket}}" data-ng-repeat="semester in semesters | limitTo:pastSemestersLimit">
       <div>
-        <h3 data-ng-if="semester.hasEnrollmentData"><a class="cc-left" data-ng-href="/academics/semester/{{semester.slug}}" data-ng-bind="semester.name"></a></h3>
-        <h3 data-ng-if="!semester.hasEnrollmentData" data-ng-bind="semester.name"></h3>
+        <h3 data-ng-if="semester.hasEnrollmentData && semester.slug"><a class="cc-left" data-ng-href="/academics/semester/{{semester.slug}}" data-ng-bind="semester.name"></a></h3>
+        <h3 data-ng-if="!semester.hasEnrollmentData || !semester.slug" data-ng-bind="semester.name"></h3>
         <h4 data-ng-if="semester.notation" data-ng-bind="semester.notation"></h4>
-        <a class="cc-right cc-academics-semester-title-link" data-ng-href="/academics/booklist/{{semester.slug}}" data-ng-if="semester.hasEnrollmentData && semester.timeBucket !== 'past'">Book List</a>
+        <a class="cc-right cc-academics-semester-title-link" data-ng-href="/academics/booklist/{{semester.slug}}" data-ng-if="semester.hasEnrollmentData && semester.slug && semester.timeBucket !== 'past'">Book List</a>
         <table>
           <thead>
             <tr>

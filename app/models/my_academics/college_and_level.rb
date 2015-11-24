@@ -1,21 +1,25 @@
 module MyAcademics
   class CollegeAndLevel
-    include AcademicsModule, ClassLogger
+    extend Cache::Cacheable
+    include AcademicsModule
+    include ClassLogger
+    include Cache::UserCacheExpiry
 
     def merge(data)
-      response = Bearfacts::Profile.new(user_id: @uid).get
-      feed = response.delete :feed
-
-      # The Bear Facts API can return empty profiles if the user is no longer (or not yet) considered an active student.
-      # Partial profiles can be returned for incoming students around the start of the term.
-      if (feed.nil? || feed['studentProfile']['studentGeneralProfile'].blank? || feed['studentProfile']['ugGradFlag'].blank?)
-        response[:empty] = true
-      else
-        response.merge! parse_feed(feed)
+      college_and_level = self.class.fetch_from_cache @uid do
+        response = Bearfacts::Profile.new(user_id: @uid).get
+        feed = response.delete :feed
+        # The Bear Facts API can return empty profiles if the user is no longer (or not yet) considered an active student.
+        # Partial profiles can be returned for incoming students around the start of the term.
+        if (feed.nil? || feed['studentProfile']['studentGeneralProfile'].blank? || feed['studentProfile']['ugGradFlag'].blank?)
+          response[:empty] = true
+        else
+          response.merge! parse_feed(feed)
+        end
+        response[:termName] = parse_term_name feed
+        response
       end
-      response[:termName] = parse_term_name feed
-
-      data[:collegeAndLevel] = response
+      data[:collegeAndLevel] = college_and_level
     end
 
     def parse_feed(feed)

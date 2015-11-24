@@ -6,7 +6,7 @@ var angular = require('angular');
 /**
  * Academics controller
  */
-angular.module('calcentral.controllers').controller('AcademicsController', function(academicsFactory, academicsService, apiService, badgesFactory, $routeParams, $scope) {
+angular.module('calcentral.controllers').controller('AcademicsController', function(academicsFactory, academicsService, apiService, badgesFactory, $q, $routeParams, $scope) {
   apiService.util.setTitle('My Academics');
 
   var checkPageExists = function(page) {
@@ -111,10 +111,12 @@ angular.module('calcentral.controllers').controller('AcademicsController', funct
     }
   };
 
+  var loadBadges = function(data) {
+    $scope.studentInfo = data.studentInfo;
+  };
+
   var parseAcademics = function(data) {
     angular.extend($scope, data);
-
-    $scope.semesters = data.semesters;
 
     if (data.semesters) {
       $scope.pastSemestersCount = academicsService.pastSemestersCount(data.semesters);
@@ -126,11 +128,6 @@ angular.module('calcentral.controllers').controller('AcademicsController', funct
 
     $scope.isLSStudent = academicsService.isLSStudent($scope.collegeAndLevel);
     $scope.isUndergraduate = ($scope.collegeAndLevel && $scope.collegeAndLevel.standing === 'Undergraduate');
-
-    $scope.isAcademicInfoAvailable = !!(($scope.semesters && $scope.semesters.length) ||
-                                        ($scope.requirements && $scope.requirements.length) ||
-                                        ($scope.studentInfo && $scope.studentInfo.regStatus && $scope.studentInfo.regStatus.code !== null));
-
     $scope.isProfileCurrent = !$scope.transitionTerm || $scope.transitionTerm.isProfileCurrent;
     $scope.showProfileMessage = (!$scope.isProfileCurrent || !$scope.collegeAndLevel || !$scope.collegeAndLevel.standing);
 
@@ -157,6 +154,27 @@ angular.module('calcentral.controllers').controller('AcademicsController', funct
     $scope.gpaUnits.cumulativeGpa = parseFloat($scope.gpaUnits.cumulativeGpa); // converted to Float to be processed regularly
   };
 
+  var filterWidgets = function() {
+    $scope.hasRegStatus = !!($scope.studentInfo && $scope.studentInfo.regStatus && $scope.studentInfo.regStatus.code !== null);
+    $scope.isAcademicInfoAvailable = !!($scope.hasRegstatus ||
+                                       ($scope.semesters && $scope.semesters.length) ||
+                                       ($scope.requirements && $scope.requirements.length));
+
+    $scope.showStatusAndBlocks = !$scope.filteredForDelegate &&
+                                 ($scope.hasRegStatus ||
+                                 ($scope.regblocks && !$scope.regblocks.noStudentId) ||
+                                 ($scope.studentInfo && ($scope.studentInfo.californiaResidency)));
+    $scope.showAdvising = !$scope.filteredForDelegate && $scope.api.user.profile.features.advising && $scope.isLSStudent;
+
+    if (!$scope.filteredForDelegate) {
+      if ($scope.studentInfo.isLawStudent) {
+        $scope.transcriptLink = 'http://www.law.berkeley.edu/php-programs/registrar/forms/transcriptrequestform.php';
+      } else {
+        $scope.transcriptLink = 'https://telebears.berkeley.edu/tranreq/';
+      }
+    }
+  };
+
   $scope.currentSelection = 'Class Info';
   $scope.selectOptions = ['Class Info', 'Class Roster'];
 
@@ -168,15 +186,9 @@ angular.module('calcentral.controllers').controller('AcademicsController', funct
   $scope.$on('calcentral.api.user.isAuthenticated', function(event, isAuthenticated) {
     if (isAuthenticated) {
       $scope.canViewAcademics = $scope.api.user.profile.hasAcademicsTab;
-      academicsFactory.getAcademics().success(parseAcademics);
-      badgesFactory.getBadges().success(function(data) {
-        $scope.studentInfo = data.studentInfo;
-        if ($scope.studentInfo.isLawStudent) {
-          $scope.transcriptLink = 'http://www.law.berkeley.edu/php-programs/registrar/forms/transcriptrequestform.php';
-        } else {
-          $scope.transcriptLink = 'https://telebears.berkeley.edu/tranreq/';
-        }
-      });
+      var getAcademics = academicsFactory.getAcademics().success(parseAcademics);
+      var getBadges = badgesFactory.getBadges().success(loadBadges);
+      $q.all([getAcademics, getBadges]).then(filterWidgets);
     }
   });
 });

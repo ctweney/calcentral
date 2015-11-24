@@ -1,6 +1,7 @@
 describe MyAcademics::Semesters do
 
-  let(:feed) { feed = {}; MyAcademics::Semesters.new(random_id).merge(feed); feed }
+  let(:initial_feed) { {} }
+  let(:feed) { feed = initial_feed; MyAcademics::Semesters.new(random_id).merge(feed); feed }
 
   before do
     allow_any_instance_of(CampusOracle::UserCourses::All).to receive(:get_all_campus_courses).and_return enrollment_data
@@ -96,32 +97,36 @@ describe MyAcademics::Semesters do
     }
   end
 
-  it 'should include the expected semesters in reverse order' do
-    expect(feed[:semesters].length).to eq 4
-    term_keys.sort.reverse.each_with_index do |key, index|
-      term_year, term_code = key.split('-')
-      expect(feed[:semesters][index]).to include({
-        termCode: term_code,
-        termYear: term_year,
-        name: Berkeley::TermCodes.to_english(term_year, term_code)
-      })
+  shared_examples 'semester ordering' do
+    it 'should include the expected semesters in reverse order' do
+      expect(feed[:semesters].length).to eq 4
+      term_keys.sort.reverse.each_with_index do |key, index|
+        term_year, term_code = key.split('-')
+        expect(feed[:semesters][index]).to include({
+          termCode: term_code,
+          termYear: term_year,
+          name: Berkeley::TermCodes.to_english(term_year, term_code)
+        })
+      end
     end
-  end
 
-  it 'should place semesters in the right buckets' do
-    current_term = Berkeley::Terms.fetch.current
-    current_term_key = "#{current_term.year}-#{current_term.code}"
-    feed[:semesters].each do |s|
-      semester_key = "#{s[:termYear]}-#{s[:termCode]}"
-      if semester_key < current_term_key
-        expect(s[:timeBucket]).to eq 'past'
-      elsif semester_key > current_term_key
-        expect(s[:timeBucket]).to eq 'future'
-      else
-        expect(s[:timeBucket]).to eq 'current'
+    it 'should place semesters in the right buckets' do
+      current_term = Berkeley::Terms.fetch.current
+      current_term_key = "#{current_term.year}-#{current_term.code}"
+      feed[:semesters].each do |s|
+        semester_key = "#{s[:termYear]}-#{s[:termCode]}"
+        if semester_key < current_term_key
+          expect(s[:timeBucket]).to eq 'past'
+        elsif semester_key > current_term_key
+          expect(s[:timeBucket]).to eq 'future'
+        else
+          expect(s[:timeBucket]).to eq 'current'
+        end
       end
     end
   end
+
+  include_examples 'semester ordering'
 
   it 'should preserve structure of enrollment data' do
     feed[:semesters].each do |s|
@@ -313,5 +318,55 @@ describe MyAcademics::Semesters do
         }]
       end
     end
+  end
+
+  context 'filtered view for delegate' do
+    def enrollment_summary_term(key)
+      rand(2..4).times.map { enrollment_summary(key) }
+    end
+
+    def enrollment_summary(key)
+      enrollment = course_enrollment key
+      enrollment[:sections].map! { |section| section.except(:instructors, :schedules) }
+      enrollment
+    end
+
+    let(:initial_feed) { {filteredForDelegate: true} }
+    let(:enrollment_summary_data) { Hash[term_keys.map{|key| [key, enrollment_summary_term(key)]}] }
+    before { allow_any_instance_of(CampusOracle::UserCourses::All).to receive(:get_enrollments_summary).and_return enrollment_summary_data }
+
+    include_examples 'semester ordering'
+
+    it 'should preserve structure of enrollment summary data' do
+      feed[:semesters].each do |s|
+        expect(s[:hasEnrollmentData]).to eq true
+        enrollment_semester = enrollment_summary_data["#{s[:termYear]}-#{s[:termCode]}"]
+        expect(s[:classes].length).to eq enrollment_semester.length
+        s[:classes].each do |course|
+          matching_enrollment = enrollment_semester.find { |e| e[:id] == course[:course_id] }
+          expect(course[:sections].count).to eq matching_enrollment[:sections].count
+          expect(course[:title]).to eq matching_enrollment[:name]
+          expect(course[:courseCatalog]).to eq matching_enrollment[:course_catalog]
+          [:course_code, :dept, :dept_desc, :role, :slug].each do |key|
+            expect(course[key]).to eq matching_enrollment[key]
+          end
+        end
+      end
+    end
+
+    it 'should filter out course URLs' do
+      feed[:semesters].each do |s|
+        s[:classes].each do |course|
+          expect(course).not_to include :url
+        end
+      end
+    end
+
+    it 'should filter out semester slugs' do
+      feed[:semesters].each do |s|
+        expect(s).not_to include :slug
+      end
+    end
+
   end
 end
