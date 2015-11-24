@@ -4,31 +4,39 @@ module MyBadges
     include Cache::FreshenOnWarm
     include Cache::JsonAddedCacher
     include Cache::FilteredViewAsFeed
+    include MergedModel
 
-    GOOGLE_SOURCES = {
-      'bcal' => GoogleCalendar,
-      'bdrive' => GoogleDrive,
-      'bmail' => GoogleMail
-    }
+    def self.providers
+      {
+        'bcal' => GoogleCalendar,
+        'bdrive' => GoogleDrive,
+        'bmail' => GoogleMail
+      }
+    end
 
     def initialize(uid, options={})
       super(uid, options)
       @now_time = Time.zone.now
     end
 
+    def provider_class_name(provider)
+      provider[1].to_s
+    end
+
     def get_feed_internal
       feed = {
-        badges: get_google_badges,
+        alert: get_latest_alert,
+        badges: {},
         studentInfo: StudentInfo.new(@uid).get
       }
-      feed[:alert] = get_latest_alert
+      merge_google_badges feed
       logger.debug "#{self.class.name} get_feed is #{feed.inspect}"
       feed
     end
 
     def filter_for_view_as(feed)
       filtered_badges = {}
-      GOOGLE_SOURCES.each_key do |key|
+      self.class.providers.each_key do |key|
         filtered_badges[key] = {
           count: 0,
           items: []
@@ -38,14 +46,12 @@ module MyBadges
       feed
     end
 
-    def get_google_badges
-      badges = {}
+    def merge_google_badges(feed)
       if GoogleApps::Proxy.access_granted?(@uid)
-        GOOGLE_SOURCES.each do |key, provider|
-          badges[key] = provider.new(@uid).fetch_counts
+        handling_provider_exceptions(feed, self.class.providers) do |provider_key, provider_value|
+          feed[:badges][provider_key] = provider_value.new(@uid).fetch_counts
         end
       end
-      badges
     end
 
     def get_latest_alert

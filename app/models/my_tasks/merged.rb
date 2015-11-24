@@ -1,5 +1,3 @@
-require 'my_tasks/param_validator'
-
 module MyTasks
   class Merged < UserSpecificModel
     include MyTasks::ParamValidator
@@ -7,8 +5,7 @@ module MyTasks
     include Cache::FreshenOnWarm
     include Cache::JsonAddedCacher
     include Cache::FilteredViewAsFeed
-
-    attr_reader :enabled_sources
+    include MergedModel
 
     def initialize(uid, options={})
       super(uid, options)
@@ -17,8 +14,12 @@ module MyTasks
       @now_time = Time.zone.now
     end
 
-    def init
-      @enabled_sources ||= {
+    def providers
+      @providers ||= candidate_providers.select { |k,v| v[:access_granted] == true }
+    end
+
+    def candidate_providers
+      {
         Canvas::Proxy::APP_NAME => {access_granted: Canvas::Proxy.access_granted?(@uid),
                                 source: MyTasks::CanvasTasks.new(@uid, @starting_date)},
         GoogleApps::Proxy::APP_ID => {access_granted: GoogleApps::Proxy.access_granted?(@uid),
@@ -28,16 +29,21 @@ module MyTasks
         Slate::Checklist::APP_ID => {access_granted: true,
                                 source: MyTasks::SlateTasks.new(@uid, @starting_date)}
       }
-      @enabled_sources.select!{|k,v| v[:access_granted] == true}
+    end
+
+    def provider_class_name(provider)
+      provider[1][:source].class.to_s
     end
 
     def get_feed_internal
-      tasks = []
-      @enabled_sources.each do |key, value_hash|
-        tasks += value_hash[:source].fetch_tasks
+      feed = {
+        tasks: []
+      }
+      handling_provider_exceptions(feed, providers) do |provider_key, provider_value|
+        feed[:tasks] += provider_value[:source].fetch_tasks
       end
-      logger.debug "#{self.class.name} get_feed is #{tasks.inspect}"
-      {tasks: tasks}
+      logger.debug "#{self.class.name} get_feed is #{feed[:tasks].inspect}"
+      feed
     end
 
     def filter_for_view_as(feed)
@@ -45,11 +51,10 @@ module MyTasks
       feed
     end
 
-    def update_task(params, task_list_id="@default")
-      init
-      return {} if @enabled_sources[params["emitter"]].blank?
+    def update_task(params, task_list_id='@default')
+      return {} if providers[params['emitter']].blank?
       validate_update_params params
-      source = @enabled_sources[params["emitter"]][:source]
+      source = providers[params['emitter']][:source]
       response = source.update_task(params, task_list_id)
       if response != {}
         expire_cache
@@ -58,10 +63,9 @@ module MyTasks
       response
     end
 
-    def insert_task(params, task_list_id="@default")
-      init
-      return {} if @enabled_sources[params["emitter"]].blank?
-      source = @enabled_sources[params["emitter"]][:source]
+    def insert_task(params, task_list_id='@default')
+      return {} if providers[params['emitter']].blank?
+      source = providers[params['emitter']][:source]
       response = source.insert_task(params, task_list_id)
       if response != {}
         expire_cache
@@ -70,10 +74,9 @@ module MyTasks
       response
     end
 
-    def clear_completed_tasks(params, task_list_id="@default")
-      init
-      return {tasksCleared: false} if @enabled_sources[params["emitter"]].blank?
-      source = @enabled_sources[params["emitter"]][:source]
+    def clear_completed_tasks(params, task_list_id='@default')
+      return {tasksCleared: false} if providers[params['emitter']].blank?
+      source = providers[params['emitter']][:source]
       response = source.clear_completed_tasks(task_list_id)
       if response[:tasksCleared] != false
         expire_cache
@@ -82,10 +85,9 @@ module MyTasks
       response
     end
 
-    def delete_task(params, task_list_id="@default")
-      init
-      return {task_deleted: false} if @enabled_sources[params["emitter"]].blank?
-      source = @enabled_sources[params["emitter"]][:source]
+    def delete_task(params, task_list_id='@default')
+      return {task_deleted: false} if providers[params['emitter']].blank?
+      source = providers[params['emitter']][:source]
       response = source.delete_task(params, task_list_id)
       if response != {}
         expire_cache
@@ -102,11 +104,12 @@ module MyTasks
 
     def validate_update_params(params)
       filters = {
-          "type" => Proc.new { |arg| !arg.blank? && arg.is_a?(String) },
-          "emitter" => includes_whitelist_values?(@enabled_sources.keys),
-          "status" => includes_whitelist_values?(%w(needsAction completed))
+          'type' => Proc.new { |arg| !arg.blank? && arg.is_a?(String) },
+          'emitter' => includes_whitelist_values?(providers.keys),
+          'status' => includes_whitelist_values?(%w(needsAction completed))
       }
       validate_params(params, filters)
     end
+
   end
 end

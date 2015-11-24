@@ -17,10 +17,10 @@ module HubEdos
     end
 
     def get_internal
-      edo_feed = Student.new(user_id: @uid).get
+      edo_feed = MyStudent.new(user_id: @uid).get_feed
       result = {}
       if (feed = edo_feed[:feed])
-        edo = HashConverter.symbolize feed['student'] # TODO will have to dynamically switch student/person EDO somehow
+        edo = HashConverter.symbolize feed[:student] # TODO will have to dynamically switch student/person EDO somehow
         set_ids(result)
         extract_passthrough_elements(edo, result)
         extract_names(edo, result)

@@ -2,9 +2,9 @@ module MyActivities
   class CanvasActivities
     include ClassLogger, DatedFeed, HtmlSanitizer, SafeJsonParser
 
-    def self.append!(uid, classes, activities)
+    def self.append_with_dashboard_sites!(uid, activities, dashboard_sites)
       return unless Canvas::Proxy.access_granted?(uid)
-      canvas_results = get_feed(uid, index_classes_by_emitter(classes))
+      canvas_results = get_feed(uid, index_classes_by_emitter(dashboard_sites))
       activities.concat canvas_results
     end
 
