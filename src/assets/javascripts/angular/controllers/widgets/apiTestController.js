@@ -25,7 +25,7 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
 
   $scope.apiTest = {
     data: [],
-    enabled: false,
+    isLoading: true,
     showTests: false,
     running: false
   };
@@ -53,7 +53,7 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
     });
   };
 
-  var initTestRoutes = function() {
+  var initRoutes = function() {
     apiTestFactory.smokeTest({
       refreshCache: true
     }).success(function(data) {
@@ -65,7 +65,7 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
         });
       });
       $scope.apiTest.data = output;
-      $scope.apiTest.enabled = true;
+      $scope.apiTest.isLoading = false;
     });
   };
 
@@ -83,9 +83,5 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
     });
   };
 
-  $scope.$on('calcentral.api.user.profile', function(event, profile) {
-    if (profile.isSuperuser) {
-      initTestRoutes();
-    }
-  });
+  initRoutes();
 });

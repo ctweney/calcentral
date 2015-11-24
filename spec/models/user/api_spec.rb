@@ -34,9 +34,9 @@ describe User::Api do
   it 'should revert to the default name' do
     u = User::Api.new @random_id
     u.update_attributes preferred_name: 'Herr Heyer'
-    u = User::Api.new(@random_id)
+    u = User::Api.new @random_id
     u.update_attributes preferred_name: ''
-    u = User::Api.new(@random_id)
+    u = User::Api.new @random_id
     u.init
     expect(u.preferred_name).to eq @default_name
   end
@@ -62,7 +62,7 @@ describe User::Api do
     expect(user_data[:firstLoginAt]).to be_nil
   end
   it 'should properly register a call to record_first_login' do
-    user_api = User::Api.new(@random_id)
+    user_api = User::Api.new @random_id
     user_api.get_feed
     user_api.record_first_login
     updated_data = user_api.get_feed
@@ -136,7 +136,7 @@ describe User::Api do
     context 'superuser' do
       before { User::Auth.new_or_update_superuser! @random_id }
       it 'should show My Toolbox tab' do
-        user_api = User::Api.new(@random_id)
+        user_api = User::Api.new @random_id
         expect(user_api.get_feed[:hasToolboxTab]).to be true
       end
     end

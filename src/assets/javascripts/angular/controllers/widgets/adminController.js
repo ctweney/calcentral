@@ -12,7 +12,8 @@ angular.module('calcentral.controllers').controller('AdminController', function(
       id: ''
     },
     searchedUsers: [],
-    storedUsers: {}
+    storedUsers: {},
+    isLoading: true
   };
 
   $scope.admin.storeSavedUser = function(user) {
@@ -47,9 +48,11 @@ angular.module('calcentral.controllers').controller('AdminController', function(
       .success(function(data) {
         $scope.admin.storedUsers = data.users;
         updateUserLists();
+        $scope.admin.isLoading = false;
       })
       .error(function() {
         $scope.admin.actAsErrorStatus = 'There was a problem fetching your items.';
+        $scope.admin.isLoading = false;
       });
   };
 
@@ -109,7 +112,7 @@ angular.module('calcentral.controllers').controller('AdminController', function(
   var actAsUser = function(user) {
     return adminFactory.actAs({
       uid: user.ldap_uid
-    }).success(apiService.util.redirectToSettings);
+    }).success(apiService.util.redirectToToolbox);
   };
 
   $scope.admin.actAsUser = function(user) {
