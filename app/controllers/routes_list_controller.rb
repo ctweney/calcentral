@@ -33,7 +33,6 @@ class RoutesListController < ApplicationController
       /api/ping
       /api/server_info
       /api/stats
-      /api/tools/styles
     )
   end
 end
