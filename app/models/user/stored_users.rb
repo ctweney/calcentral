@@ -22,6 +22,7 @@ module User
 
       return users unless all_uids.present?
 
+      # TODO SISRP-10824 find a way to replace this batch user query with Crosswalk (which doesn't offer multi-user lookup, or names)
       users_found = User::SearchUsersByUid.new(:ids => all_uids).search_users_by_uid_batch
       uid_hash = {}
 

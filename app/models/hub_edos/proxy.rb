@@ -13,6 +13,7 @@ module HubEdos
 
     def initialize(settings, options)
       super
+      p "@uid = #{@uid}"
       if @fake
         @campus_solutions_id = lookup_campus_solutions_id
         initialize_mocks

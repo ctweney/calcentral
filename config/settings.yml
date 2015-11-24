@@ -274,6 +274,8 @@ cache:
     CampusSolutions::DashboardUrl: <%= 29.days %>
 
     CalnetCrosswalk::Proxy: <%= 29.days %>
+    CalnetCrosswalk::ByUid: <%= 29.days %>
+    CalnetCrosswalk::BySid: <%= 29.days %>
 
 # Cache warmer settings
 cache_warmer:
@@ -409,6 +411,6 @@ hub_edos_proxy:
 
 calnet_crosswalk_proxy:
   fake: true
-  base_url: 'https://registry-d1.calnet.1918.berkeley.edu:8453/registry-service/api/v1/identifiers/UID'
+  base_url: 'https://registry-d1.calnet.1918.berkeley.edu:8453/registry-service/api/v1/identifiers'
   username: secret
   password: secret
