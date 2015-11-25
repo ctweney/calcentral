@@ -3,6 +3,20 @@
   .cc-toolbox-section {
     margin-top: 30px;
   }
+  .cc-toolbox-widget {
+    background: $cc-color-white;
+    form {
+      background: transparent;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      label {
+        display: inline-block;
+        margin: 0;
+        text-align: left;
+      }
+    }
+  }
   .cc-toolbox-apitest-list {
     margin-left: 20px;
     .cc-toolbox-apitest-pending {
@@ -28,8 +42,5 @@
       font-size: 12px;
       padding: 4px;
     }
-  }
-  .cc-toolbox-recent-uids {
-    margin-top: 7px;
   }
 }

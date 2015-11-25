@@ -68,4 +68,8 @@ class AuthenticationStatePolicy
     feature_flag = Settings.features.webcast_sign_up_on_calcentral
     feature_flag.present? && feature_flag && (can_administrate? || can_view_as? || can_add_current_official_sections?)
   end
+
+  def has_toolbox_tab?
+    can_administrate? || (@user.user_auth.active? && @user.user_auth.is_viewer?)
+  end
 end

@@ -112,7 +112,7 @@ angular.module('calcentral.controllers').controller('AdminController', function(
   var actAsUser = function(user) {
     return adminFactory.actAs({
       uid: user.ldap_uid
-    }).success(apiService.util.redirectToToolbox);
+    }).success(apiService.util.redirectToHome);
   };
 
   $scope.admin.actAsUser = function(user) {
