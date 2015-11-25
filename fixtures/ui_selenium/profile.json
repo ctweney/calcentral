@@ -21,17 +21,20 @@
                 "phones": [
                     {
                         "type": "Mobile",
+                        "test": "adding",
                         "phoneNumberInput": "510-555-1234",
                         "phoneNumberDisplay": "510/555-1234",
                         "phoneExt": "2"
                     },
                     {
                         "type": "Home/Permanent",
+                        "test": "editing",
                         "phoneNumberInput": "44 01698 12345",
                         "phoneNumberDisplay": "44 01698 12345"
                     },
                     {
                         "type": "Local",
+                        "test": "editing",
                         "phoneNumberInput": "123456789012345678901234567890",
                         "phoneNumberDisplay": "123456789012345678901234",
                         "phoneExt": "1234567890"

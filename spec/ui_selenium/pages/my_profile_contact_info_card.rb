@@ -93,7 +93,6 @@ module CalCentralPages
       logger.info "Entering phone of type #{type}, number #{number}, extension #{ext}"
       WebDriverUtils.wait_for_element_and_type(phone_number_input_element, number) unless number.nil?
       WebDriverUtils.wait_for_element_and_type(phone_ext_input_element, ext) unless ext.nil?
-      sleep WebDriverUtils.campus_solutions_timeout
       if phone_type? && !type.nil?
         WebDriverUtils.wait_for_element_and_select(phone_type_element, type)
       end
@@ -119,7 +118,7 @@ module CalCentralPages
       click_edit_phone index
       click_delete_phone
       phone.when_not_present WebDriverUtils.page_load_timeout
-      sleep WebDriverUtils.campus_solutions_timeout
+      phone_label_element.when_visible WebDriverUtils.campus_solutions_timeout
     end
 
     def delete_all_phones
@@ -176,7 +175,7 @@ module CalCentralPages
     select_list(:email_type, :id => 'cc-page-widget-profile-email-type')
     text_area(:email_input, :id => 'cc-page-widget-profile-email-address')
     checkbox(:email_preferred_cbx, :id => 'cc-page-widget-profile-email-preferred')
-    span(:email_validation_error, :xpath => '//span[contains(.,"Invalid email address")]')
+    span(:email_validation_error, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//span[@data-ng-bind="errorMessage"]')
 
     def email_types
       types = []
@@ -216,7 +215,7 @@ module CalCentralPages
       WebDriverUtils.wait_for_element_and_click cancel_email_button_element
     end
 
-    def enter_email(address, pref = nil)
+    def enter_email(address, pref)
       logger.info "Entering email address '#{address}'"
       WebDriverUtils.wait_for_element_and_type(email_input_element, address) unless address.nil?
       pref ? check_email_preferred_cbx : uncheck_email_preferred_cbx
@@ -265,7 +264,7 @@ module CalCentralPages
       types
     end
 
-    def addresses_formatted
+    def all_formatted_addresses
       addresses = []
       address_formatted_elements.each { |address| addresses << address.text }
       addresses
@@ -287,6 +286,7 @@ module CalCentralPages
     def click_edit_address(index)
       click_cancel_address if cancel_address_button_element.visible?
       wait_until(WebDriverUtils.page_load_timeout) { address_edit_button_elements.any? }
+      # Scroll to the bottom of the page in case the Edit button is not in view
       execute_script('window.scrollTo(0, document.body.scrollHeight);')
       WebDriverUtils.wait_for_element_and_click address_edit_button_elements[index]
     end
@@ -301,12 +301,33 @@ module CalCentralPages
       # Scroll to the bottom of the page in case the Cancel button is not in view
       execute_script('window.scrollTo(0, document.body.scrollHeight);')
       WebDriverUtils.wait_for_element_and_click cancel_address_button_element
-      sleep WebDriverUtils.campus_solutions_timeout
+      cancel_address_button_element.when_not_visible WebDriverUtils.page_event_timeout
+    end
+
+    def wait_for_address_form(address)
+      logger.info "Waiting for the #{address['country']} address form to appear"
+      address['inputs'].each do |input|
+        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{input['index']}']/span")
+        wait_until(1, "The label '#{input['label']}' is not present") do
+          label.when_visible(1)
+          label.text == input['label']
+        end rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      end
+      unless address['selects'].nil?
+        address['selects'].each do |select|
+          label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{select['index']}']/span")
+          label.when_visible(1)
+          wait_until(1, "The label '#{select['label']}' is not present") do
+            label.text == select['label']
+          end
+        end
+      end
+      true
     end
 
     def load_country_form(address)
       WebDriverUtils.wait_for_element_and_select(country_select_element, address['country'])
-      sleep WebDriverUtils.campus_solutions_timeout
+      wait_for_address_form address
       # Scroll to the bottom of the page to bring the complete form into view
       execute_script('window.scrollTo(0, document.body.scrollHeight);')
     end
@@ -350,59 +371,36 @@ module CalCentralPages
     def edit_address(index, address, inputs, selections)
       click_edit_address index
       enter_address(address, inputs, selections)
+      click_save_address
     end
 
-    def wait_for_saved_address(addresses_length)
-      logger.debug 'Waiting for address update to complete'
-      wait_until(WebDriverUtils.page_load_timeout, 'Address update has timed out') do
-        address_formatted_elements.length == addresses_length
-      end
+    def trimmed_input(input)
+      input['text'].slice(0..(input['max'] - 1)).strip
     end
 
     def verify_address(index, inputs, selections)
-      logger.info "About to check the text displayed for #{inputs.length} inputs"
-      sleep WebDriverUtils.campus_solutions_timeout
+      wait_until(WebDriverUtils.campus_solutions_timeout, 'Timed out waiting for the new address to appear') do
+        all_formatted_addresses.find { |address| address.include? trimmed_input(inputs[0]) } rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      end
       logger.debug "Address displayed is \n#{formatted_address(index)}"
       inputs.each do |input|
         if input['display'].nil?
           logger.debug "Checking that '#{input['text']}' is visible"
-          wait_until(2, "The text '#{input['text'].slice(0..(input['max'] - 1))}' is not present") do
-            formatted_address(index).include? input['text'].slice(0..(input['max'] - 1)).strip
+          wait_until(1, "The text '#{trimmed_input(input)}' is not present") do
+            formatted_address(index).include? trimmed_input(input)
           end
         elsif !input['display']
           logger.debug "Checking that '#{input['text']}' is not visible"
-          wait_until(2, "The text '#{input['text']}' is present but it should not be") do
-            !formatted_address(index).include? input['text'].slice(0..(input['max'] - 1)).strip
+          wait_until(1, "The text '#{input['text']}' is present but it should not be") do
+            !formatted_address(index).include? trimmed_input(input)
           end
         end
       end
       unless selections.nil?
-        logger.debug "About to check the text displayed for #{selections.length} selections"
         selections.each do |select|
           logger.debug "Checking that '#{select['option']}' is visible"
-          wait_until(2, "The option '#{select['option']}' i  s not present") do
+          wait_until(1, "The option '#{select['option']}' is not present") do
             formatted_address(index).include? select['option']
-          end
-        end
-      end
-    end
-
-    def verify_address_labels(address)
-      address['inputs'].each do |input|
-        logger.debug "Checking that there is an input labeled #{input['label']}"
-        label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{input['index']}']/span")
-        label.when_visible(1)
-        wait_until(1, "The label '#{input['label']}' is not present") do
-          label.text == input['label']
-        end
-      end
-      unless address['selects'].nil?
-        address['selects'].each do |select|
-          logger.debug "Checking that there is a drop-down labeled #{select['label']}"
-          label = span_element(:xpath => "//label[@for='cc-page-widget-profile-field-#{select['index']}']/span")
-          label.when_visible(1)
-          wait_until(1, "The label '#{select['label']}' is not present") do
-            label.text == select['label']
           end
         end
       end

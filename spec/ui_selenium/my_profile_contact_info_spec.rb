@@ -210,7 +210,7 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
         it 'allows a user to choose a different preferred email' do
           # This example requires that a campus email be present, which might not be true
           if @contact_info_card.email_types.include? 'Campus'
-            @contact_info_card.edit_email(nil, false)
+            @contact_info_card.edit_email nil
             @contact_info_card.wait_until(WebDriverUtils.page_load_timeout) { !@contact_info_card.email_primary?(@index) }
           else
             logger.warn 'Only one email exists, so skipping test for switching preferred emails'
@@ -219,7 +219,7 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
 
         it 'allows a user to change the email address' do
           new_address = 'foo@bar.bar'
-          @contact_info_card.edit_email new_address
+          @contact_info_card.edit_email(new_address, true)
           @contact_info_card.wait_until(WebDriverUtils.page_load_timeout, 'New email was not saved') do
             @contact_info_card.email_addresses.include? new_address
           end
@@ -236,27 +236,27 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
         end
         it 'requires that the email address include the @ and . characters' do
           @contact_info_card.edit_email('foo', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address include the . character' do
           @contact_info_card.edit_email('foo@bar', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address include the @ character' do
           @contact_info_card.edit_email('foo.bar', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address contain at least one . following the @' do
           @contact_info_card.edit_email('foo.bar@foo', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address not contain @ as the first character' do
           @contact_info_card.edit_email('@foo.bar', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address not contain . as the last character' do
           @contact_info_card.edit_email('foo@bar.', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'allows a maximum of 70 email address characters to be entered' do
           @contact_info_card.edit_email('foobar@foobar.foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoo', true)
@@ -266,14 +266,16 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
 
       describe 'deleting' do
 
-        it 'allows a user to delete an email of type Other' do
+        it 'allows a user to delete an email of type Other if it is not the only email' do
           # This example requires that a second email be present, which might not be true
           if @contact_info_card.email_types.include? 'Campus'
             logger.warn 'Campus email exists, so testing deleting Other email'
             @contact_info_card.delete_email
           else
             logger.warn 'Campus email does not exist, so testing that Other email cannot be deleted'
-            @contact_info_card.delete_email
+            @contact_info_card.click_edit_email
+            WebDriverUtils.wait_for_element_and_click @contact_info_card.delete_email_button_element
+            @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'One email Address must be checked as Preferred' }
           end
         end
 
@@ -310,20 +312,11 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
         # Iterate through each address in the test data file to exercise the internationalized address forms
         addresses.each do |address|
 
-          it "shows a user custom address fields for #{address['country']}" do
-            @contact_info_card.load_page
-            @contact_info_card.click_edit_address @local_index
-            @contact_info_card.load_country_form address
-            @contact_info_card.verify_address_labels address
-          end
-
           it "allows a user to enter an address for #{address['country']} with max character restrictions" do
             address_inputs = address['inputs']
             address_selects = address['selects']
             @contact_info_card.load_page
             @contact_info_card.edit_address(@local_index, address, address_inputs, address_selects)
-            @contact_info_card.click_save_address
-            @contact_info_card.wait_for_saved_address @addresses
             @contact_info_card.verify_address(@local_index, address_inputs, address_selects)
           end
           it "requires a user to complete certain fields for an address in #{address['country']}" do
@@ -346,7 +339,6 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
             @contact_info_card.click_edit_address @local_index
             @contact_info_card.clear_address_fields(address, nonreq_address_inputs, address['selects'])
             @contact_info_card.click_save_address
-            @contact_info_card.wait_for_saved_address @addresses
             @contact_info_card.verify_address(@local_index, req_address_inputs, [])
           end
           it 'prevents a user adding an address of the same type as an existing one' do
