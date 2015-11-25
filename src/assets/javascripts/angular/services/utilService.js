@@ -75,6 +75,13 @@ angular.module('calcentral.services').service('utilService', function($cacheFact
   };
 
   /**
+   * Redirect to base URL
+   */
+  var redirectToHome = function() {
+    window.location = '/';
+  };
+
+  /**
    * Prevent a click event from bubbling up to its parents
    */
   var preventBubble = function($event) {
@@ -218,6 +225,7 @@ angular.module('calcentral.services').service('utilService', function($cacheFact
     printPage: printPage,
     redirect: redirect,
     redirectToToolbox: redirectToToolbox,
+    redirectToHome: redirectToHome,
     setTitle: setTitle,
     supportsLocalStorage: supportsLocalStorage,
     uidPattern: uidPattern
