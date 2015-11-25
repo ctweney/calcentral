@@ -36,7 +36,7 @@ describe GoogleApps::SheetsManager do
     end
 
     it 'should output the same CSV values that were put in' do
-      spreadsheet_file = @sheet_manager.find_items(id: @spreadsheet.id, parent_id: @folder.id).first
+      spreadsheet_file = @sheet_manager.find_items(parent_id: @folder.id).first
       csv_export = @sheet_manager.export_csv spreadsheet_file
       parsed_csv = CSV.parse csv_export
       expect(parsed_csv[0]).to eq @sis_import_sheet.headers
@@ -47,7 +47,7 @@ describe GoogleApps::SheetsManager do
     end
 
     it 'should update cells in batch' do
-      spreadsheet_file = @sheet_manager.find_items(id: @spreadsheet.id, parent_id: @folder.id).first
+      spreadsheet_file = @sheet_manager.find_items(parent_id: @folder.id).first
       worksheet = @sheet_manager.spreadsheet_by_id(@spreadsheet.id).worksheets.first
       @sheet_manager.update_worksheet(worksheet, {
         [2, 2] => 'Kilroy',
@@ -67,8 +67,7 @@ describe GoogleApps::SheetsManager do
     end
 
     it 'should have named the worksheet as well as the Sheets file' do
-      spreadsheet_file = @sheet_manager.find_items(id: @spreadsheet.id, parent_id: @folder.id).first
-      worksheet = spreadsheet_file.worksheets.first
+      worksheet = @sheet_manager.spreadsheet_by_id(@spreadsheet.id).worksheets.first
       expect(worksheet.title).to eq @worksheet_title
     end
 
