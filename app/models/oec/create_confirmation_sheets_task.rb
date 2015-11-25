@@ -43,7 +43,7 @@ module Oec
               raise RuntimeError, "Could not find worksheet 'Report Viewers' in template copy '#{dept_sheet.title}'" unless report_viewers_worksheet
             else
               log :debug, "No template confirmation sheet found, will create blank '#{dept_name}' confirmation sheet"
-              dept_sheet = @remote_drive.upload_to_spreadsheet(dept_name, '', StringIO.new(dept_confirmations[:courses].headers.join(',')), departments_folder.id)
+              dept_sheet = @remote_drive.upload_to_spreadsheet(dept_name, StringIO.new(dept_confirmations[:courses].headers.join(',')), departments_folder.id)
               courses_worksheet = dept_sheet.worksheets.first
               report_viewers_worksheet = dept_sheet.add_worksheet('Report Viewers', 100, dept_confirmations[:supervisors].headers.count)
               dept_confirmations[:supervisors].headers.each_with_index { |header, i| report_viewers_worksheet[1, i+1] = header }

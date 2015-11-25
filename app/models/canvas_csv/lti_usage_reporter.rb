@@ -13,7 +13,7 @@ module CanvasCsv
       # will be changed as changes are made to account-level external_tools configurations, new
       # reports will become increasingly inaccurate. Reports made at the end of a semester should
       # be archived rather than regenerated.
-      @sis_term_id = sis_term_id
+      @sis_term_id = sis_term_id || default_term_id
 
       # Tools which are not configured at the top account may have more than one Canvas ID and more than one
       # label for the same underlying LTI app.
@@ -26,6 +26,10 @@ module CanvasCsv
       @course_to_visible_tools = {}
     end
 
+    def default_term_id
+      Canvas::Terms.current_sis_term_ids.first
+    end
+
     def run
       collect_account_external_tools
       collect_course_external_tools
@@ -33,6 +37,12 @@ module CanvasCsv
       @courses_report = generate_courses_report
       logger.warn "Summary LTI usage report for #{@sis_term_id} is at #{@summary_report}"
       logger.warn "Detailed LTI usage report for #{@sis_term_id} is at #{@courses_report}"
+      if sheets_manager && reports_folder
+        sheets_file = sheets_manager.upload_to_spreadsheet("LTI Usage #{@sis_term_id} #{DateTime.now.strftime('%F')}",
+          @summary_report, reports_folder.id, 'Summary')
+        sheets_manager.upload_csv_to_worksheet(sheets_file, 'Courses', CSV.read(@courses_report))
+        logger.warn "Online LTI usage report in Google Drive at #{sheets_file.human_url}, folder = #{reports_folder.title}, title = #{sheets_file.title}"
+      end
     end
 
     def generate_summary_report
