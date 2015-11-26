@@ -3,35 +3,34 @@
     <h2>UID/SID Lookup</h2>
   </div>
   <div class="cc-widget-text">
-    <div>
-      <div class="cc-text-red" data-ng-if="admin.viewAsErrorStatus">
-        <i class="cc-icon-red fa fa-exclamation-circle"></i>
-        <span data-ng-bind="admin.viewAsErrorStatus"></span>
-      </div>
+    <div class="cc-toolbox-error" data-ng-if="admin.lookupErrorStatus">
+      <i class="cc-icon-red fa fa-exclamation-circle"></i>
+      <span class="cc-text-red" data-ng-bind="admin.lookupErrorStatus"></span>
     </div>
     <form data-ng-submit="admin.lookupUser()">
       <div>
-        <div>
-          <input id="cc-toolbox-id" data-ng-pattern="api.util.uidPattern" placeholder="Enter UID or SID here" data-ng-model="admin.id" type="text" data-cc-select-on-click-directive />
-        </div>
+        <label for="cc-toolbox-id">UID/SID</label>
+        <input id="cc-toolbox-id" data-ng-pattern="api.util.uidPattern" placeholder="Enter UID or SID here" data-ng-model="admin.id" type="text" data-cc-select-on-click-directive />
       </div>
       <div>
         <button class="cc-button cc-button-blue" data-ng-disabled="!admin.id" type="submit">Look Up</button>
       </div>
-      <table class="cc-toolbox-table" data-ng-if="admin.users">
-        <thead>
-          <tr>
-            <th width="50%" scope="col">UID</th>
-            <th width="50%" scope="col">SID</th>
-          </tr>
-        </thead>
-        <tbody data-ng-repeat="user in admin.users">
-          <tr>
-            <td data-ng-bind="user.ldap_uid"></td>
-            <td data-ng-bind="user.student_id || 'This user has no SID'"></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="cc-table cc-toolbox-table" data-ng-if="admin.users.length">
+        <table>
+          <thead>
+            <tr>
+              <th width="50%" scope="col">UID</th>
+              <th width="50%" scope="col">SID</th>
+            </tr>
+          </thead>
+          <tbody data-ng-repeat="user in admin.users">
+            <tr>
+              <td data-ng-bind="user.ldap_uid"></td>
+              <td data-ng-bind="user.student_id || 'This user has no SID'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </form>
   </div>
 </div>

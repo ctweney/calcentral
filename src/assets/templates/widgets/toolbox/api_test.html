@@ -1,17 +1,17 @@
-<div class="cc-widget cc-toolbox-widget" data-ng-controller="ApiTestController" data-cc-spinner-directive="apiTest.isLoading">
+<div class="cc-widget cc-toolbox-widget" data-ng-controller="ApiTestController">
   <div class="cc-widget-title">
     <h2>CalCentral API Test</h2>
   </div>
-  <div class="cc-widget-text">
+  <div class="cc-widget-text" data-cc-spinner-directive="apiTest.isLoading">
     <form data-ng-submit="runApiTest()">
       <button class="cc-button cc-button-blue" data-ng-disabled="apiTest.running" type="submit">Run</button>
       <div data-ng-show="apiTest.showTests">
         <ul class="cc-toolbox-apitest-list">
-          <li data-ng-repeat="route in apiTest.data" ng-switch="route.status" class="cc-flex">
-            <i ng-switch-when="success" title="{{route.route}}" class="fa fa-check-circle cc-icon-green cc-toolbox-apitest-icon"></i>
-            <i ng-switch-when="failed" title="{{route.route}}" class="fa fa-check-circle cc-icon-red cc-toolbox-apitest-icon"></i>
-            <i ng-switch-default title="{{route.route}}" class="fa fa-spinner fa-spin cc-toolbox-apitest-icon"></i>
-            <span class="cc-toolbox-apitest-{{route.status}}" data-ng-bind="route.route"></span>
+          <li data-ng-repeat="(route, status) in apiTest.data" ng-switch="status" class="cc-flex cc-flex-align-base">
+            <i ng-switch-when="success" title="Success" class="fa fa-check-circle cc-icon-green cc-toolbox-apitest-icon"></i>
+            <i ng-switch-when="failed" title="Failed" class="fa fa-check-circle cc-icon-red cc-toolbox-apitest-icon"></i>
+            <i ng-switch-default title="Pending" class="fa fa-spinner fa-spin cc-toolbox-apitest-icon"></i>
+            <span data-ng-attr-class="cc-toolbox-apitest-{{status}}" data-ng-bind="route"></span>
           </li>
         </ul>
       </div>
