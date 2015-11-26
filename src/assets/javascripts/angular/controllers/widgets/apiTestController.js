@@ -1,11 +1,12 @@
 'use strict';
 
 var angular = require('angular');
+var _ = require('lodash');
 
 /**
  * API Test controller
  */
-angular.module('calcentral.controllers').controller('ApiTestController', function(apiTestFactory, $scope) {
+angular.module('calcentral.controllers').controller('ApiTestController', function(apiTestFactory, $scope, $q) {
   // Crude way of testing against the http.success responses due to insufficient status codes.
   var responseDictionary = {
     '/api/blog/release_notes/latest': 'entries',
@@ -22,6 +23,8 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
     '/api/smoke_test_routes': 'routes'
   };
 
+  var routesWithStatus = {};
+
   $scope.apiTest = {
     data: [],
     isLoading: true,
@@ -29,58 +32,73 @@ angular.module('calcentral.controllers').controller('ApiTestController', functio
     running: false
   };
 
-  var hitEndpoint = function(index) {
-    apiTestFactory.request({
-      url: $scope.apiTest.data[index].route,
+  /**
+   * Hit an actual API endpoint
+   * We first check whether the endpoint is mentioned in the dictionary
+   * If so, check whether we have that key as part of the response
+   * If not, we rely on the http success status (2XX)
+   */
+  var hitEndpoint = function(route) {
+    return apiTestFactory.request({
+      url: route,
       refreshCache: true
     })
     .success(function(data) {
-      var route = responseDictionary[$scope.apiTest.data[index].route];
-      if (route) {
-        $scope.apiTest.data[index].status = data[route] ? 'success' : 'failed';
+      var responseItem = responseDictionary[route];
+      if (responseItem) {
+        $scope.apiTest.data[route] = data[responseItem] ? 'success' : 'failed';
       } else {
-        $scope.apiTest.data[index].status = 'success';
+        $scope.apiTest.data[route] = 'success';
       }
     })
     .error(function() {
-      $scope.apiTest.data[index].status = 'failed';
-    })
-    .success(function() {
-      runOnLastEndpoint(index);
-    }).error(function() {
-      runOnLastEndpoint(index);
+      $scope.apiTest.data[route] = 'failed';
     });
   };
 
-  var initRoutes = function() {
-    apiTestFactory.smokeTest({
-      refreshCache: true
-    }).success(function(data) {
-      var output = [];
-      angular.forEach(data.routes, function(value) {
-        output.push({
-          route: value,
-          status: 'pending'
-        });
-      });
-      $scope.apiTest.data = output;
-      $scope.apiTest.isLoading = false;
-    });
+  /**
+   * Gets executed at the end of the test run
+   */
+  var runFinished = function() {
+    $scope.apiTest.running = false;
   };
 
-  var runOnLastEndpoint = function(index) {
-    if (parseInt(index, 10) + 1 >= $scope.apiTest.data.length) {
-      $scope.apiTest.running = false;
-    }
-  };
-
+  /**
+   * Run the API test
+   * This will hit multiple endpoints and see whether we do get successful responses back
+   */
   $scope.runApiTest = function() {
     $scope.apiTest.running = true;
     $scope.apiTest.showTests = true;
-    angular.forEach($scope.apiTest.data, function(value, index) {
-      hitEndpoint(index);
-    });
+
+    // Copy the routes (to get a clean start every time)
+    $scope.apiTest.data = angular.copy(routesWithStatus);
+
+    return $q.all(_.map(_.keys(routesWithStatus), function(route) {
+      return hitEndpoint(route);
+    })).then(runFinished);
   };
 
-  initRoutes();
+  /**
+   * Parse the routes so we can add a status to them
+   */
+  var parseRoutes = function(data) {
+    routesWithStatus = {};
+    _.forEach(data.routes, function(url) {
+      routesWithStatus[url] = 'pending';
+    });
+    $scope.apiTest.isLoading = false;
+  };
+
+  /**
+   * Get all the routes we need to test for the smoke test
+   * We only need to get these once
+   */
+  var getRoutes = function() {
+    apiTestFactory.smokeTest({
+      refreshCache: true
+    }).success(parseRoutes);
+  };
+
+  getRoutes();
 });
