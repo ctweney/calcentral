@@ -24,4 +24,8 @@ class UserSpecificModel
     @authentication_state.directly_authenticated?
   end
 
+  def delegate_permissions
+    @authentication_state.delegate_permissions || []
+  end
+
 end

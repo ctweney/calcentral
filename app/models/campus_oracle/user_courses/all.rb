@@ -27,6 +27,14 @@ module CampusOracle
         end
       end
 
+      def get_enrollments_summary
+        self.class.fetch_from_cache "summary-#{@uid}" do
+          campus_classes = {}
+          merge_enrollments campus_classes
+          Hash[campus_classes.sort.reverse]
+        end
+      end
+
     end
   end
 end

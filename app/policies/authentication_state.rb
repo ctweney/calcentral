@@ -10,6 +10,16 @@ class AuthenticationState
     @lti_authenticated_only = session['lti_authenticated_only']
   end
 
+  def authenticated_as_delegate?
+    #TODO implement me
+    false
+  end
+
+  def delegate_permissions
+    #TODO implement me
+    nil
+  end
+
   def directly_authenticated?
     user_id && !lti_authenticated_only &&
       (original_user_id.blank? ||

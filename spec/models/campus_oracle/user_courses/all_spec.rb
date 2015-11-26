@@ -100,4 +100,22 @@ describe CampusOracle::UserCourses::All do
     course_primary[:enroll_limit].to_s.should == '5000'
   end
 
+  it 'should return a shallower summary of enrollment data on request', :if => CampusOracle::Connection.test_data? do
+    client = CampusOracle::UserCourses::All.new({user_id: '300939'})
+    summary = client.get_enrollments_summary
+    expect(summary.keys).to match_array %w(2014-C 2014-B 2013-D 2012-B)
+    expect(summary['2013-D']).to have(2).items
+    summary['2013-D'].each do |course|
+      expect(course[:id]).to be_present
+      expect(course[:course_code]).to be_present
+      expect(course[:role]).to eq 'Student'
+      course[:sections].each do |section|
+        expect(section[:ccn]).to be_present
+        expect(section[:section_label]).to be_present
+        expect(section).not_to include :instructors
+        expect(section).not_to include :schedules
+      end
+    end
+  end
+
 end
