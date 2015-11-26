@@ -1,0 +1,22 @@
+.cc-widget-finaid-table {
+  &:not(:last-child) {
+    margin-bottom: 15px;
+  }
+  .cc-widget-finaid-sub-total-title {
+    padding-left: 20px;
+    position: relative;
+    &:before {
+      content: "• ";
+      margin-left: -10px;
+      position: absolute;
+    }
+  }
+  .cc-widget-finaid-table-budget-total-title {
+    color: $cc-color-lighter-medium-grey;
+  }
+}
+.cc-widget-finaid-table-grand-total td {
+  border-top: 1px solid $cc-color-popover-border;
+  font-weight: bold;
+  padding-top: 5px;
+}
