@@ -8,7 +8,16 @@
     </div>
     <div data-ng-if="!errored">
       <div data-ng-if="finaidAwards.hasAwards">
-        <div class="cc-widget-text cc-widget-finaid-profile-message" data-ng-bind="finaidAwards.message"></div>
+        <div class="cc-widget-text cc-widget-finaid-awards-message">
+          <div data-ng-bind="finaidAwards.message"></div>
+
+          <div class="cc-widget-finaid-awards-padding-top">
+            <a data-ng-href="/finances/finaid/awards/{{finaidYear.id}}">
+              Term View
+            </a>
+          </div>
+        </div>
+
         <div
           data-ng-repeat="key in finaidAwardsInfo.keysGiftWork"
           data-ng-include="'widgets/finaid_awards_section.html'"

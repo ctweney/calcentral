@@ -1,0 +1,27 @@
+<div class="cc-widget cc-widget-finaid-awards" data-ng-controller="FinaidAwardsTermController">
+  <div class="cc-widget-title">
+    <h2>Awards by Term</h2>
+  </div>
+  <div data-cc-spinner-directive="finaidAwardsTerm.isLoading">
+    <div data-ng-if="errored" class="cc-widget-text">
+      An error occurred while trying to retrieve your data.
+    </div>
+    <div data-ng-if="!errored">
+      <div class="cc-widget-text cc-widget-finaid-awards-message">
+        <div data-ng-bind="finaidAwardsTerm.feed.message"></div>
+
+        <div class="cc-widget-finaid-awards-padding-top">
+          <a data-ng-href="/finances/finaid/{{finaidYear.id}}">
+            View Award Details
+          </a>
+        </div>
+      </div>
+      <div
+        class="cc-widget-text"
+        data-cc-finaid-table-directive
+        data-data="finaidAwardsTerm.feed.awards.semester.data"
+        data-toggle="api.widget.toggleShow"
+      ></div>
+    </div>
+  </div>
+</div>

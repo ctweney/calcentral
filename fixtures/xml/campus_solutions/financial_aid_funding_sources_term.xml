@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<ROOT>
+  <MESSAGE>Financial aid awards are offered to meet your need up to your student budget (estimated cost of attendance).</MESSAGE>
+  <AWARDS>
+    <SEMESTER>
+      <DATA type="array">
+        <DATA_ITEM>
+          <HEADERS type="array">
+            <HEADER>Fall</HEADER>
+            <HEADER>Spring</HEADER>
+            <HEADER>Summer</HEADER>
+            <HEADER>Total</HEADER>
+          </HEADERS>
+          <ITEMS type="array">
+            <ITEM>
+              <AMOUNTS type="array">
+                <AMOUNT type="float">2363</AMOUNT>
+                <AMOUNT type="float">1637</AMOUNT>
+              </AMOUNTS>
+              <TOTAL type="float">4000</TOTAL>
+              <TITLE>Federal Pell Grant</TITLE>
+            </ITEM>
+            <ITEM>
+              <AMOUNTS type="array">
+                <AMOUNT type="float">500</AMOUNT>
+                <AMOUNT type="float">500</AMOUNT>
+              </AMOUNTS>
+              <TOTAL type="float">1000</TOTAL>
+              <TITLE>Federal SEOG Grant</TITLE>
+            </ITEM>
+            <ITEM>
+              <AMOUNTS type="array">
+                <AMOUNT type="float">725</AMOUNT>
+              </AMOUNTS>
+              <TOTAL type="float">725</TOTAL>
+              <TITLE>Summer Federal Pell Grant</TITLE>
+            </ITEM>
+          </ITEMS>
+          <TITLE>Gift Aid</TITLE>
+        </DATA_ITEM>
+        <DATA_ITEM>
+          <HEADERS type="array">
+            <HEADER>Fall</HEADER>
+            <HEADER>Spring</HEADER>
+            <HEADER>Summer</HEADER>
+            <HEADER>Total</HEADER>
+          </HEADERS>
+          <ITEMS type="array">
+            <ITEM>
+              <AMOUNTS type="array">
+                <AMOUNT type="float">750</AMOUNT>
+                <AMOUNT type="float">750</AMOUNT>
+              </AMOUNTS>
+              <TOTAL type="float">1500</TOTAL>
+              <TITLE>Fed Direct Subsidized Loan 1</TITLE>
+            </ITEM>
+            <ITEM>
+              <AMOUNTS type="array">
+                <AMOUNT type="float">1000</AMOUNT>
+              </AMOUNTS>
+              <TOTAL type="float">1000</TOTAL>
+              <TITLE>Fed Dir Subsidized Loan Smr1</TITLE>
+            </ITEM>
+          </ITEMS>
+          <TITLE>Subsidized</TITLE>
+        </DATA_ITEM>
+        <DATA_ITEM>
+          <HEADERS type="array">
+            <HEADER>Fall</HEADER>
+            <HEADER>Spring</HEADER>
+            <HEADER>Summer</HEADER>
+            <HEADER>Total</HEADER>
+          </HEADERS>
+          <ITEMS type="array">
+            <ITEM>
+              <AMOUNTS type="array">
+                <AMOUNT type="float">5338</AMOUNT>
+                <AMOUNT type="float">2887</AMOUNT>
+              </AMOUNTS>
+              <TOTAL type="float">8225</TOTAL>
+              <TITLE>Grand Total</TITLE>
+            </ITEM>
+          </ITEMS>
+        </DATA_ITEM>
+      </DATA>
+    </SEMESTER>
+  </AWARDS>
+</ROOT>

@@ -19,49 +19,10 @@
           </button>
         </div>
         <div
-          class="cc-table cc-widget-finaid-coa-table"
-          data-ng-class="{'cc-widget-finaid-coa-table-grand-total':(category.title === 'Grand Total')}"
-          data-ng-repeat="category in coa[coa.currentView].data"
-        >
-          <table>
-            <thead>
-              <tr>
-                <th data-ng-bind="category.title" scope="col" width="40%"></th>
-                <th data-ng-repeat="header in category.headers" class="cc-table-right" data-ng-bind="header" scope="col" width="20%"></th>
-              </tr>
-            </thead>
-            <tbody
-              data-cc-accessible-focus-directive="!!item.subItems.length"
-              data-ng-repeat="item in category.items"
-              data-ng-class="{'cc-widget-table-hover-opened cc-widget-list-selected':(item.show), 'cc-widget-table-hover': (item.subItems.length)}"
-              data-ng-click="!item.subItems.length || api.widget.toggleShow($event, category.items, item, 'Financial Aid - Cost of Attendance')">
-              <tr data-ng-if="!item.totals">
-                <td data-ng-bind="item.title"></td>
-                <td data-ng-repeat="amount in item.amounts track by $index" data-cc-amount-directive="amount" data-cc-amount-directive-color="false" class="cc-table-right" data-ng-if="!item.show"></td>
-                <td data-cc-amount-directive="item.total" data-cc-amount-directive-color="false" class="cc-table-right" data-ng-if="!item.show"></td>
-                <td data-ng-repeat="amount in item.amounts track by $index" class="cc-table-right" data-ng-if="item.show">-</td>
-                <td data-ng-if="item.show" class="cc-table-right">-</td>
-              </tr>
-              <tr data-ng-if="item.totals.length">
-                <td
-                  data-ng-attr-colspan="{{item.totals.length + 1}}"
-                  class="cc-table-right cc-table-top-border cc-text-small cc-widget-finaid-coa-budget-total-title cc-text-uppercase"
-                >
-                  <span data-ng-if="category.title === 'Standard Budget Items'">Standard Budget Total</span>
-                  <span data-ng-if="category.title === 'Additional Items'">Additional Budget Total</span>
-                </td>
-              </tr>
-              <tr data-ng-if="item.totals.length">
-                <td>&nbsp;</td>
-                <td data-ng-repeat="total in item.totals track by $index" data-cc-amount-directive="total" data-cc-amount-directive-color="false" class="cc-table-right"></td>
-              </tr>
-              <tr data-ng-if="item.show && item.subItems.length" data-ng-repeat="subItem in item.subItems">
-                <td class="cc-widget-finaid-coa-budget-table-title-sub" data-ng-bind="subItem.title"></td>
-                <td data-ng-repeat="amount in subItem.amounts track by $index" data-cc-amount-directive="amount" data-cc-amount-directive-color="false" class="cc-table-right"></td>
-                <td data-cc-amount-directive="subItem.total" data-cc-amount-directive-color="false" class="cc-table-right"></td>
-              </tr>
-            </tbody>
-          </table>
+          data-cc-finaid-table-directive
+          data-data="coa[coa.currentView].data"
+          data-toggle="api.widget.toggleShow"
+        ></div>
         </div>
       </div>
     </div>

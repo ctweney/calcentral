@@ -12,7 +12,6 @@ angular.module('calcentral.controllers').controller('FinaidAwardsController', fu
 
   $scope.finaidAwardsInfo = {
     isLoading: true,
-    backToText: 'Financial Aid',
     keysGiftWork: keysGiftWork,
     keysLoans: keysLoans
   };

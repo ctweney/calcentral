@@ -1,26 +1,4 @@
 .cc-widget-finaid-coa {
-  .cc-widget-finaid-coa-budget-total-title {
-    color: $cc-color-lighter-medium-grey;
-  }
-  .cc-widget-finaid-coa-table {
-    &:not(:last-child) {
-      margin-bottom: 15px;
-    }
-    .cc-widget-finaid-coa-budget-table-title-sub {
-      padding-left: 20px;
-      position: relative;
-      &:before {
-        content: "• ";
-        margin-left: -10px;
-        position: absolute;
-      }
-    }
-  }
-  .cc-widget-finaid-coa-table-grand-total td {
-    border-top: 1px solid $cc-color-popover-border;
-    font-weight: bold;
-    padding-top: 5px;
-  }
   .cc-widget-finaid-coa-text-padding {
     padding: 10px 0;
   }
