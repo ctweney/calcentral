@@ -24,7 +24,8 @@ module MyActivities
               user_id: uid,
               date: format_date(strptime_in_time_zone(message[:lastupddttm], "%Y-%m-%d-%H.%M.%S.000000")), # 2015-08-26-16.36.29.000000
               sourceUrl: message[:url],
-              url: message[:url]
+              url: message[:url],
+              isFinaidActivity: (['FINA', 'FINT', 'ISIR', 'LOAN'].include? message[:adminFunction])
             }
           end
         end
