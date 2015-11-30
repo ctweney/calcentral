@@ -2,19 +2,27 @@
   <div class="cc-widget-title">
     <h2>Communications</h2>
   </div>
-  <div class="cc-widget-text" data-cc-spinner-directive="communications.isLoading">
+  <div data-cc-spinner-directive="communicationsInfo.isLoading">
     <div data-ng-if="errored">
       An error occurred while trying to retrieve your data.
     </div>
     <div data-ng-if="!errored">
       <div>
-        <a
-          data-cc-campus-solutions-link-directive="communications.unsolicitedResourcesUrl"
-          data-cc-campus-solutions-link-directive-text="finaid.backToText"
-          data-cc-outbound-enabled="false"
-        >
-          Archive of Official Communications
-        </a>
+        <div class="cc-widget-subtitle">
+          <h3>Messages</h3>
+        </div>
+        <div class="cc-widget-activities">
+          <div data-ng-include="'widgets/activity_list.html'"></div>
+        </div>
+      </div>
+      <div data-ng-if="archiveUrl.length">
+        <div class="cc-widget-subtitle">
+          <h3>Archive</h3>
+        </div>
+        <div
+          data-ng-include="'widgets/activity_archive.html'"
+          data-onload="backToText=finaid.backToText"
+        ></div>
       </div>
     </div>
   </div>

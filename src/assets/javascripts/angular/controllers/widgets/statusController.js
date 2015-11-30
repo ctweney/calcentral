@@ -78,10 +78,10 @@ angular.module('calcentral.controllers').controller('StatusController', function
       // Get all the necessary data from the different factories
       var getBadges = badgesFactory.getBadges().success(loadStudentInfo);
       var getFinances = financesFactory.getFinances().success(loadFinances);
-      var getFinaidActivity = activityFactory.getFinaidActivity().then(loadActivity);
+      var getFinaidActivityOld = activityFactory.getFinaidActivityOld().then(loadActivity);
 
       // Make sure to hide the spinner when everything is loaded
-      $q.all(getBadges, getFinances, getFinaidActivity).then(finishLoading);
+      $q.all(getBadges, getFinances, getFinaidActivityOld).then(finishLoading);
     }
   });
 });

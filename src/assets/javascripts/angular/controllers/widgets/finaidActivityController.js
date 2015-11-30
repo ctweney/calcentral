@@ -3,21 +3,19 @@
 var angular = require('angular');
 
 /**
- * Activity controller
+ * Finaid Activity controller for messages before 2016
  */
-angular.module('calcentral.controllers').controller('FinaidActivityController', function(activityFactory, apiService, $scope) {
-  var getFinaidActivity = function() {
-    $scope.process = {
+angular.module('calcentral.controllers').controller('FinaidActivityOldController', function(activityFactory, apiService, $scope) {
+  var getFinaidActivityOld = function() {
+    $scope.activityInfo = {
       isLoading: true
     };
-    activityFactory.getFinaidActivity().then(function(data) {
+    activityFactory.getFinaidActivityOld().then(function(data) {
       apiService.updatedFeeds.feedLoaded(data);
       angular.extend($scope, data);
-      $scope.process.isLoading = false;
+      $scope.activityInfo.isLoading = false;
     });
   };
 
-  $scope.mode = 'finaidActivity';
-
-  getFinaidActivity();
+  getFinaidActivityOld();
 });
