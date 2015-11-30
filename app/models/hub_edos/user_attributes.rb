@@ -17,7 +17,7 @@ module HubEdos
     end
 
     def get_internal
-      edo_feed = MyStudent.new(user_id: @uid).get_feed
+      edo_feed = MyStudent.new(@uid).get_feed
       result = {}
       if (feed = edo_feed[:feed])
         edo = HashConverter.symbolize feed[:student] # TODO will have to dynamically switch student/person EDO somehow
