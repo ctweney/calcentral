@@ -22,7 +22,9 @@ module User
 
       return users unless all_uids.present?
 
-      # TODO SISRP-10824 find a way to replace this batch user query with Crosswalk (which doesn't offer multi-user lookup, or names)
+      # TODO SISRP-10824 / SISRP-11917: Have to find a way to replace this batch user query with Crosswalk
+      # (which doesn't offer multi-user lookup, or names)
+      # Until that's done, act-as search history will only be saved for users who are present in Oracle.
       users_found = User::SearchUsersByUid.new(:ids => all_uids).search_users_by_uid_batch
       uid_hash = {}
 
