@@ -16,7 +16,7 @@ module Oec
         file = @previous_term_csvs[worksheet_class]
         if file && (file.mime_type == 'text/csv') && file.download_url
           content = StringIO.new @remote_drive.download(file)
-          @remote_drive.upload_to_spreadsheet(file.title.chomp('.csv'), file.description, content, term_subfolders[:overrides].id)
+          @remote_drive.upload_to_spreadsheet(file.title.chomp('.csv'), content, term_subfolders[:overrides].id)
         elsif file
           copy_file(file, term_subfolders[:overrides])
         else

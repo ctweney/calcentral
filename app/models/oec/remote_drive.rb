@@ -39,7 +39,7 @@ module Oec
         raise RuntimeError, "Item '#{title}' already exists in remote drive folder '#{folder.title}'; could not upload"
       end
       upload_operation = (type == Oec::Worksheet) ?
-        upload_worksheet(title, '', item, folder_id(folder), format_numbers: :text) :
+        upload_to_spreadsheet(title, item.to_io, folder_id(folder)) :
         upload_file(title, '', folder_id(folder), type, item.to_s)
       unless upload_operation
         raise RuntimeError, "Item '#{title}' could not be uploaded to remote drive folder '#{folder.title}'"

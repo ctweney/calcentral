@@ -14,8 +14,9 @@ module GoogleApps
       find_items(options)
     end
 
-    def find_folders_by_title(title, parent_id = 'root')
-      find_items_by_title(title, mime_type: 'application/vnd.google-apps.folder', parent_id: parent_id)
+    def find_folders_by_title(title, options = {})
+      options.merge!(mime_type: 'application/vnd.google-apps.folder')
+      find_items_by_title(title, options)
     end
 
     def find_folders(parent_id = 'root')
@@ -37,10 +38,16 @@ module GoogleApps
       client = get_google_api
       drive_api = client.discovered_api('drive', 'v2')
       items = []
-      parent_id = options[:parent_id] || 'root'
-      query = "'#{parent_id}' in parents and trashed=false"
+      query = 'trashed=false'
+      parent_id = options[:parent_id]
+      # Shared items will not be found under our own root folder.
+      unless parent_id || options[:shared]
+        parent_id = 'root'
+      end
+      query.concat " and '#{parent_id}' in parents" if parent_id
       query.concat " and title='#{escape options[:title]}'" if options.has_key? :title
       query.concat " and mimeType='#{options[:mime_type]}'" if options.has_key? :mime_type
+      query.concat ' and sharedWithMe' if options[:shared]
       page_token = nil
       begin
         parameters = { :q => query }

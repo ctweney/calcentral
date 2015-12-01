@@ -91,6 +91,8 @@ canvas_proxy:
   test_admin_id:
   test_servers:
   test_cas_url: 'https://auth-test.berkeley.edu/cas'
+  # If reports are provided through Google Drive, this is the UID that creates them.
+  reporter_uid:
 ldap:
   host: 'nds.berkeley.edu'
   port: 636

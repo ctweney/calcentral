@@ -113,6 +113,24 @@ module Oec
       @rows.values
     end
 
+    def to_csv_string
+      CSV.generate do |csv|
+        csv << headers
+        each_sorted do |row|
+          csv_row = headers.map do |header|
+            # A trick to force plaintext formatting in Google Sheets.
+            # TODO Why not use the CSV :force_quotes option?
+            row[header] =~ /\A\d+\Z/ ? "'#{row[header]}" : row[header]
+          end
+          csv << csv_row
+        end
+      end
+    end
+
+    def to_io
+      StringIO.new(to_csv_string)
+    end
+
     def write_csv
       if @rows.any?
         output = CSV.open(csv_export_path, 'wb', headers: headers, write_headers: true)
