@@ -22,7 +22,7 @@ feature "act_as_user" do
     response['isLoggedIn'].should be_truthy
     response['uid'].should == '2040'
     suppress_rails_logging {
-     stop_act_as_user
+      stop_act_as_user
     }
     visit '/api/my/status'
     response = JSON.parse(page.body)
@@ -38,13 +38,13 @@ feature "act_as_user" do
     super_user_uid = "238382"
     act_as_uid = @target_uid
     # act_as user has never logged in
-    User::Data.where(:uid=>act_as_uid).first.should be_nil
+    User::Data.where(:uid => act_as_uid).first.should be_nil
     # log into CAS with the super user
     login_with_cas super_user_uid
     # stub out the environment, faking as production
     Settings.application.stub(:layer).and_return("production")
     # make the act_as request
-    page.driver.post '/act_as', {:uid=>act_as_uid}
+    page.driver.post '/act_as', {:uid => act_as_uid}
     # failing attempts will redirect to the root_path, giving a 302 statusCode
     # successful attempts don't redirect and return nothing but a 204 status code
     page.status_code.should == 204
@@ -56,29 +56,29 @@ feature "act_as_user" do
 
     # you don't want the admin user to record a first log for a "viewed as" user that does not exist in the database
     impossible_uid = '78903478484358033984502345858034583043548034580'
-    User::Data.where(:uid=>impossible_uid).should be_empty
+    User::Data.where(:uid => impossible_uid).should be_empty
     login_with_cas "238382" # super user
     suppress_rails_logging {
       act_as_user impossible_uid
     }
     page.driver.post '/api/my/record_first_login'
     page.status_code.should == 204
-    User::Data.where(:uid=>impossible_uid).should be_empty
+    User::Data.where(:uid => impossible_uid).should be_empty
 
     # you don't want the admin user to record a visit that's wasn't really made by the "viewed as" user
     visit '/api/my/status'
     page.status_code.should == 200
-    User::Visit.where(:uid=>'4').should be_empty
+    User::Visit.where(:uid => '4').should be_empty
 
     # you don't want the admin user to delete an existing "viewed as" user's data row
     viewed_user_uid = "2040"
-    User::Data.where(:uid=>viewed_user_uid).should_not be_empty
+    User::Data.where(:uid => viewed_user_uid).should_not be_empty
     suppress_rails_logging {
       act_as_user "2040"
     }
     page.driver.post '/api/my/opt_out'
     page.status_code.should == 403
-    viewed_user = User::Data.where(:uid=>viewed_user_uid).first
+    viewed_user = User::Data.where(:uid => viewed_user_uid).first
     viewed_user.should_not be_nil
     viewed_user.uid.should == viewed_user_uid
   end
@@ -193,16 +193,24 @@ feature "act_as_user" do
     response["items"].empty?.should be_truthy
   end
 
-  scenario "make sure you cannot act as an invalid user" do
-    Cache::UserCacheWarmer.stub(:warm).and_return(nil)
-    invalid_uid = "89923458987947"
-    login_with_cas "238382"
-    suppress_rails_logging {
-      act_as_user invalid_uid
-    }
-    visit "/api/my/status"
-    response = JSON.parse(page.body)
-    response["isLoggedIn"].should be_truthy
-    response["uid"].should == "238382"
+  context "with an invalid user" do
+    before do
+      fake_uid_proxy = CalnetCrosswalk::ByUid.new
+      allow(fake_uid_proxy).to receive(:lookup_ldap_uid).and_return(nil)
+      allow(CalnetCrosswalk::ByUid).to receive(:new).and_return(fake_uid_proxy)
+    end
+    scenario "make sure you cannot act as an invalid user" do
+      Cache::UserCacheWarmer.stub(:warm).and_return(nil)
+      invalid_uid = "89923458987947"
+      login_with_cas "238382"
+      suppress_rails_logging {
+        act_as_user invalid_uid
+      }
+      visit "/api/my/status"
+      response = JSON.parse(page.body)
+      response["isLoggedIn"].should be_truthy
+      response["uid"].should == "238382"
+    end
   end
 end
+
