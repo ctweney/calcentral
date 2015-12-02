@@ -1,4 +1,4 @@
-describe CalnetCrosswalk::Proxy do
+describe CalnetCrosswalk::ByUid do
 
   shared_examples 'a proxy that returns data' do
     it 'returns data with the expected structure' do
@@ -24,7 +24,7 @@ describe CalnetCrosswalk::Proxy do
   end
 
   context 'mock proxy' do
-    let(:proxy) { CalnetCrosswalk::Proxy.new(user_id: '61889', fake: true) }
+    let(:proxy) { CalnetCrosswalk::ByUid.new(user_id: '61889', fake: true) }
     let(:feed) { proxy.get[:feed] }
     it_behaves_like 'a proxy that returns data'
     it 'can be overridden to return errors' do
@@ -36,7 +36,7 @@ describe CalnetCrosswalk::Proxy do
   end
 
   context 'real proxy', testext: true do
-    let(:proxy) { CalnetCrosswalk::Proxy.new(user_id: '61889', fake: false) }
+    let(:proxy) { CalnetCrosswalk::ByUid.new(user_id: '61889', fake: false) }
     let(:feed) { proxy.get[:feed] }
     it_behaves_like 'a proxy that returns data'
     include_context 'looking up ids'

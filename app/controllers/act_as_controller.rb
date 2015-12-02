@@ -47,9 +47,17 @@ class ActAsController < ApplicationController
     end
 
     # Ensure uid is in our database
-    if CampusOracle::Queries.find_people_by_uid(act_as_uid).blank?
-      logger.warn "ACT-AS: User #{current_user.real_user_id} FAILED to login to #{act_as_uid}, act_as_uid not found"
-      return false
+    if Settings.features.cs_profile
+      ldap_uid = CalnetCrosswalk::ByUid.new(user_id: act_as_uid).lookup_ldap_uid
+      if ldap_uid.blank?
+        logger.warn "ACT-AS: User #{current_user.real_user_id} FAILED to login to #{act_as_uid}, act_as_uid not found"
+        return false
+      end
+    else
+      if CampusOracle::Queries.find_people_by_uid(act_as_uid).blank?
+        logger.warn "ACT-AS: User #{current_user.real_user_id} FAILED to login to #{act_as_uid}, act_as_uid not found"
+        return false
+      end
     end
     true
   end

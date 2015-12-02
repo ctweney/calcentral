@@ -19,9 +19,9 @@ describe 'MyTasks::Merged' do
     @fake_canvas_todo_proxy = Canvas::Todo.new({fake: true})
     @fake_canvas_courses = Canvas::UserCourses.new({fake: true}).courses
     @fake_campus_solutions_checklist_proxy = CampusSolutions::Checklist.new({fake: true})
-    @fake_calnet_crosswalk_proxy = CalnetCrosswalk::Proxy.new({fake: true, user_id: '12345'})
+    @fake_calnet_crosswalk_proxy = CalnetCrosswalk::ByUid.new({fake: true, user_id: '12345'})
     allow(CampusSolutions::Checklist).to receive(:new).and_return(@fake_campus_solutions_checklist_proxy)
-    allow(CalnetCrosswalk::Proxy).to receive(:new).and_return(@fake_calnet_crosswalk_proxy)
+    allow(CalnetCrosswalk::ByUid).to receive(:new).and_return(@fake_calnet_crosswalk_proxy)
   end
 
   context 'pre-recorded fake Google and Canvas proxy feeds using the server\'s timezone' do
