@@ -28,12 +28,14 @@ module HubEdos
 
     def transform_address_keys(response)
       # this should really be done in the Integration Hub, but they won that argument due to time constraints.
-      response['studentResponse']['students']['students'].each do |student|
-        if student['addresses'].present?
-          student['addresses'].each do |address|
-            address['state'] = address.delete('stateCode')
-            address['postal'] = address.delete('postalCode')
-            address['country'] = address.delete('countryCode')
+      if response['studentResponse'].present? && response['studentResponse']['students'].present?
+        response['studentResponse']['students']['students'].each do |student|
+          if student['addresses'].present?
+            student['addresses'].each do |address|
+              address['state'] = address.delete('stateCode')
+              address['postal'] = address.delete('postalCode')
+              address['country'] = address.delete('countryCode')
+            end
           end
         end
       end
@@ -42,10 +44,12 @@ module HubEdos
 
     def redact_sensitive_keys(response)
       # more stuff the Integration Hub should be doing, but the team doesn't have time for.
-      response['studentResponse']['students']['students'].each do |student|
-        SENSITIVE_KEYS.each do |key|
-          if student[key].present?
-            student[key].delete_if { |k| k['uiControl'].present? && k['uiControl']['code'] == 'N' }
+      if response['studentResponse'].present? && response['studentResponse']['students'].present?
+        response['studentResponse']['students']['students'].each do |student|
+          SENSITIVE_KEYS.each do |key|
+            if student[key].present?
+              student[key].delete_if { |k| k['uiControl'].present? && k['uiControl']['code'] == 'N' }
+            end
           end
         end
       end
@@ -58,8 +62,10 @@ module HubEdos
         return response['studentResponse']['students']['students'][0]
       end
       result = {}
-      response['studentResponse']['students']['students'][0].keys.each do |field|
-        result[field] = response['studentResponse']['students']['students'][0][field] if include_fields.include?(field)
+      if response['studentResponse'].present? && response['studentResponse']['students'].present?
+        response['studentResponse']['students']['students'][0].keys.each do |field|
+          result[field] = response['studentResponse']['students']['students'][0][field] if include_fields.include?(field)
+        end
       end
       result
     end

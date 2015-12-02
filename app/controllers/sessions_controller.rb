@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
     # Save crosswalk some work by caching critical IDs if they were asserted to us via SAML.
     if auth.respond_to?(:extra)
       logger.warn "Omniauth extra from SAML = #{auth.extra.inspect}"
-      crosswalk = CalnetCrosswalk::Proxy.new(user_id: auth_uid)
+      crosswalk = CalnetCrosswalk::ByUid.new(user_id: auth_uid)
       sid = auth.extra['berkeleyEduStuID']
       cs_id = auth.extra['berkeleyEduCSID']
       if sid.present?

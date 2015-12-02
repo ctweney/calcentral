@@ -74,14 +74,18 @@ module CalcentralConfig
   end
 
   def update_rails_logger_level(new_level)
-    old_level = Rails.logger.level
     if invalid_logger_level? new_level
       Rails.logger.warn "The new logger level is invalid: #{new_level}"
-    elsif new_level == old_level
-      Rails.logger.warn "No change to logger level: #{Log4r::LNAMES[Rails.logger.level]}"
     else
-      Rails.logger.level = new_level
-      Rails.logger.warn "Logger level changed (old -> new): #{Log4r::LNAMES[old_level]} -> #{Log4r::LNAMES[Rails.logger.level]}"
+      Rails.logger.outputters.each do |outputter|
+        old_level = outputter.level
+        if old_level == new_level
+          Rails.logger.warn "No change to level on logger output #{outputter.name}: #{Log4r::LNAMES[old_level]}"
+        else
+          outputter.level = new_level
+          Rails.logger.warn "Logger output #{outputter.name} level changed (old -> new): #{Log4r::LNAMES[old_level]} -> #{Log4r::LNAMES[outputter.level]}"
+        end
+      end
     end
   end
 

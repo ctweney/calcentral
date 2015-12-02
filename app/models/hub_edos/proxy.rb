@@ -61,7 +61,12 @@ module HubEdos
         }
       else
         logger.info "Fake = #{@fake}; Making request to #{url} on behalf of user #{@uid}; cache expiration #{self.class.expires_in}"
-        response = get_response(url, request_options)
+        opts = request_options.merge({
+                                       on_error: {
+                                         rescue_status: 404
+                                       }
+                                     })
+        response = get_response(url, opts)
         logger.debug "Remote server status #{response.code}, Body = #{response.body.force_encoding('UTF-8')}"
         feed = build_feed response
         {

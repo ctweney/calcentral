@@ -29,10 +29,6 @@ module CalnetCrosswalk
       json
     end
 
-    def mock_request
-      super.merge(uri_matching: "#{@settings.base_url}/#{@uid}")
-    end
-
     def get
       if @uid.blank? && !@fake
         logger.error "Crosswalk called with empty UID!"
@@ -63,13 +59,10 @@ module CalnetCrosswalk
       }
     end
 
-    def url
-      "#{@settings.base_url}/#{@uid}"
-    end
-
     def request_options
       {
-        digest_auth: {username: @settings.username, password: @settings.password}
+        digest_auth: {username: @settings.username, password: @settings.password},
+        on_error: {rescue_status: 404}
       }
     end
 
@@ -94,7 +87,7 @@ module CalnetCrosswalk
         id = nil
         response = get
         if response[:errored]
-          raise Errors::ProxyError.new "Lookup of #{id_type} for #{@uid} from Crosswalk had an error"
+          return nil
         end
         feed = response[:feed]
         if feed.present?
@@ -104,6 +97,21 @@ module CalnetCrosswalk
               break
             end
           end
+        end
+        id
+      end
+    end
+
+    def lookup_ldap_uid
+      self.class.smart_fetch_from_cache({id: "#{@uid}/CALNET_UID"}) do
+        id = nil
+        response = get
+        if response[:errored]
+          return nil
+        end
+        feed = response[:feed]
+        if feed.present?
+          id = feed['Person']['uid']
         end
         id
       end

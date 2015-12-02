@@ -15,32 +15,44 @@ module User
       if is_cs_profile_feature_enabled
         @edo_attributes ||= HubEdos::UserAttributes.new(user_id: @uid).get
       end
-      @default_name ||= get_campus_attribute('person_name')
+      @default_name ||= get_campus_attribute('person_name', :string)
       @first_login_at ||= @calcentral_user_data ? @calcentral_user_data.first_login_at : nil
-      @first_name ||= get_campus_attribute('first_name') || ''
-      @last_name ||= get_campus_attribute('last_name') || ''
+      @first_name ||= get_campus_attribute('first_name', :string) || ''
+      @last_name ||= get_campus_attribute('last_name', :string) || ''
       @override_name ||= @calcentral_user_data ? @calcentral_user_data.preferred_name : nil
-      @student_id = get_campus_attribute('student_id')
+      @student_id = get_campus_attribute('student_id', :numeric_string)
     end
 
     # split brain until SIS GoLive5 makes registration data available
-    def get_campus_attribute(field)
-      value = nil
-      if is_sis_profile_visible? && @edo_attributes[:noStudentId].blank?
-        value = @edo_attributes[field.to_sym]
+    def get_campus_attribute(field, format)
+      if is_sis_profile_visible? && @edo_attributes[:noStudentId].blank? && (edo_attribute = @edo_attributes[field.to_sym])
+        begin
+          validated_edo_attribute = validate_attribute(edo_attribute, format)
+        rescue
+          logger.error "EDO attribute #{field} failed validation for UID #{@uid}: expected a #{format}, got #{edo_attribute}"
+        end
       end
-      if value.nil?
-        value = @oracle_attributes[field]
+      validated_edo_attribute || @oracle_attributes[field]
+    end
+
+    def validate_attribute(value, format)
+      case format
+        when :string
+          raise ArgumentError unless value.is_a?(String) && value.present?
+        when :numeric_string
+          raise ArgumentError unless value.is_a?(String) && Integer(value, 10)
       end
       value
     end
 
-    # special-case brain split for roles
+    # Conservative merge of roles from EDO
+    WHITELISTED_EDO_ROLES = [:student]
+
     def get_campus_roles
       oracle_roles = (@oracle_attributes && @oracle_attributes[:roles]) || {}
       edo_roles = (@edo_attributes && @edo_attributes[:roles]) || {}
-      if is_sis_profile_visible?
-        oracle_roles.merge edo_roles
+      if is_sis_profile_visible? && edo_roles.respond_to?(:slice)
+        oracle_roles.merge edo_roles.slice(*WHITELISTED_EDO_ROLES)
       else
         oracle_roles
       end
@@ -156,7 +168,7 @@ module User
         :roles => roles,
         :uid => @uid,
         :sid => @student_id,
-        :campusSolutionsID => get_campus_attribute('campus_solutions_id'),
+        :campusSolutionsID => get_campus_attribute('campus_solutions_id', :string),
         :isCampusSolutionsStudent => is_campus_solutions_student?,
         :showSisProfileUI => is_sis_profile_visible?
       }
