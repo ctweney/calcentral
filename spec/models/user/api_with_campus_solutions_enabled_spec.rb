@@ -5,7 +5,7 @@ describe User::Api do
     @default_name = "Joe Default"
     HubEdos::UserAttributes.stub(:new).and_return(double(get: {
       :person_name => @default_name,
-      :student_id => 1234567890,
+      :student_id => '1234567890',
       :campus_solutions_id => 'CC12345678',
       :roles => {
         :student => true,
@@ -42,7 +42,7 @@ describe User::Api do
     user_data[:preferred_name].should == @default_name
     user_data[:hasCanvasAccount].should_not be_nil
     user_data[:isCalendarOptedIn].should_not be_nil
-    user_data[:sid].should == 1234567890
+    user_data[:sid].should == '1234567890'
     user_data[:campusSolutionsID].should == 'CC12345678'
     user_data[:isCampusSolutionsStudent].should be_truthy
     user_data[:showSisProfileUI].should be_truthy
@@ -53,7 +53,7 @@ describe User::Api do
         double(
         get: {
           :person_name => @default_name,
-          :campus_solutions_id => 12345678,    # note: 8-digit ID means legacy
+          :campus_solutions_id => '12345678',    # note: 8-digit ID means legacy
           :roles => {
             :student => true,
             :exStudent => false,
@@ -140,45 +140,122 @@ describe User::Api do
     expect(user_data[:hasAcademicsTab]).to eq false
   end
 
-  describe "my finances tab" do
-    let(:student_roles) do
+  describe 'my finances tab' do
+    let(:oracle_roles) do
       {
         :active   => { :student => true,  :exStudent => false, :faculty => false, :staff => false },
         :expired  => { :student => false, :exStudent => true,  :faculty => false, :staff => false },
         :non      => { :student => false, :exStudent => false, :faculty => false, :staff => true },
       }
     end
+    let(:edo_roles) do
+      {
+        active: { student: true },
+        expired: {},
+        non: {},
+      }
+    end
     before do
-      HubEdos::UserAttributes.stub(:new).and_return(double(get: {
-        roles: test_roles
-      }))
+      allow(CampusOracle::UserAttributes).to receive(:new).and_return double(get_feed: {
+        roles: oracle_roles[test_roles]
+      })
+      allow(HubEdos::UserAttributes).to receive(:new).and_return double(get: {
+        roles: edo_roles[test_roles]
+      })
     end
     subject {User::Api.new(@random_id).get_feed[:hasFinancialsTab]}
     context 'an active student' do
-      let(:test_roles) {student_roles[:active]}
+      let(:test_roles) {:active}
       it {should be_truthy}
     end
     context 'a non-student' do
-      let(:test_roles) {student_roles[:non]}
+      let(:test_roles) {:non}
       it {should be_falsey}
     end
     context 'an ex-student' do
-      let(:test_roles) {student_roles[:expired]}
+      let(:test_roles) {:expired}
       it {should be_truthy}
     end
   end
 
-  it "should not explode when HubEdos returns empty feeds" do
-    HubEdos::UserAttributes.stub(:new).and_return(double(get: {
-    }))
-    fake_instructor_proxy = CampusOracle::UserCourses::HasInstructorHistory.new({:fake => true})
-    fake_instructor_proxy.stub(:has_instructor_history?).and_return(false)
-    CampusOracle::UserCourses::HasInstructorHistory.stub(:new).and_return(fake_instructor_proxy)
-    fake_student_proxy = CampusOracle::UserCourses::HasStudentHistory.new({:fake => true})
-    fake_student_proxy.stub(:has_student_history?).and_return(false)
-    CampusOracle::UserCourses::HasStudentHistory.stub(:new).and_return(fake_student_proxy)
-    user_data = User::Api.new("904715").get_feed
-    user_data[:hasAcademicsTab].should_not be_truthy
+  context 'HubEdos errors', if: CampusOracle::Queries.test_data? do
+    let(:uid) { '1151855' }
+    let(:feed) { User::Api.new(uid).get_feed }
+
+    before do
+      allow(HubEdos::UserAttributes).to receive(:new).and_return double(get: badly_behaved_edo_attributes)
+    end
+
+    let(:expected_values_from_campus_oracle) {
+      {
+        first_name: 'Eugene V',
+        last_name: 'Debs',
+        preferred_name: 'Eugene V Debs',
+        fullName: 'Eugene V Debs',
+        uid: '1151855',
+        sid: '18551926',
+        isCampusSolutionsStudent: false,
+        roles: {
+          student: true,
+          registered: true,
+          exStudent: false,
+          faculty: false,
+          staff: false,
+          guest: false,
+          concurrentEnrollmentStudent: false,
+          expiredAccount: false
+        }
+      }
+    }
+
+    shared_examples 'handling bad behavior' do
+      it 'should fall back to campus Oracle' do
+        expect(feed).to include expected_values_from_campus_oracle
+      end
+    end
+
+    context 'empty response' do
+      let(:badly_behaved_edo_attributes) { {} }
+      include_examples 'handling bad behavior'
+    end
+
+    context 'ID lookup errors' do
+      let(:badly_behaved_edo_attributes) do
+        {
+          student_id: {
+            body: 'An unknown server error occurred',
+            statusCode: 503
+          }
+        }
+      end
+      include_examples 'handling bad behavior'
+    end
+
+    context 'name lookup errors' do
+      let(:badly_behaved_edo_attributes) do
+        {
+          first_name: nil,
+          last_name: nil,
+          person_name: {
+            body: 'An unknown server error occurred',
+            statusCode: 503
+          }
+        }
+      end
+      include_examples 'handling bad behavior'
+    end
+
+    context 'role lookup errors' do
+      let(:badly_behaved_edo_attributes) do
+        {
+          roles: {
+            body: 'An unknown server error occurred',
+            statusCode: 503
+          }
+        }
+      end
+      include_examples 'handling bad behavior'
+    end
   end
 
   context "proper cache handling" do
