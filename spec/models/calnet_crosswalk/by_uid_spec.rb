@@ -11,14 +11,14 @@ describe CalnetCrosswalk::ByUid do
     context 'looking up cs id' do
       subject { proxy.lookup_campus_solutions_id }
       it 'should return the CS ID' do
-        expect(subject).to eq '11667051'
+        expect(subject).to be
       end
     end
 
     context 'looking up student id' do
       subject { proxy.lookup_student_id }
       it 'should return the Student ID' do
-        expect(subject).to eq '11667051'
+        expect(subject).to be
       end
     end
   end
@@ -36,7 +36,7 @@ describe CalnetCrosswalk::ByUid do
   end
 
   context 'real proxy', testext: true do
-    let(:proxy) { CalnetCrosswalk::ByUid.new(user_id: '61889', fake: false) }
+    let(:proxy) { CalnetCrosswalk::ByUid.new(user_id: '300940', fake: false) }
     let(:feed) { proxy.get[:feed] }
     it_behaves_like 'a proxy that returns data'
     include_context 'looking up ids'
