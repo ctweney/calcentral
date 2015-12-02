@@ -273,9 +273,9 @@ cache:
     CampusSolutions::Translate: <%= 24.hours %>
     CampusSolutions::DashboardUrl: <%= 29.days %>
 
-    CalnetCrosswalk::Proxy: <%= 29.days %>
-    CalnetCrosswalk::ByUid: <%= 29.days %>
-    CalnetCrosswalk::BySid: <%= 29.days %>
+    CalnetCrosswalk::Proxy: <%= 24.hours %>
+    CalnetCrosswalk::ByUid: <%= 24.hours %>
+    CalnetCrosswalk::BySid: <%= 24.hours %>
 
 # Cache warmer settings
 cache_warmer:
