@@ -2,6 +2,7 @@ module HubEdos
   class WorkExperience < Proxy
 
     include Cache::UserCacheExpiry
+    include ResponseHandler
 
     def initialize(options = {})
       super(Settings.hub_edos_proxy, options)
@@ -18,10 +19,10 @@ module HubEdos
 
     def build_feed(response)
       resp = parse_response response
-      if resp['studentResponse'].present? && resp['studentResponse']['students'].present? && resp['studentResponse']['students'].length > 0
+      students = get_students(resp)
+      if students.any? && students[0]['workExperiences'].present?
         {
-          # yes, the array structure really is this weird.
-          'workExperiences' => response.parsed_response['studentResponse']['students']['students'][0]['workExperiences']['workExperiences']
+          'workExperiences' => students[0]['workExperiences']['workExperiences']
         }
       else
         {}
