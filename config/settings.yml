@@ -371,6 +371,7 @@ ui_selenium:
   googleTaskTimeout: 12
   pageEventTimeout: 3
   pageLoadTimeout: 12
+  campus_solutions_timeout: 6
   liveUpdateTimeoutDelta: 180
   academicsTimeout: 20
   canvasUpdateTimeout: 60

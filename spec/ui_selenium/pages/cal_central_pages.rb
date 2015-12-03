@@ -43,9 +43,10 @@ module CalCentralPages
   image(:finaid_status_alert_icon, :xpath => '//li[@data-ng-if="countUndatedFinaid > 0"]//i[@class="cc-left fa fa-exclamation-circle cc-icon-red"]')
   span(:finaid_status_alert_count, :xpath => '//li[@data-ng-if="countUndatedFinaid > 0"]//span[@data-ng-bind="countUndatedFinaid"]')
 
-  # Settings, Log Out
+  # Gear - Settings, Profile, Log Out
   link(:gear_link, :xpath => '//i[@class="fa fa-cog"]')
   button(:settings_link, :xpath => '//button[@data-ng-click="api.popover.clickThrough(\'Gear - Settings\');api.util.redirect(\'settings\')"]')
+  button(:profile_link, :xpath => '//button[contains(text(),"Profile")]')
   button(:logout_link, :xpath => '//button[contains(text(),"Log out")]')
 
   # Footer
@@ -83,7 +84,7 @@ module CalCentralPages
   end
 
   def show_unread_email
-    if !unread_email_heading_element.visible?
+    unless unread_email_heading_element.visible?
       email_badge
       unread_email_heading_element.when_visible(timeout=WebDriverUtils.page_event_timeout)
     end
@@ -122,6 +123,13 @@ module CalCentralPages
     logger.info('Clicking the link to the Settings page')
     WebDriverUtils.wait_for_page_and_click gear_link_element
     WebDriverUtils.wait_for_element_and_click settings_link_element
+  end
+
+  def click_profile_link(driver)
+    logger.info 'Clicking Profile link'
+    WebDriverUtils.wait_for_page_and_click gear_link_element
+    WebDriverUtils.wait_for_element_and_click profile_link_element
+    CalCentralPages::MyProfilePage::MyProfileBasicInfoCard.new driver
   end
 
   def click_logout_link
