@@ -58,6 +58,10 @@ class WebDriverUtils
     Settings.ui_selenium.pageLoadTimeout
   end
 
+  def self.campus_solutions_timeout
+    Settings.ui_selenium.campus_solutions_timeout
+  end
+
   def self.academics_timeout
     Settings.ui_selenium.academicsTimeout
   end
@@ -151,11 +155,6 @@ class WebDriverUtils
       end
       driver.switch_to.window driver.window_handles.first
     end
-  end
-
-  # Temporary timeout
-  def self.campus_solutions_timeout
-    Settings.ui_selenium.campus_solutions_timeout
   end
 
 end
