@@ -40,7 +40,7 @@ module HubEdos
         internal_response = self.class.smart_fetch_from_cache(id: instance_key) do
           get_internal
         end
-        if internal_response[:noStudentId] || internal_response[:statusCode] < 400
+        if internal_response[:noStudentId] || internal_response[:studentNotFound] || internal_response[:statusCode] < 400
           internal_response
         else
           internal_response.merge({
@@ -55,7 +55,7 @@ module HubEdos
     def get_internal
       @campus_solutions_id ||= lookup_campus_solutions_id
       if @campus_solutions_id.nil?
-        logger.info "Lookup of campus_solutions_id for uid #{@uid} failed, cannot call Campus Solutions API"
+        logger.warn "Lookup of campus_solutions_id for uid #{@uid} failed, cannot call Campus Solutions API"
         {
           noStudentId: true
         }
@@ -68,10 +68,19 @@ module HubEdos
                                      })
         response = get_response(url, opts)
         logger.debug "Remote server status #{response.code}, Body = #{response.body.force_encoding('UTF-8')}"
+        if response.code == 404
+          if response['StudentResponse'] && response['StudentResponse']['message'] == 'Student Not Found'
+            student_not_found = true
+            logger.warn "Student Not Found for UID #{@uid}, Campus Solutions ID #{@campus_solutions_id}"
+          else
+            logger.error "Unexpected 404 response for UID #{@uid}, Campus Solutions ID #{@campus_solutions_id}: #{response}"
+          end
+        end
         feed = build_feed response
         {
           statusCode: response.code,
-          feed: feed
+          feed: feed,
+          studentNotFound: student_not_found
         }
       end
     end

@@ -18,10 +18,10 @@ module HubEdos
 
       [HubEdos::Contacts, HubEdos::Demographics, HubEdos::Affiliations].each do |proxy|
         hub_response = proxy.new({user_id: @uid}).get
-        if hub_response[:noStudentId] || hub_response[:statusCode] > 400
+        if hub_response[:errored]
           merged[:statusCode] = 500
           merged[:errored] = true
-          logger.error("Got errors in merged student feed on #{proxy} for uid #{@uid}")
+          logger.error("Got errors in merged student feed on #{proxy} for uid #{@uid} with response #{hub_response}")
         else
           merged[:feed][:student].merge!(hub_response[:feed]['student'])
         end
