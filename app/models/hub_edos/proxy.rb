@@ -57,6 +57,7 @@ module HubEdos
       if @campus_solutions_id.nil?
         logger.warn "Lookup of campus_solutions_id for uid #{@uid} failed, cannot call Campus Solutions API"
         {
+          feed: empty_feed,
           noStudentId: true
         }
       else
@@ -119,6 +120,10 @@ module HubEdos
 
     def build_feed(response)
       parse_response response
+    end
+
+    def empty_feed
+      {}
     end
 
   end

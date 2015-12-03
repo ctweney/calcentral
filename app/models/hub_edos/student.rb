@@ -27,6 +27,12 @@ module HubEdos
       }
     end
 
+    def empty_feed
+      {
+        'student' => {}
+      }
+    end
+
     def transform_address_keys(response)
       # TODO: this should really be done in the Integration Hub
       get_students(response).each do |student|
