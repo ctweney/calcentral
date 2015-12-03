@@ -42,6 +42,7 @@ module CalnetCrosswalk
       if internal_response[:noStudentId] || internal_response[:statusCode] < 400
         internal_response
       else
+        logger.error "Got Crosswalk error for UID #{@uid} with response #{internal_response}"
         {
           errored: true
         }
