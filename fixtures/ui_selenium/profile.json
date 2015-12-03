@@ -1,150 +1,150 @@
 {
-    "users": [
-        {
-            "username": "username",
-            "password": "password",
-            "basicInfo": {
-                "uid": "999999",
-                "sid": "99999999",
-                "officialName":  {
-                    "firstName": "Oski",
-                    "lastName": "Bear"
-                },
-                "preferredName":  {
-                    "option1": "Oskirrific",
-                    "option2": "Oskitrocious",
-                    "maxChar": "Oskicalifragilisticexpialidocious",
-                    "specChar": "Öskié"
-                }
-            },
-            "contactInfo": {
-                "phones": [
-                    {
-                        "type": "Mobile",
-                        "test": "adding",
-                        "phoneNumberInput": "510-555-1234",
-                        "phoneNumberDisplay": "510/555-1234",
-                        "phoneExt": "2"
-                    },
-                    {
-                        "type": "Home/Permanent",
-                        "test": "editing",
-                        "phoneNumberInput": "44 01698 12345",
-                        "phoneNumberDisplay": "44 01698 12345"
-                    },
-                    {
-                        "type": "Local",
-                        "test": "editing",
-                        "phoneNumberInput": "123456789012345678901234567890",
-                        "phoneNumberDisplay": "123456789012345678901234",
-                        "phoneExt": "1234567890"
-                    }
-                ],
-                "addresses": [
-                    {
-                        "country": "Belgium",
-                        "required": "Street Name, Street Number",
-                        "inputs": [
-                            {
-                                "index": 0,
-                                "req": true,
-                                "label": "Street Name",
-                                "text": "Brügge Boulevard",
-                                "max": 55
-                            },
-                            {
-                                "index": 1,
-                                "req": true,
-                                "label": "Street Number",
-                                "text": "2850",
-                                "max": 55
-                            },
-                            {
-                                "index": 2,
-                                "label": "Box Number",
-                                "text": "1A",
-                                "max": 6
-                            },
-                            {
-                                "index": 3,
-                                "label": "Addition",
-                                "text": "Addition",
-                                "max": 6
-                            },
-                            {
-                                "index": 4,
-                                "label": "Postal Code",
-                                "text": "3000",
-                                "max": 12
-                            },
-                            {
-                                "index": 5,
-                                "label": "Town",
-                                "text": "Brussels",
-                                "max": 30
-                            }
-                        ],
-                        "selects": [
-                            {
-                                "index": 6,
-                                "label": "Province",
-                                "option": "Brussels-Capital Region"
-                            }
-                        ]
-                    },
-                    {
-                        "country": "United States",
-                        "inputs": [
-                            {
-                                "index": 0,
-                                "req": true,
-                                "label": "Address 1",
-                                "text": "American Address 1 American Address 1 American Address 1 American Address 1",
-                                "max": 55
-                            },
-                            {
-                                "index": 1,
-                                "req": true,
-                                "label": "Address 2",
-                                "text": "American Address 2¢ American Address 2¢ American Address 2¢ American Address 2¢",
-                                "max": 55
-                            },
-                            {
-                                "index": 2,
-                                "req": true,
-                                "label": "Address 3",
-                                "text": "American Address 3 American Address 3 American Address 3 American Address 3",
-                                "max": 55
-                            },
-                            {
-                                "index": 3,
-                                "label": "City",
-                                "text": "American City American City American City",
-                                "max": 30
-                            },
-                            {
-                                "index": 5,
-                                "label": "ZIP Code",
-                                "text": "20260-6500",
-                                "max": 12
-                            },
-                            {
-                                "index": 6,
-                                "label": "County",
-                                "text": "American County American County American County",
-                                "max": 30
-                            }
-                        ],
-                        "selects": [
-                            {
-                                "index": 4,
-                                "label": "State",
-                                "option": "California"
-                            }
-                        ]
-                    }
-                ]
-            }
+  "users": [
+    {
+      "username": "username",
+      "password": "password",
+      "basicInfo": {
+        "uid": "999999",
+        "sid": "99999999",
+        "officialName": {
+          "firstName": "Oski",
+          "lastName": "Bear"
+        },
+        "preferredName": {
+          "option1": "Oskirrific",
+          "option2": "Oskitrocious",
+          "maxChar": "Oskicalifragilisticexpialidocious",
+          "specChar": "Öskié"
         }
-    ]
+      },
+      "contactInfo": {
+        "phones": [
+          {
+            "type": "Mobile",
+            "test": "adding",
+            "phoneNumberInput": "510-555-1234",
+            "phoneNumberDisplay": "510/555-1234",
+            "phoneExt": "2"
+          },
+          {
+            "type": "Home/Permanent",
+            "test": "editing",
+            "phoneNumberInput": "44 01698 12345",
+            "phoneNumberDisplay": "44 01698 12345"
+          },
+          {
+            "type": "Local",
+            "test": "editing",
+            "phoneNumberInput": "123456789012345678901234567890",
+            "phoneNumberDisplay": "123456789012345678901234",
+            "phoneExt": "1234567890"
+          }
+        ],
+        "addresses": [
+          {
+            "country": "Belgium",
+            "required": "Street Name, Street Number",
+            "inputs": [
+              {
+                "index": 0,
+                "req": true,
+                "label": "Street Name",
+                "text": "Brügge Boulevard",
+                "max": 55
+              },
+              {
+                "index": 1,
+                "req": true,
+                "label": "Street Number",
+                "text": "2850",
+                "max": 55
+              },
+              {
+                "index": 2,
+                "label": "Box Number",
+                "text": "1A",
+                "max": 6
+              },
+              {
+                "index": 3,
+                "label": "Addition",
+                "text": "Addition",
+                "max": 6
+              },
+              {
+                "index": 4,
+                "label": "Postal Code",
+                "text": "3000",
+                "max": 12
+              },
+              {
+                "index": 5,
+                "label": "Town",
+                "text": "Brussels",
+                "max": 30
+              }
+            ],
+            "selects": [
+              {
+                "index": 6,
+                "label": "Province",
+                "option": "Brussels-Capital Region"
+              }
+            ]
+          },
+          {
+            "country": "United States",
+              "inputs": [
+                {
+                  "index": 0,
+                  "req": true,
+                  "label": "Address 1",
+                  "text": "American Address 1 American Address 1 American Address 1 American Address 1",
+                  "max": 55
+                },
+                {
+                  "index": 1,
+                  "req": true,
+                  "label": "Address 2",
+                  "text": "American Address 2¢ American Address 2¢ American Address 2¢ American Address 2¢",
+                  "max": 55
+                },
+                {
+                  "index": 2,
+                  "req": true,
+                  "label": "Address 3",
+                  "text": "American Address 3 American Address 3 American Address 3 American Address 3",
+                  "max": 55
+                },
+                {
+                  "index": 3,
+                  "label": "City",
+                  "text": "American City American City American City",
+                  "max": 30
+                },
+                {
+                  "index": 5,
+                  "label": "ZIP Code",
+                  "text": "20260-6500",
+                  "max": 12
+                },
+                {
+                  "index": 6,
+                  "label": "County",
+                  "text": "American County American County American County",
+                  "max": 30
+                }
+              ],
+              "selects": [
+                {
+                  "index": 4,
+                  "label": "State",
+                  "option": "California"
+                }
+              ]
+            }
+        ]
+      }
+    }
+  ]
 }

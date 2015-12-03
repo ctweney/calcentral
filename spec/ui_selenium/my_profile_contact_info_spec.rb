@@ -36,7 +36,7 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
       before(:all) do
         # Get rid of any existing phone data
         @contact_info_card.delete_all_phones
-        @possible_phone_types = %w(Local, Mobile, Home/Permanent)
+        @possible_phone_types = %w(Local Mobile Home/Permanent)
         @phones = contact_info['phones']
       end
 
