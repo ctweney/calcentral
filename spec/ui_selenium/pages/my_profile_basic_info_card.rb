@@ -51,12 +51,6 @@ module CalCentralPages
       WebDriverUtils.wait_for_element_and_click preferred_name_cancel_button_element
     end
 
-    def add_pref_name(first_name)
-      click_add_pref_name_button
-      enter_preferred_name first_name
-      click_save_pref_name_button
-    end
-
     def edit_pref_name(new_name)
       click_edit_pref_name_button
       enter_preferred_name new_name

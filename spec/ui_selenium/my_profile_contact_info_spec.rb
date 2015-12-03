@@ -1,29 +1,29 @@
 describe 'My Profile Contact Info', :testui => true, :order => :defined do
 
-  if ENV['UI_TEST'] && Settings.ui_selenium.layer != 'production'
+  if ENV['UI_TEST'] && Settings.ui_selenium.layer == 'local'
 
     include ClassLogger
 
     # Load a test data file.  See sample in the ui_selenium fixtures dir.
     test_users = UserUtils.load_profile_test_data
-    student = test_users.find { |user| user['type'] == 'newStudent' }
+    student = test_users.first
     contact_info = student['contactInfo']
     addresses = contact_info['addresses']
 
     before(:all) do
       @driver = WebDriverUtils.launch_browser
-      @driver.manage.window.maximize
       @splash_page = CalCentralPages::SplashPage.new @driver
       @cal_net_page = CalNetAuthPage.new @driver
       @my_dashboard = CalCentralPages::MyDashboardPage.new @driver
       @contact_info_card = CalCentralPages::MyProfileContactInfoCard.new @driver
 
-      @splash_page.log_into_dashboard(@driver, @cal_net_page, student['username'], UserUtils.test_password)
+      @splash_page.log_into_dashboard(@driver, @cal_net_page, student['username'], student['password'])
       @my_dashboard.click_profile_link @driver
       @contact_info_card.click_contact_info
       @contact_info_card.wait_until(WebDriverUtils.page_load_timeout) do
         @contact_info_card.phone_label_element.visible?
         @contact_info_card.email_label_element.visible?
+        @contact_info_card.address_label_element.visible?
       end
     end
 
@@ -167,27 +167,27 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
         end
         it 'requires that the email address include the @ and . characters' do
           @contact_info_card.add_email('foo', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address include the . character' do
           @contact_info_card.add_email('foo@bar', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address include the @ character' do
           @contact_info_card.add_email('foo.bar', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address contain at least one . following the @' do
           @contact_info_card.add_email('foo.bar@foo', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address not contain @ as the first character' do
           @contact_info_card.add_email('@foo.bar', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'requires that the email address not contain . as the last character' do
           @contact_info_card.add_email('foo@bar.', true)
-          @contact_info_card.email_validation_error_element.when_visible(WebDriverUtils.page_event_timeout)
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'Invalid email address' }
         end
         it 'allows a maximum of 70 email address characters to be entered' do
           @contact_info_card.add_email('foobar@foobar.foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoo', true)
@@ -266,17 +266,9 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
 
       describe 'deleting' do
 
-        it 'allows a user to delete an email of type Other if it is not the only email' do
-          # This example requires that a second email be present, which might not be true
-          if @contact_info_card.email_types.include? 'Campus'
-            logger.warn 'Campus email exists, so testing deleting Other email'
-            @contact_info_card.delete_email
-          else
-            logger.warn 'Campus email does not exist, so testing that Other email cannot be deleted'
-            @contact_info_card.click_edit_email
-            WebDriverUtils.wait_for_element_and_click @contact_info_card.delete_email_button_element
-            @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { @contact_info_card.email_validation_error == 'One email Address must be checked as Preferred' }
-          end
+        it 'allows a user to delete an email of type Other' do
+          @contact_info_card.delete_email
+          @contact_info_card.wait_until(WebDriverUtils.page_event_timeout) { !@contact_info_card.email_types.include? 'Other' }
         end
 
       end
@@ -318,6 +310,7 @@ describe 'My Profile Contact Info', :testui => true, :order => :defined do
             @contact_info_card.load_page
             @contact_info_card.edit_address(@local_index, address, address_inputs, address_selects)
             @contact_info_card.verify_address(@local_index, address_inputs, address_selects)
+            sleep 30
           end
           it "requires a user to complete certain fields for an address in #{address['country']}" do
             @contact_info_card.load_page

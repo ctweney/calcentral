@@ -8,12 +8,17 @@ class WebDriverUtils
     # Sometimes browser does not launch successfully, so try twice
     tries ||= 2
     logger.info('Launching browser')
-    if Settings.ui_selenium.webDriver == 'firefox'
-      Selenium::WebDriver.for :firefox
-    elsif Settings.ui_selenium.webDriver == 'chrome'
-      Selenium::WebDriver.for :chrome
-    elsif Settings.ui_selenium.webDriver == 'safari'
-      Selenium::WebDriver.for :safari
+    case Settings.ui_selenium.webDriver
+      when 'firefox'
+        driver = Selenium::WebDriver.for :firefox
+        driver.manage.window.maximize
+        driver
+      when 'chrome'
+        Selenium::WebDriver.for :chrome
+      when 'safari'
+        Selenium::WebDriver.for :safari
+      else
+        logger.error 'Unsupported webdriver'
     end
   rescue => e
     logger.error('Browser failed to launch')

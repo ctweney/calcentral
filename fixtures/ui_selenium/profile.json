@@ -1,8 +1,8 @@
 {
     "users": [
         {
-            "type": "newStudent",
             "username": "username",
+            "password": "password",
             "basicInfo": {
                 "uid": "999999",
                 "sid": "99999999",
@@ -145,14 +145,6 @@
                     }
                 ]
             }
-        },
-        {
-            "type": "existingStudent",
-            "username": "username"
-        },
-        {
-            "type": "nonStudent",
-            "username": "username"
         }
     ]
 }

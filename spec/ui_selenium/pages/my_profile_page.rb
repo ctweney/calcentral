@@ -14,10 +14,6 @@ module CalCentralPages
     link(:work_experience_link, :text => 'Work Experience')
     link(:honors_and_awards_link, :text => 'Academic Honors and Awards')
 
-    def load_page
-      navigate_to "#{WebDriverUtils.base_url}/profile"
-    end
-
     def click_contact_info
       WebDriverUtils.wait_for_element_and_click contact_info_link_element
     end

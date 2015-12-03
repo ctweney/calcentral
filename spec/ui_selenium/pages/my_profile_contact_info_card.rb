@@ -112,13 +112,16 @@ module CalCentralPages
     end
 
     def delete_phone(index)
-      logger.info 'Deleting a phone'
-      phone = phone_elements[index]
-      click_cancel_phone if cancel_phone_button_element.visible?
+      phones = phone_elements.length
+      logger.info "Deleting one of #{phones} phones"
+      if cancel_phone_button_element.visible?
+        click_cancel_phone
+        cancel_phone_button_element.when_not_visible WebDriverUtils.page_event_timeout
+      end
       click_edit_phone index
       click_delete_phone
-      phone.when_not_present WebDriverUtils.page_load_timeout
-      phone_label_element.when_visible WebDriverUtils.campus_solutions_timeout
+      sleep WebDriverUtils.page_event_timeout
+      wait_until(WebDriverUtils.page_event_timeout) { phone_elements.length == phones - 1 }
     end
 
     def delete_all_phones
@@ -134,6 +137,7 @@ module CalCentralPages
 
     # Preferred flag defaults to false
     def verify_phone(phone, pref = false)
+      add_phone_form_element.when_not_present WebDriverUtils.page_event_timeout
       sleep WebDriverUtils.campus_solutions_timeout
       wait_until(WebDriverUtils.page_load_timeout, "Phone type '#{phone['type']}' is not present") do
         phone_types.include? phone['type']
@@ -163,7 +167,7 @@ module CalCentralPages
     div(:email_label, :xpath => '//div[text()="Email"]')
     elements(:email, :div, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]')
     elements(:email_type, :div, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]//strong')
-    elements(:email_address, :span, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]//span[@data-ng-bind="item.emailAddress"]')
+    elements(:email_address, :span, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//div[@data-ng-repeat="item in items.content"]//div[@data-ng-bind="item.emailAddress"]')
 
     button(:add_email_button, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//button[@data-ng-click="showAdd()"]')
     button(:save_email_button, :xpath => '//div[@data-ng-controller="ProfileEmailController"]//button[contains(.,"Save")]')
@@ -199,11 +203,13 @@ module CalCentralPages
 
     def click_add_email
       cancel_email_button if cancel_email_button_element.visible?
+      sleep 2
       WebDriverUtils.wait_for_element_and_click add_email_button_element
     end
 
     def click_edit_email
       cancel_email_button if cancel_email_button_element.visible?
+      sleep 2
       WebDriverUtils.wait_for_element_and_click edit_email_button_element
     end
 
@@ -346,7 +352,7 @@ module CalCentralPages
     end
 
     def clear_address_fields(address, inputs, selections)
-      logger.info 'Removing all input and selections'
+      logger.info 'Removing inputs and selections'
       load_country_form address
       unless inputs.nil?
         inputs.each do |input|
@@ -375,6 +381,7 @@ module CalCentralPages
     end
 
     def trimmed_input(input)
+      # returns the max allowed input in a field regardless of what a user attempts to enter
       input['text'].slice(0..(input['max'] - 1)).strip
     end
 
@@ -424,6 +431,4 @@ module CalCentralPages
     end
 
   end
-
 end
-
