@@ -1,5 +1,5 @@
 <div class="medium-5 columns medium-push-3 cc-page-dashboard-column-b">
-  <div data-ng-include="'widgets/hookup_google_reminder.html'"></div>
+  <div data-ng-include="'widgets/hookup_google_reminder.html'" data-ng-if="api.user.profile.officialBmailAddress"></div>
   <div data-ng-include="'widgets/tasks.html'"></div>
 </div>
 

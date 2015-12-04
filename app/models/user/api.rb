@@ -134,6 +134,7 @@ module User
     def get_feed_internal
       google_mail = User::Oauth2Data.get_google_email(@uid)
       canvas_mail = User::Oauth2Data.get_canvas_email(@uid)
+      official_bmail_address = get_campus_attribute('official_bmail_address', :string)
       current_user_policy = authentication_state.policy
       is_google_reminder_dismissed = User::Oauth2Data.is_google_reminder_dismissed(@uid)
       is_google_reminder_dismissed = is_google_reminder_dismissed && is_google_reminder_dismissed.present?
@@ -162,6 +163,7 @@ module User
         :inEducationAbroadProgram => @oracle_attributes[:education_abroad],
         :googleEmail => google_mail,
         :canvasEmail => canvas_mail,
+        :officialBmailAddress => official_bmail_address,
         :last_name => @last_name,
         :preferred_name => self.preferred_name,
         :roles => roles,

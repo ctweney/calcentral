@@ -7,6 +7,7 @@ describe User::Api do
       :person_name => @default_name,
       :student_id => '1234567890',
       :campus_solutions_id => 'CC12345678',
+      :official_bmail_address => 'foo@foo.com',
       :roles => {
         :student => true,
         :exStudent => false,
@@ -46,6 +47,7 @@ describe User::Api do
     user_data[:campusSolutionsID].should == 'CC12345678'
     user_data[:isCampusSolutionsStudent].should be_truthy
     user_data[:showSisProfileUI].should be_truthy
+    user_data[:officialBmailAddress].should eq 'foo@foo.com'
   end
   context 'with a legacy student' do
     before do

@@ -8,7 +8,7 @@ module CampusOracle
         log_access(connection, connection_handler, name)
         sql = <<-SQL
       select pi.ldap_uid, pi.student_id, pi.ug_grad_flag, trim(pi.first_name) as first_name, trim(pi.last_name) as last_name,
-        pi.person_name, pi.email_address, pi.affiliations, pi.person_type,
+        pi.person_name, pi.email_address, pi.affiliations, pi.person_type, pi.alternateid AS official_bmail_address,
         reg.reg_status_cd, reg.educ_level, reg.admin_cancel_flag, reg.acad_blk_flag, reg.admin_blk_flag,
         reg.fin_blk_flag, reg.reg_blk_flag, reg.tot_enroll_unit, reg.fee_resid_cd, reg.reg_special_pgm_cd, reg.role_cd
       from calcentral_person_info_vw pi
