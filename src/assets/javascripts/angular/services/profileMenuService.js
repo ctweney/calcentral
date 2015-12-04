@@ -18,10 +18,11 @@ angular.module('calcentral.services').factory('profileMenuService', function() {
           'id': 'contact',
           'name': 'Contact Information'
         },
+        /* SISRP-12049 - Hide emergency contact information till after GL3
         {
           'id': 'emergency',
           'name': 'Emergency Contact'
-        },
+        },*/
         {
           'id': 'demographic',
           'name': 'Demographic Information'
